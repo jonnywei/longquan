@@ -1,0 +1,28 @@
+#!/bin/sh
+
+TWITTER_HOME=/home/wjj/haijia
+TWITTER_LOG_HOME=/home/wjj/log
+
+#export LANG=zh_CN.GBK
+#export JAVA_HOME=/usr/local/jdk
+#export PATH=$JAVA_HOME/bin:$PATH
+#CLASSPATH=.:$JAVA_HOME/lib:$JAVA_HOME/lib/tools.jar:$JAVA_HOME/jre/lib/ext/*.jar
+CLASSPATH=.
+
+for i in "$TWITTER_HOME"/lib/*.jar
+do
+    CLASSPATH="$i:$CLASSPATH"
+done
+
+CLASSPATH=$TWITTER_HOME/config:$CLASSPATH
+
+export CLASSPATH
+
+#ARCHIVE_SUFFIX=`date +%Y%m%d-%H%M`
+#mv $TWITTER_LOG_HOME/stdout.log $TWITTER_LOG_HOME/stdout.log.${ARCHIVE_SUFFIX} 
+#mv $TWITTER_LOG_HOME/stderr.log $TWITTER_LOG_HOME/stderr.log.${ARCHIVE_SUFFIX} 
+#mv $TWITTER_LOG_HOME/rmi_gc.log $TWITTER_LOG_HOME/rmi_gc.log.${ARCHIVE_SUFFIX} 
+
+java -server -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -XX:NewSize=20m -XX:PermSize=80m  -XX:MaxPermSize=256m -Xss128K -Xms40m -Xmx1000m -Dsun.rmi.transport.tcp.responseTimeout=5000 -Dsun.rmi.dgc.server.gcInterval=3600000 -XX:+DisableExplicitGC -verbose:GC -Xloggc:$TWITTER_LOG_HOME/rmi_gc.log com.sohu.wap.HaijiaMain   2>&1  
+echo "Start Haijia-Yuche SUCCESS!"
+#java -server   -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -XX:NewSize=1500m -XX:PermSize=80m  -XX:MaxPermSize=256m -Xss128K -Xms6000m -Xmx6000m -Dsun.rmi.transport.tcp.responseTimeout=5000 -Dsun.rmi.dgc.server.gcInterval=3600000 -XX:+DisableExplicitGC -verbose:GC -Xloggc:$TWITTER_LOG_HOME/rmi_gc.log com.chinaren.twitter.innerapi.server.RmiServer 1>$TWITTER_LOG_HOME/stdout.log  2>$TWITTER_LOG_HOME/stderr.log&
