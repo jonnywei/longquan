@@ -37,17 +37,26 @@ public class HaijiaMain
     
     public static void main( String[] args ) throws InterruptedException, IOException
     {
-        String userName = SystemConfigurations.getSystemStringProperty("system.username","411326198509012412")  ;
-        String passwd =SystemConfigurations.getSystemStringProperty("system.password","0901")  ;
+//        String userName = SystemConfigurations.getSystemStringProperty("system.username","411326198509012412")  ;
+//        String passwd =SystemConfigurations.getSystemStringProperty("system.password","0901")  ;
         
         String date = DateUtil.getFetureDay(SystemConfigurations.getSystemIntProperty("system.yueche.date",7));
           
         System.out.println(date);
    
-        doLogin(userName,passwd);
+        for (String accoutId: AccountMap.getInstance().getXueYuanAccountMap().keySet()){
+            XueYuanAccount  xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);
+            if ( xy!=null){
+                doLogin(xy.getUserName(),xy.getPassword());
+                
+                doYuche(date);
+                
+                YueChe.logout();
+            }
         
-        doYuche(date);
+        }
         
+    
         System.out.println("请按任意键退出程序!");
         System.in.read();
       

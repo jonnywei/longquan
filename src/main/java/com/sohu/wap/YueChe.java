@@ -85,7 +85,7 @@ public class YueChe {
 			String imageCode = null;
 			do{
 				try {
-					imageCode = getImgCode2(LOGIN_IMG_URL);
+					imageCode = getImgCode(LOGIN_IMG_URL);
 				} catch (IOException e1) {
 					log.error("get image code error", e1);
 				}
@@ -208,7 +208,7 @@ public class YueChe {
 					System.out.println("选择的车是：" + selectedCar.toString());
 					String imageCode = "";
 					try {
-						imageCode = getImgCode2(BOOKING_IMG_URL);
+						imageCode = getImgCode(BOOKING_IMG_URL);
 					} catch (IOException e1) {
 						log.error("get book image code error", e1);
 						continue;
