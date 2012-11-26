@@ -60,7 +60,8 @@ public class YueChe {
 	public static int BOOK_CAR_SUCCESS = 0;
 	public static int NO_CAR = 1;
 	public static int GET_CAR_ERROR = 2;
-
+	public static int ALREADY_BOOKED_CAR=3;
+	
 	public static int YUCHE_RETRY_TIME = 3;
 
 	/**
@@ -207,7 +208,7 @@ public class YueChe {
 					System.out.println("选择的车是：" + selectedCar.toString());
 					String imageCode = "";
 					try {
-						imageCode = getImgCode(BOOKING_IMG_URL);
+						imageCode = getImgCode2(BOOKING_IMG_URL);
 					} catch (IOException e1) {
 						log.error("get book image code error", e1);
 						continue;
@@ -238,7 +239,7 @@ public class YueChe {
 						continue;
 					}
 
-					// System.out.println(bookResult.toString());
+					 System.out.println(bookResult.toString());
 
 					JSONArray jbResult = new JSONArray(bookResult.getString("d"));
 
@@ -254,8 +255,17 @@ public class YueChe {
 						result = BOOK_CAR_SUCCESS;
 					} else {
 						//TODO 如果今天已经约车车辆
-						System.out.println("book car return error:"+jbResult.getJSONObject(0).getString("OutMSG"));
-						log.error("book car return error:"+jbResult.getJSONObject(0).getString("OutMSG"));
+						String outMsg = jbResult.getJSONObject(0).getString("OutMSG");
+						if ("该日已预约过小时".equals(outMsg)){
+							result = ALREADY_BOOKED_CAR;
+							break;
+						}
+						if("验证码错误！".equals(outMsg)){
+							System.out.println(outMsg+"不计入retry次数");
+							yucheTry--; //验证码错误，不计入retry次数
+						}
+						System.out.println("book car return error:"+outMsg);
+						log.error("book car return error:"+outMsg);
 					}
 
 				}
@@ -342,7 +352,7 @@ public class YueChe {
 
 		url = url + RandomUtil.getJSRandomDecimals();
 
-		String imageCode = "";
+		String imageCode = null;
 		String  uuid =  Util.generateUUID();
 		String fileName = uuid + ".gif"; // 生成唯一的id
 		String destName = uuid + ".jpg";
@@ -401,7 +411,7 @@ public class YueChe {
 
 		System.out.println("请输入验证码\r\n");
 
-		
+		try{
 			BufferedReader  strin2 = new BufferedReader(new FileReader(new File(textImg+".txt")));
 			imageCode = strin2.readLine().trim();
 			imageCode =imageCode.replaceAll("[^0-9a-zA-Z]", "");
@@ -410,6 +420,9 @@ public class YueChe {
 			if(imageCode.length() != 4 ){
 				throw new IOException("scan image code error!");
 			}
+		} catch (Exception ex){
+			log.error("tessecret return null", ex);
+		}
 //		IO.deleteFile(storeAddress);
 
 		return imageCode;
