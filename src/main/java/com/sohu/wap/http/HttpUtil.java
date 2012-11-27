@@ -70,27 +70,27 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * 
+ * 修正为工厂方法
  * httpClient4的实现，争取最高的性能
  * @author jianjunwei
  *
  */
-public class HttpUtil4
+public class HttpUtil
 {
 	
-	private static Logger log = LoggerFactory.getLogger(HttpUtil4.class);
+	private static Logger log = LoggerFactory.getLogger(HttpUtil.class);
 	
 	private static  int TIME_OUT =60000;
 	
 	//设置时间的instance map
-    private static Map<Integer , HttpUtil4>   _instanceWithTimeoutMap = new HashMap<Integer , HttpUtil4>();
+    private static Map<Integer , HttpUtil>   _instanceWithTimeoutMap = new HashMap<Integer , HttpUtil>();
 	
     private static final Pattern META_CHARSET_PATTERN =
 		Pattern.compile("<meta\\s*.*charset\\s*=\\s*[\"']?([^\"\\s]+)[\\s\"';]{1}",Pattern.CASE_INSENSITIVE);
 
-	private  static HttpUtil4 _instance;
+	private  static HttpUtil _instance;
 	
-	private  static HttpUtil4 _instance_haveCookie;
+	private  static HttpUtil _instance_haveCookie;
 	
 	//对象变量
 	private HttpClient httpClient;
@@ -99,7 +99,7 @@ public class HttpUtil4
 	/*
 	 * 
 	 */
-	private HttpUtil4()
+	private HttpUtil()
 	{
 		init(false);
 	}
@@ -108,7 +108,7 @@ public class HttpUtil4
     /*
      * 
      */
-    private HttpUtil4(boolean haveCookie)
+    private HttpUtil(boolean haveCookie)
     {
         init(haveCookie);
     }
@@ -116,7 +116,7 @@ public class HttpUtil4
 	/*
 	 * 
 	 */
-	private HttpUtil4(int timeout)
+	private HttpUtil(int timeout)
 	{
 		init(timeout);
 	}
@@ -206,18 +206,18 @@ public class HttpUtil4
 	 *@param timeout  超时时间单位毫秒
 	 * 
 	 */
-	public static HttpUtil4 getInstance(int timeout)
+	public static HttpUtil getInstance(int timeout)
 	{
 		if(timeout < 0)
 		{
 			timeout = TIME_OUT;
 		}
 		Integer key = Integer.valueOf(timeout);
-		HttpUtil4  _instanceTime = _instanceWithTimeoutMap.get(key);
+		HttpUtil  _instanceTime = _instanceWithTimeoutMap.get(key);
         if (_instanceTime == null) {
-            synchronized (HttpUtil4.class) {
+            synchronized (HttpUtil.class) {
                 if (_instanceTime == null) {
-                    _instanceTime = new HttpUtil4(timeout);
+                    _instanceTime = new HttpUtil(timeout);
                     _instanceWithTimeoutMap.put(key, _instanceTime);
                 }
             }
@@ -234,15 +234,15 @@ public class HttpUtil4
 	 *得到实例 
 	 * 
 	 */
-	public static HttpUtil4 getInstanceHaveCookie()
+	public static HttpUtil getInstanceHaveCookie()
 	{
 		if(_instance_haveCookie == null)
 		{
-			synchronized(HttpUtil4.class )
+			synchronized(HttpUtil.class )
 			{
 				if(_instance_haveCookie == null)
 				{
-				    _instance_haveCookie = new HttpUtil4(true);
+				    _instance_haveCookie = new HttpUtil(true);
 				}
 			}
 		}
@@ -254,29 +254,22 @@ public class HttpUtil4
      *得到实例 
      * 
      */
-    public static HttpUtil4 getInstance()
+    public static HttpUtil getInstance()
     {
         if(_instance == null)
         {
-            synchronized(HttpUtil4.class )
+            synchronized(HttpUtil.class )
             {
                 if(_instance == null)
                 {
-                    _instance = new HttpUtil4();
+                    _instance = new HttpUtil();
                 }
             }
         }
         return _instance;
     }
 	
-    /**
-     * 
-     *工厂方法，产生httpClient实例 
-     * 
-     */
-    public static HttpUtil4 createHttpClient(){
-    	return  new HttpUtil4(true);
-    }
+    
     
     private static String encodeurl(String url)
     {
@@ -877,7 +870,7 @@ public class HttpUtil4
 	{
 		
 		 long start0 = System.currentTimeMillis();
-		 HttpUtil4 httpUtil = HttpUtil4.getInstance();
+		 HttpUtil httpUtil = HttpUtil.getInstance();
 		 long start1 =System.currentTimeMillis();
 		 System.out.println("getInstanceTime:"+(start1 -start0));
 		 

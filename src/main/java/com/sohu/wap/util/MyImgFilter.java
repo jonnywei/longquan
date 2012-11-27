@@ -253,6 +253,7 @@ public class MyImgFilter {
     }
     
     public static void main(String[] args) throws IOException {  
+    	MyImgFilter.transformImg("/home/wjj/haijia/img/110eff88a7374c9c91d7cae6dc80398b.gif", "/home/wjj/d");
         FileInputStream fin=new FileInputStream(args[0]);  
         BufferedImage bi=ImageIO.read(fin);  
         MyImgFilter flt=new MyImgFilter(bi);  

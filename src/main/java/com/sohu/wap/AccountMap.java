@@ -66,7 +66,7 @@ public class AccountMap {
  
     
     
-  public ConcurrentHashMap  <String , XueYuanAccount>     getXueYuanAccountMap(){
+  public ConcurrentHashMap  <String , XueYuanAccount>   getXueYuanAccountMap(){
             return xueYuanAccountMap;
     }
   

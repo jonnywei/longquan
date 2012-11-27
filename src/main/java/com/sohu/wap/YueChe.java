@@ -8,7 +8,6 @@ package com.sohu.wap;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,6 +29,7 @@ import com.sohu.wap.util.MyImgFilter;
 import com.sohu.wap.util.OSUtil;
 import com.sohu.wap.util.RandomUtil;
 import com.sohu.wap.util.SystemConfigurations;
+import com.sohu.wap.util.ThreadUtil;
 import com.sohu.wap.util.Util;
 
 /**
@@ -64,14 +64,17 @@ public class YueChe {
 	
 	public static int YUCHE_RETRY_TIME = 3;
 
+	
+	protected  HttpUtil4 httpUtil4 = HttpUtil4.getInstanceHaveCookie(); //默认值
 	/**
 	 * 
 	 * 处理用户登录
+	 * @throws InterruptedException 
 	 * 
 	 */
-	public static boolean login(String userName, String passwd) {
+	public  boolean login(String userName, String passwd) throws InterruptedException {
 
-		String firstPage = HttpUtil4.getInstanceHaveCookie().getContent(LOGIN_URL);
+		String firstPage = httpUtil4.getContent(LOGIN_URL);
 		if (firstPage == null) {
 			return false;
 		}
@@ -85,7 +88,7 @@ public class YueChe {
 			String imageCode = null;
 			do{
 				try {
-					imageCode = getImgCode(LOGIN_IMG_URL);
+					imageCode = getImgCode2(LOGIN_IMG_URL);
 				} catch (IOException e1) {
 					log.error("get image code error", e1);
 				}
@@ -106,11 +109,10 @@ public class YueChe {
 				log.error("error", e);
 				e.printStackTrace();
 			}
-			String result = HttpUtil4.getInstanceHaveCookie().post(LOGIN_URL, json);
+			String result = httpUtil4.post(LOGIN_URL, json);
 
 			if (result != null) {
-				
-				log.debug(result);
+//				log.debug(result);
 				if (result.equals("/index.aspx")) {
 					isLoginSuccess =true;
 					return true;
@@ -120,7 +122,11 @@ public class YueChe {
 					System.out.println("账号或密码错误！登录失败.");
 					log.error("账号或密码错误"); //打印错误，直接退出
 					System.exit(1);
+				}else if (result.indexOf("系统服务时间每天从07:35-20:00")!= -1  ){
+					System.out.println("系统服务时间每天从07:35-20:00;"+"enter sleep");
+					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
 				}else{
+					
 				}
 //				
 			 
@@ -134,7 +140,7 @@ public class YueChe {
 	 * -1 约车错误 0 约车成功 1 无车可约
 	 * 
 	 */
-	public static int yuche(String date, String amOrpm, boolean isGetHiddenKM)
+	public  int yuche(String date, String amOrpm, boolean isGetHiddenKM)
 			throws InterruptedException {
 
 		int result = UNKNOWN_ERROR;
@@ -142,8 +148,7 @@ public class YueChe {
 		// 页面中一个隐藏的输入，默认为2，可能更改
 		String hiddenKM = "2";
 		if (isGetHiddenKM) {
-			String yuchePage = HttpUtil4.getInstanceHaveCookie().getContent(
-					YUCHE_URL);
+			String yuchePage = httpUtil4.getContent(YUCHE_URL);
 			Document document = Jsoup.parse(yuchePage);
 			Element hkm = document.getElementById(HIDDEN_KM);
 			hiddenKM = hkm.absUrl("value");
@@ -159,8 +164,7 @@ public class YueChe {
 			json.put("pageNum", 1);
 
 			// 得到某天的信息
-			JSONObject carsJson = HttpUtil4.getInstanceHaveCookie().postJson(
-					GET_CARS_URL, json);
+			JSONObject carsJson = httpUtil4.postJson(GET_CARS_URL, json);
 
 			if (carsJson == null) {
 				log.error("get car info error");
@@ -208,7 +212,7 @@ public class YueChe {
 					System.out.println("选择的车是：" + selectedCar.toString());
 					String imageCode = "";
 					try {
-						imageCode = getImgCode(BOOKING_IMG_URL);
+						imageCode = getImgCode2(BOOKING_IMG_URL);
 					} catch (IOException e1) {
 						log.error("get book image code error", e1);
 						continue;
@@ -232,7 +236,7 @@ public class YueChe {
 					Thread.sleep(1000);
 					// 得到某天的信息
 
-					JSONObject bookResult = HttpUtil4.getInstanceHaveCookie().postJson(BOOKING_CAR_URL, bookCarJson);
+					JSONObject bookResult = httpUtil4.postJson(BOOKING_CAR_URL, bookCarJson);
 					yucheTry++;
 					if (bookResult == null) {
 						System.out.println("book car timeout or error");
@@ -278,13 +282,13 @@ public class YueChe {
 		return result;
 	}
 
-	public static boolean logout() {
+	public  boolean logout() {
 
-		String logout = HttpUtil4.getInstanceHaveCookie().getContent(LOGOUT_URL);
+		String logout = httpUtil4.getContent(LOGOUT_URL);
 		return true;
 	}
 
-	private static String getImgCode(String url) throws IOException {
+	private  String getImgCode(String url) throws IOException {
 
 		url = url + RandomUtil.getJSRandomDecimals();
 
@@ -306,7 +310,7 @@ public class YueChe {
 		// 重试三次
 		int loop = 0;
 		do {
-			bytes = HttpUtil4.getInstanceHaveCookie().getImage(url);
+			bytes = httpUtil4.getImage(url);
 			loop++;
 		} while (bytes == null && loop < 3);
 
@@ -348,7 +352,7 @@ public class YueChe {
 	}
 	
 	
-	private static String getImgCode2(String url) throws IOException {
+	private  String getImgCode2(String url) throws IOException {
 
 		url = url + RandomUtil.getJSRandomDecimals();
 
@@ -373,7 +377,7 @@ public class YueChe {
 		// 重试三次
 		int loop = 0;
 		do {
-			bytes = HttpUtil4.getInstanceHaveCookie().getImage(url);
+			bytes = httpUtil4.getImage(url);
 			loop++;
 		} while (bytes == null && loop < 3);
 
@@ -382,20 +386,24 @@ public class YueChe {
 		}else{
 			throw new IOException("download image error!");
 		}
-
-		MyImgFilter.transformImg(storeAddress, destAddress);
+		try{
+			MyImgFilter.transformImg(storeAddress, destAddress);
+		}
+		catch(Exception e){
+			throw new IOException("download image error!");
+		}
 		
 		comand +=  storeAddress; //命令行
 
-		Process process = Runtime.getRuntime().exec(comand);
-
-		int w = 0;
-		try {
-			w = process.waitFor();
-		} catch (InterruptedException e) {
-
-			e.printStackTrace();
-		}
+//		Process process = Runtime.getRuntime().exec(comand);
+//
+//		int w = 0;
+//		try {
+//			w = process.waitFor();
+//		} catch (InterruptedException e) {
+//
+//			e.printStackTrace();
+//		}
 
 		comand =  "tesseract "+ destAddress +" " + textImg ; //命令行
 
@@ -414,7 +422,10 @@ public class YueChe {
 		try{
 			BufferedReader  strin2 = new BufferedReader(new FileReader(new File(textImg+".txt")));
 			imageCode = strin2.readLine().trim();
+			//常用识别错误处理
+			imageCode=imageCode.replace(")(", "X");
 			imageCode =imageCode.replaceAll("[^0-9a-zA-Z]", "");
+			
 			System.out.println("自动识别结果:" + imageCode + "; \r\n");
 		
 			if(imageCode.length() != 4 ){
@@ -426,5 +437,11 @@ public class YueChe {
 //		IO.deleteFile(storeAddress);
 
 		return imageCode;
+	}
+	
+	//扫描table ，得到约车信息
+	
+	private  String getYueCheInfo(){
+		return null;
 	}
 }
