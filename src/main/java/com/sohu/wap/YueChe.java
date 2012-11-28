@@ -66,6 +66,9 @@ public class YueChe {
 
 	
 	protected  HttpUtil4 httpUtil4 = HttpUtil4.getInstanceHaveCookie(); //默认值
+	
+	
+	
 	/**
 	 * 
 	 * 处理用户登录
@@ -75,10 +78,11 @@ public class YueChe {
 	public  boolean login(String userName, String passwd) throws InterruptedException {
 
 		String firstPage = httpUtil4.getContent(LOGIN_URL);
-		if (firstPage == null) {
+		if (firstPage == null || firstPage.length()< 100) {
 			return false;
 		}
-
+		
+		
 		Document document = Jsoup.parse(firstPage);
 		Element viewState = document.getElementById(__VIEWSTATE);
 		Element eventValid = document.getElementById(__EVENTVALIDATION);
@@ -100,8 +104,14 @@ public class YueChe {
 				json.put("txtUserName", userName);
 				json.put("txtPassword", passwd);
 				json.put("BtnLogin", "登  录");
-				json.put(__VIEWSTATE, viewState.attr("value"));
-				json.put(__EVENTVALIDATION, eventValid.attr("value"));
+				if (viewState!= null){
+					json.put(__VIEWSTATE, viewState.attr("value"));
+				}
+				if (eventValid != null){
+					json.put(__EVENTVALIDATION, eventValid.attr("value"));;
+				}
+				
+				
 				json.put("rcode", "");
 				json.put("txtIMGCode", imageCode);
 
@@ -112,7 +122,7 @@ public class YueChe {
 			String result = httpUtil4.post(LOGIN_URL, json);
 
 			if (result != null) {
-//				log.debug(result);
+				log.debug(result);
 				if (result.equals("/index.aspx")) {
 					isLoginSuccess =true;
 					return true;

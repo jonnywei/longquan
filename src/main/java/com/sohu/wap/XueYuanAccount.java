@@ -14,6 +14,7 @@ public class XueYuanAccount {
     private int id;
     private String userName;
     private String password;
+     
     private boolean isBookSuccess = false;
     /**
      * @return the id

@@ -392,6 +392,9 @@ public class HttpUtil4
 		try
 		{
 			HttpResponse  httpResponse = httpClient.execute(httpGet);
+			if (httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE){
+				return null;
+			}
 			HttpEntity httpEntity =  httpResponse.getEntity();
 			content = EntityUtils.toString(httpEntity);
 			//System.out.print(content);
@@ -430,6 +433,9 @@ public class HttpUtil4
         HttpResponse response;
         try {
                 response = httpClient.execute(httpGet);
+                if (response.getStatusLine().getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE){
+    				return null;
+    			}
                 HttpEntity entity = response.getEntity();
                 if (entity != null) 
                 {
@@ -749,7 +755,7 @@ public class HttpUtil4
              HttpEntity httpEntity =  httpResponse.getEntity();
             
             String content = EntityUtils.toString(httpEntity);
-          
+            System.out.println(content);
             rj = new JSONObject(content);
             
         }
