@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.PropConfigurations;
 
 
@@ -40,6 +41,10 @@ public class AccountMap {
     
     private PropConfigurations xueYuan;
     
+private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   = new ConcurrentHashMap<String, XueYuanAccount> ();
+   
+    
+    private PropConfigurations scanXueYuan;
     
     
     private  AccountMap (){
@@ -69,7 +74,9 @@ public class AccountMap {
   public ConcurrentHashMap  <String , XueYuanAccount>   getXueYuanAccountMap(){
             return xueYuanAccountMap;
     }
-  
+  public ConcurrentHashMap  <String , XueYuanAccount>   getScanXueYuanAccountMap(){
+      return scanXueYuanAccountMap;
+}
   
     
     
@@ -86,6 +93,10 @@ public class AccountMap {
          xueYuan = new PropConfigurations("mapdb.properties");
       
          initXueYuanAccounts();
+         
+         scanXueYuan = new PropConfigurations("scan.properties");
+         
+         initScanXueYuanAccounts();
     }
     
     
@@ -124,6 +135,40 @@ public class AccountMap {
         log.info("initXuYuanAccounts over!" );
     }
     
+    /**
+     * 初始化 account 对象 
+     */
+    private   void initScanXueYuanAccounts(   ){
+     
+        
+       Properties mapdb =  scanXueYuan.getProperties();
+      
+ 
+        Iterator itor =mapdb.keySet().iterator();
+   
+        while(itor.hasNext())
+        {
+           String key = ((String)itor.next()).trim() ;
+      
+           String value =(String) mapdb.get(key);
+        
+           String temp [] =  value.split(";");
+           
+           String password = temp[0];
+
+           XueYuanAccount sa= new XueYuanAccount();
+         
+           sa.setUserName(key);
+           sa.setPassword(password);
+           sa.setYueCheDate(DateUtil.getCurrYearStr()+temp[1]);
+           sa.setYueCheAmPm(YueCheHelper.AMPM.get(temp[2]));
+           sa.setCarType(temp[3]);
+           scanXueYuanAccountMap.put(key, sa);
+//           log.info("add SohuAccounts " + sa);
+         }
+         
+        log.info("initScanXuYuanAccounts over!" );
+    }
     
     
 }

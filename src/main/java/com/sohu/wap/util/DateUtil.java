@@ -35,6 +35,15 @@ public class DateUtil
         return sdf.format(dt).toLowerCase();
     }
 	
+	
+	/**
+	 *得到年 
+	 * 
+	 */
+	public static String getCurrYearStr( ) {
+		return	getYearStr(new Date());
+    }
+	
 	/**
 	 * 获取时间格式化输出
 	 * @param dt

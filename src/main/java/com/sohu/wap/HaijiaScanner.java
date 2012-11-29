@@ -38,31 +38,28 @@ public class HaijiaScanner
     public static void main( String[] args ) throws InterruptedException, IOException
     {
         
-        String date = DateUtil.getFetureDay(SystemConfigurations.getSystemIntProperty("system.yueche.date",7));
-          
-        System.out.println(date);
-   
-//        doLogin(userName,passwd);
-//        
-//        doYuche(date);
+        
+    	scan();
         
         System.in.read();
       
     }
     
-    public  static void scan (){
+    public  static void scan () throws InterruptedException{
         
-        // 选择周六周末
+         
         do {
             //在服务时间内
             if (YueCheHelper.isInServiceTime()){
             	
-            	for (String accoutId: AccountMap.getInstance().getXueYuanAccountMap().keySet()){
-                    XueYuanAccount  xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);
+            	for (String accoutId: AccountMap.getInstance().getScanXueYuanAccountMap().keySet()){
+                    XueYuanAccount  xy =AccountMap.getInstance().getScanXueYuanAccountMap().get(accoutId);
                     if ( xy!=null){
-//                    	YueCheThread yueCheTask = new YueCheThread(xy,date);
-//                    	resultList.add(executeService.submit(yueCheTask) );
+                    	
+                    	ScanYueCheTask yueCheTask = new ScanYueCheTask(xy);
+                    	yueCheTask.scan();
                     }
+                    ThreadUtil.sleep(  RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
                 }
             	
                 ThreadUtil.sleep(IN_SERVICE_SCANNER_BASE + RandomUtil.getRandomInt(IN_SERVICE_SCANNER_INTERVAL)); 

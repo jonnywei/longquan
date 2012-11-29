@@ -14,7 +14,13 @@ public class XueYuanAccount {
     private int id;
     private String userName;
     private String password;
-     
+    
+    private String carType;
+    
+    private String yueCheDate;
+    
+    private String amPm;
+    
     private boolean isBookSuccess = false;
     /**
      * @return the id
@@ -64,4 +70,22 @@ public class XueYuanAccount {
     public void setBookSuccess(boolean isBookSuccess) {
         this.isBookSuccess = isBookSuccess;
     }
+	public String getCarType() {
+		return carType;
+	}
+	public void setCarType(String carType) {
+		this.carType = carType;
+	}
+	public String getYueCheDate() {
+		return yueCheDate;
+	}
+	public void setYueCheDate(String yueCheDate) {
+		this.yueCheDate = yueCheDate;
+	}
+	public String getYueCheAmPm() {
+		return amPm;
+	}
+	public void setYueCheAmPm(String amPm) {
+		this.amPm = amPm;
+	}
 }
