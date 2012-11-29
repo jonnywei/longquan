@@ -25,6 +25,7 @@ public class YueCheThread  extends YueChe implements Callable<Integer> {
 	
 	@Override
 	public Integer call() throws Exception {
+	    
 		 doLogin();
          doYuche();
          if (xueYuan.isBookSuccess()){
