@@ -33,6 +33,10 @@
             <directory>sbin/</directory>
              <outputDirectory>haijia/bin/</outputDirectory>
         </fileSet>
+         <fileSet>
+            <directory>data/</directory>
+             <outputDirectory>haijia/data/</outputDirectory>
+        </fileSet>
        
     </fileSets>
     <dependencySets>

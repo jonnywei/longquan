@@ -12,6 +12,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +27,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.bo.YueCheCarInfo;
 import com.sohu.wap.http.HttpUtil4;
 import com.sohu.wap.util.IO;
 import com.sohu.wap.util.MD5;
@@ -76,6 +81,7 @@ public class YueChe {
 	private Element eventValid;
 	
 	
+	private Map<String, YueCheCarInfo> yueCheCarInfoMap = new HashMap<String, YueCheCarInfo>();
 	
 	/**
 	 * 
@@ -514,7 +520,7 @@ public class YueChe {
 		if (yuchePage.equals("/login.aspx")){
 			return "notLogin";
 		}
-			
+	 
 		Document document = Jsoup.parse(yuchePage);
 		Element table = document.getElementById("tblMain");
 		Elements trs = table.getElementsByTag("tr");
@@ -527,18 +533,16 @@ public class YueChe {
 			String amStatus = tds.get(1).text();
 			String pmStatus = tds.get(2).text();
 			String niStatus = tds.get(3).text();
-			System.out.println();
-			if (date.equals("2012-11-30")){
-				if (amStatus.equals("无")){
-					return "无";
-				}else if (amStatus.equals("已约")){
-					return "已约";
-				}else{
-					return "有";
-				}
-			}
+			
+			YueCheCarInfo carInfo = new YueCheCarInfo();
+			carInfo.setDate(date.replace("-", ""));
+			carInfo.setAmCarInfo(amStatus);
+			carInfo.setPmCarInfo(pmStatus);
+			carInfo.setNiCarInfo(niStatus);
+			yueCheCarInfoMap.put(date,carInfo);
+			
 		}
-		return "无";
+		return "getedCarInfo";
 	}
 	/**
 	 * 0 可以
@@ -547,16 +551,21 @@ public class YueChe {
 	 * 3 登录超时
 	 */
 	public int canYueChe (String yueCheDate,  String amPm){
-		String yueCheInfo = getYueCheInfo();
-		if (yueCheInfo.equals("noLogin")){
+		String result = getYueCheInfo();
+		
+		if (result.equals("noLogin")){
 			return 3;
-		}else if (yueCheInfo.equals("无")){
-			return 2;
-		}else if (yueCheInfo.equals("已约")){
-			return 1;
 		}else{
-			 return 0;
+		    YueCheCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
+		    if (ycCarInfo != null){
+		        
+		    }
+		    if (result.equals("无")){
+	            return 2;
+	        }else if (result.equals("已约")){
+	            return 1;
+	        }
 		}
-	  
+		 return 0;
 	}
 }

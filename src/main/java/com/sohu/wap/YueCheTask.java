@@ -59,7 +59,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
      */
     private  void  doYuche () throws InterruptedException {
     
-    	String[] timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
+    	String[] timeArray = xueYuan.getYueCheAmPm().split("[,;]");
         if (timeArray.length > 0) {
             for (String amPm : timeArray){  //按情况约车
                

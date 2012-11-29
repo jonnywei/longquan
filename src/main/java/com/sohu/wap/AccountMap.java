@@ -122,11 +122,16 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
            String temp [] =  value.split(";");
            
            String password = temp[0];
+           String  amPm = temp[1];
+           String carType =temp[2];
+           
 
            XueYuanAccount sa= new XueYuanAccount();
          
            sa.setUserName(key);
            sa.setPassword(password);
+           sa.setCarType(carType);
+           sa.setYueCheAmPm(amPm);
           
            xueYuanAccountMap.put(key, sa);
 //           log.info("add SohuAccounts " + sa);

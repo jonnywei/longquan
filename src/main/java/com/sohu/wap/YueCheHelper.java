@@ -34,6 +34,7 @@ public class YueCheHelper
     private static String[]  AM_PM_NUM ={"812","15","58"};
     private static String[]  AM_PM_STR={"上午","下午","晚上"};
     private static String[]  AM_PM_STR1={"sw","xw","ws"};
+    private static String[]  AM_PM_STR2={"am","pm","ni"};
     public static Map<String, String> AMPM = new HashMap<String, String>();
     static  {
     	//初始化 ampm信息
@@ -41,6 +42,7 @@ public class YueCheHelper
     		AMPM.put(AM_PM_NUM[i], AM_PM_STR[i]);
     		AMPM.put(AM_PM_STR[i], AM_PM_NUM[i]);
     		AMPM.put(AM_PM_STR1[i], AM_PM_NUM[i]);
+    		AMPM.put(AM_PM_STR2[i], AM_PM_NUM[i]);
     	}
     	
     	if(! IMAGE_CODE_INPUT_METHOD.equals("auto")){
