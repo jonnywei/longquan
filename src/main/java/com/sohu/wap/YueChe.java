@@ -511,7 +511,7 @@ public class YueChe {
 			 yuchePage = httpUtil4.getContent(YUCHE_URL);
 			 
 		}while(yuchePage == null);
-		if (yuchePage.equals(" /login.aspx")){
+		if (yuchePage.equals("/login.aspx")){
 			return "notLogin";
 		}
 			
@@ -528,8 +528,17 @@ public class YueChe {
 			String pmStatus = tds.get(2).text();
 			String niStatus = tds.get(3).text();
 			System.out.println();
+			if (date.equals("2012-11-30")){
+				if (amStatus.equals("无")){
+					return "无";
+				}else if (amStatus.equals("已约")){
+					return "已约";
+				}else{
+					return "有";
+				}
+			}
 		}
-		return "";
+		return "无";
 	}
 	/**
 	 * 0 可以
@@ -541,7 +550,13 @@ public class YueChe {
 		String yueCheInfo = getYueCheInfo();
 		if (yueCheInfo.equals("noLogin")){
 			return 3;
+		}else if (yueCheInfo.equals("无")){
+			return 2;
+		}else if (yueCheInfo.equals("已约")){
+			return 1;
+		}else{
+			 return 0;
 		}
-	   return 0;
+	  
 	}
 }
