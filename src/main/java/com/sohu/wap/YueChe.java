@@ -529,7 +529,7 @@ public class YueChe {
 			String niStatus = tds.get(3).text();
 			System.out.println();
 		}
-		return null;
+		return "";
 	}
 	/**
 	 * 0 可以
