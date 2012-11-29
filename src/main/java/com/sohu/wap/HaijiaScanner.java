@@ -49,18 +49,19 @@ public class HaijiaScanner
     
     public  static void scan () throws InterruptedException{
         
+    	List <ScanYueCheTask> list = new ArrayList<ScanYueCheTask>();
+    	for (String accoutId: AccountMap.getInstance().getScanXueYuanAccountMap().keySet()){
+            XueYuanAccount  xy =AccountMap.getInstance().getScanXueYuanAccountMap().get(accoutId);
+            if ( xy!=null){
+            	
+            	ScanYueCheTask yueCheTask = new ScanYueCheTask(xy);
+            	list.add(yueCheTask);
+            }
+          
+        }
          
         do {
-        	List <ScanYueCheTask> list = new ArrayList<ScanYueCheTask>();
-        	for (String accoutId: AccountMap.getInstance().getScanXueYuanAccountMap().keySet()){
-                XueYuanAccount  xy =AccountMap.getInstance().getScanXueYuanAccountMap().get(accoutId);
-                if ( xy!=null){
-                	
-                	ScanYueCheTask yueCheTask = new ScanYueCheTask(xy);
-                	list.add(yueCheTask);
-                }
-              
-            }
+        	
         	
             //在服务时间内
             if (YueCheHelper.isInServiceTime()){
