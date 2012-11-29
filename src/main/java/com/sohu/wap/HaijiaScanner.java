@@ -3,6 +3,8 @@ package com.sohu.wap;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,16 +51,24 @@ public class HaijiaScanner
         
          
         do {
+        	List <ScanYueCheTask> list = new ArrayList<ScanYueCheTask>();
+        	for (String accoutId: AccountMap.getInstance().getScanXueYuanAccountMap().keySet()){
+                XueYuanAccount  xy =AccountMap.getInstance().getScanXueYuanAccountMap().get(accoutId);
+                if ( xy!=null){
+                	
+                	ScanYueCheTask yueCheTask = new ScanYueCheTask(xy);
+                	list.add(yueCheTask);
+                }
+              
+            }
+        	
             //在服务时间内
             if (YueCheHelper.isInServiceTime()){
             	
-            	for (String accoutId: AccountMap.getInstance().getScanXueYuanAccountMap().keySet()){
-                    XueYuanAccount  xy =AccountMap.getInstance().getScanXueYuanAccountMap().get(accoutId);
-                    if ( xy!=null){
-                    	
-                    	ScanYueCheTask yueCheTask = new ScanYueCheTask(xy);
-                    	yueCheTask.scan();
-                    }
+            	for (ScanYueCheTask yueCheTask: list){
+                     
+            		yueCheTask.scan();
+                    
                     ThreadUtil.sleep(  RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
                 }
             	
