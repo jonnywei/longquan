@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,13 @@ public class YueChe {
 	protected  HttpUtil4 httpUtil4 = HttpUtil4.getInstanceHaveCookie(); //默认值
 	
 	
+	//login 初始页面设置
+	private long visitLoginUrlTime  = 0;
+	private boolean isVisitedLoginUrl = false;
+	private Element viewState;
+	private Element eventValid;
+	
+	
 	
 	/**
 	 * 
@@ -75,24 +83,32 @@ public class YueChe {
 	 * @throws InterruptedException 
 	 * 
 	 */
-	public  boolean login(String userName, String passwd) throws InterruptedException {
-
-		String firstPage = httpUtil4.getContent(LOGIN_URL);
-		if (firstPage == null || firstPage.length()< 100) {
-			return false;
+	public  boolean login(String userName, String passwd) {
+		long currentTime = System.currentTimeMillis();
+		
+		//为了加快访问速度，只加载一次login页面
+		//如果没有访问过登录页面，或者上次访问登录页面超过了超时时间
+		if ( !isVisitedLoginUrl || (currentTime - visitLoginUrlTime > YueCheHelper.SESSION_TIMEOUT_MILLISECOND) ){
+			String firstPage = httpUtil4.getContent(LOGIN_URL);
+			if (firstPage == null || firstPage.length()< 100) { //失败，一切不操作
+				return false;
+			}
+			Document document = Jsoup.parse(firstPage);
+			viewState = document.getElementById(__VIEWSTATE);
+			eventValid = document.getElementById(__EVENTVALIDATION);
+			isVisitedLoginUrl = true;
+			visitLoginUrlTime = System.currentTimeMillis();
 		}
 		
 		
-		Document document = Jsoup.parse(firstPage);
-		Element viewState = document.getElementById(__VIEWSTATE);
-		Element eventValid = document.getElementById(__EVENTVALIDATION);
+		
 		boolean isLoginSuccess = false;
 		do {
 			//模拟用户行为，一直请求验证码
 			String imageCode = null;
 			do{
 				try {
-					imageCode = getImgCode2(LOGIN_IMG_URL);
+					imageCode = getImgCode(LOGIN_IMG_URL);
 				} catch (IOException e1) {
 					log.error("get image code error", e1);
 				}
@@ -110,8 +126,6 @@ public class YueChe {
 				if (eventValid != null){
 					json.put(__EVENTVALIDATION, eventValid.attr("value"));;
 				}
-				
-				
 				json.put("rcode", "");
 				json.put("txtIMGCode", imageCode);
 
@@ -119,13 +133,27 @@ public class YueChe {
 				log.error("error", e);
 				e.printStackTrace();
 			}
-			String result = httpUtil4.post(LOGIN_URL, json);
-
+			
+			//服务器失败的话，一直重试
+			String result = null;
+			
+			do{
+				 result = httpUtil4.post(LOGIN_URL, json);
+				 if (result == null){
+					 ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
+				 }else{
+					 break;
+				 }
+			
+			}while(result == null);
+			
+		
 			if (result != null) {
+				System.out.println(result);
 				log.debug(result);
+				//登录成功
 				if (result.equals("/index.aspx")) {
 					isLoginSuccess =true;
-					return true;
 				} else if(result.indexOf("验证码错误")!= -1 ||result.indexOf("请输入验证码")!= -1 ){  //失败的话 ，继续登录
 					System.out.println("验证码识别错误！登录失败.");
 				}else if(result.indexOf("账号或密码错误")!= -1  ){  //失败的话 ，继续登录
@@ -161,7 +189,7 @@ public class YueChe {
 			String yuchePage = httpUtil4.getContent(YUCHE_URL);
 			Document document = Jsoup.parse(yuchePage);
 			Element hkm = document.getElementById(HIDDEN_KM);
-			hiddenKM = hkm.absUrl("value");
+			hiddenKM = hkm.attr("value");
 		}
 
 		// {"yyrq":"20121126","yysd":"58","xllxID":"2","pageSize":35,"pageNum":1}
@@ -172,14 +200,18 @@ public class YueChe {
 			json.put("xllxID", hiddenKM);
 			json.put("pageSize", 35);
 			json.put("pageNum", 1);
-
-			// 得到某天的信息
-			JSONObject carsJson = httpUtil4.postJson(GET_CARS_URL, json);
-
-			if (carsJson == null) {
-				log.error("get car info error");
-				return GET_CAR_ERROR;
-			}
+			
+			JSONObject carsJson = null;
+			do{
+				// 得到某天的信息
+				carsJson = httpUtil4.postJson(GET_CARS_URL, json);
+				if (carsJson == null) {
+					log.error("get car info error");
+				}else{
+					break;
+				}
+			}while(true);
+			
 
 			// System.out.println(carsJson.toString());
 
@@ -215,14 +247,16 @@ public class YueChe {
 			int yucheTry = 0;
 
 			do {
-				selectedCar = carsArray.getJSONObject(RandomUtil
-						.getRandomInt(carsArray.length()));
+				selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
 
 				if (selectedCar != null) {
 					System.out.println("选择的车是：" + selectedCar.toString());
 					String imageCode = "";
 					try {
-						imageCode = getImgCode2(BOOKING_IMG_URL);
+						do{
+							imageCode = getImgCode(BOOKING_IMG_URL);
+						}while(imageCode == null);
+						
 					} catch (IOException e1) {
 						log.error("get book image code error", e1);
 						continue;
@@ -243,17 +277,23 @@ public class YueChe {
 
 						e.printStackTrace();
 					}
-					Thread.sleep(1000);
-					// 得到某天的信息
-
-					JSONObject bookResult = httpUtil4.postJson(BOOKING_CAR_URL, bookCarJson);
+					
+					ThreadUtil.sleep(1);
+					//一直重试，知道返回结果
+					JSONObject bookResult = null;
+					do{
+						bookResult = httpUtil4.postJson(BOOKING_CAR_URL, bookCarJson);
+						if (bookResult == null) {
+							System.out.println("book car timeout or error");
+							log.error("book car timeout or error");
+							ThreadUtil.sleep(1);
+						}
+					}while(bookResult == null);
+					
 					yucheTry++;
-					if (bookResult == null) {
-						System.out.println("book car timeout or error");
-						continue;
-					}
+					
 
-					 System.out.println(bookResult.toString());
+					System.out.println(bookResult.toString());
 
 					JSONArray jbResult = new JSONArray(bookResult.getString("d"));
 
@@ -297,8 +337,14 @@ public class YueChe {
 		String logout = httpUtil4.getContent(LOGOUT_URL);
 		return true;
 	}
+	
+	
 
-	private  String getImgCode(String url) throws IOException {
+	/**
+	 * 手动输入验证码
+	 * 
+	 */
+	private  String getImgCodeManual(String url) throws IOException {
 
 		url = url + RandomUtil.getJSRandomDecimals();
 
@@ -322,7 +368,7 @@ public class YueChe {
 		do {
 			bytes = httpUtil4.getImage(url);
 			loop++;
-		} while (bytes == null && loop < 3);
+		} while (bytes == null && loop < 5);
 
 		if (bytes != null) {
 			IO.writeByteToFile(bytes, storeAddress);
@@ -362,7 +408,15 @@ public class YueChe {
 	}
 	
 	
-	private  String getImgCode2(String url) throws IOException {
+	private String getImgCode(String url)throws IOException{
+		if (YueCheHelper.IMAGE_CODE_INPUT_METHOD_IS_AUTO){
+			return getImgCodeAuto(url);
+		}else{
+			return	getImgCodeManual(url);
+		}
+	}
+	
+	private  String getImgCodeAuto(String url) throws IOException {
 
 		url = url + RandomUtil.getJSRandomDecimals();
 
@@ -389,7 +443,7 @@ public class YueChe {
 		do {
 			bytes = httpUtil4.getImage(url);
 			loop++;
-		} while (bytes == null && loop < 3);
+		} while (bytes == null && loop < 5);
 
 		if (bytes != null) {
 			IO.writeByteToFile(bytes, storeAddress);
@@ -451,7 +505,58 @@ public class YueChe {
 	
 	//扫描table ，得到约车信息
 	
-	private  String getYueCheInfo(){
-		return null;
+	private   String getYueCheInfo(){
+		String yuchePage = null;
+		do{
+			 yuchePage = httpUtil4.getContent(YUCHE_URL);
+			 
+		}while(yuchePage == null);
+		if (yuchePage.equals("/login.aspx")){
+			return "notLogin";
+		}
+			
+		Document document = Jsoup.parse(yuchePage);
+		Element table = document.getElementById("tblMain");
+		Elements trs = table.getElementsByTag("tr");
+		int size  = trs.size();
+		for (int i = 1; i < size; i ++){
+			Element tr = trs.get(i);
+			System.out.println(tr.text());
+			Elements tds = tr.getElementsByTag("td");
+			String date = tds.get(0).text();
+			String amStatus = tds.get(1).text();
+			String pmStatus = tds.get(2).text();
+			String niStatus = tds.get(3).text();
+			System.out.println();
+			if (date.equals("2012-11-30")){
+				if (amStatus.equals("无")){
+					return "无";
+				}else if (amStatus.equals("已约")){
+					return "已约";
+				}else{
+					return "有";
+				}
+			}
+		}
+		return "无";
+	}
+	/**
+	 * 0 可以
+	 * 1 该日已经约车
+	 * 2 无车
+	 * 3 登录超时
+	 */
+	public int canYueChe (String yueCheDate,  String amPm){
+		String yueCheInfo = getYueCheInfo();
+		if (yueCheInfo.equals("noLogin")){
+			return 3;
+		}else if (yueCheInfo.equals("无")){
+			return 2;
+		}else if (yueCheInfo.equals("已约")){
+			return 1;
+		}else{
+			 return 0;
+		}
+	  
 	}
 }

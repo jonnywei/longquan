@@ -9,15 +9,15 @@ import org.slf4j.LoggerFactory;
 import com.sohu.wap.http.HttpUtil4;
 import com.sohu.wap.util.RandomUtil;
 
-public class YueCheThread  extends YueChe implements Callable<Integer> {
+public class YueCheTask  extends YueChe implements Callable<Integer> {
 
-	private static Logger log = LoggerFactory.getLogger(YueCheThread.class);
+	protected static Logger log = LoggerFactory.getLogger(YueCheTask.class);
 	
-	private XueYuanAccount xueYuan;
+	XueYuanAccount xueYuan;
 	
-	private String date;
+	String date;
 	
-	public YueCheThread(XueYuanAccount xueYuan, String date){
+	public YueCheTask(XueYuanAccount xueYuan, String date){
 		httpUtil4 = HttpUtil4.createHttpClient();
 		this.xueYuan = xueYuan;
 		this.date = date; 

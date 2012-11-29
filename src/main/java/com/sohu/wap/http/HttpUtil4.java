@@ -394,7 +394,9 @@ public class HttpUtil4
 			HttpResponse  httpResponse = httpClient.execute(httpGet);
 			if (httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE){
 				return null;
-			}
+			}else if (httpResponse.getStatusLine().getStatusCode() ==HttpStatus.SC_MOVED_TEMPORARILY){ //302跳转的话
+				return content =httpResponse.getFirstHeader("Location").getValue();
+			}  
 			HttpEntity httpEntity =  httpResponse.getEntity();
 			content = EntityUtils.toString(httpEntity);
 			//System.out.print(content);
@@ -693,6 +695,8 @@ public class HttpUtil4
 			 
 			if (httpResponse.getStatusLine().getStatusCode() ==HttpStatus.SC_MOVED_TEMPORARILY){ //302跳转的话
 			    content =httpResponse.getFirstHeader("Location").getValue();
+			} else if (httpResponse.getStatusLine().getStatusCode() >= HttpStatus.SC_INTERNAL_SERVER_ERROR){
+				return null;  //server error
 			} else{
 			    HttpEntity httpEntity =  httpResponse.getEntity();
 	            content = EntityUtils.toString(httpEntity);
@@ -752,10 +756,14 @@ public class HttpUtil4
             
             HttpResponse  httpResponse = httpClient.execute(httpPost);
             
-             HttpEntity httpEntity =  httpResponse.getEntity();
+            if (httpResponse.getStatusLine().getStatusCode() >= HttpStatus.SC_INTERNAL_SERVER_ERROR){
+				return null;  //server error
+			} 
+            
+            HttpEntity httpEntity =  httpResponse.getEntity();
             
             String content = EntityUtils.toString(httpEntity);
-            System.out.println(content);
+           
             rj = new JSONObject(content);
             
         }
