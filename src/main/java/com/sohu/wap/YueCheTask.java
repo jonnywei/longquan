@@ -6,7 +6,9 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.bo.Result;
 import com.sohu.wap.http.HttpUtil4;
+import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.RandomUtil;
 
 public class YueCheTask  extends YueChe implements Callable<Integer> {
@@ -18,7 +20,13 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	String date;
 	
 	public YueCheTask(XueYuanAccount xueYuan, String date){
-		httpUtil4 = HttpUtil4.createHttpClient();
+	    if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+	     
+	        httpUtil4 = HttpUtil4Exposer.createHttpClient();
+	    }else{
+	        httpUtil4 = HttpUtil4.createHttpClient();
+	    }
+	
 		this.xueYuan = xueYuan;
 		this.date = date; 
 	}
@@ -75,12 +83,13 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                  }else{
                      first = false;
                  }
-            
-              int  result  = yuche(date, amPm,false);
+               Result ret =  yuche(date, amPm,false);
+              int  result  = ret.getRet();
               if (result == YueChe.BOOK_CAR_SUCCESS){
                   isSuccess = true;
-                  System.out.println(date + YueCheHelper.AMPM.get(amPm)+"约车成功");
-                  log.info(date +  YueCheHelper.AMPM.get(amPm)+"约车成功");
+                  String info = xueYuan.getUserName() +":"+ret.getData()+":"+date+ YueCheHelper.AMPM.get(amPm)+"约车成功";
+                  System.out.println(info);
+                  log.info(info);
                   xueYuan.setBookSuccess(isSuccess);
               }else if (result == YueChe.NO_CAR){  //无车
                   System.out.println(date + YueCheHelper.AMPM.get(amPm)+"无车!");

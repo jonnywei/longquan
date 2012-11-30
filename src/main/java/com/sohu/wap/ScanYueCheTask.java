@@ -2,6 +2,7 @@ package com.sohu.wap;
 
 import java.io.IOException;
 
+import com.sohu.wap.bo.Result;
 import com.sohu.wap.util.RandomUtil;
 import com.sohu.wap.util.ThreadUtil;
 
@@ -59,7 +60,7 @@ public class ScanYueCheTask extends YueCheTask {
 		
 		//为了加快访问速度，只加载一次login页面
 		//如果没有访问过登录页面，或者上次访问登录页面超过了超时时间
-		if ( ! isLogon || (currentTime - lastLoginTime > YueCheHelper.SESSION_TIMEOUT_MILLISECOND) ){
+		if ( ! isLogon || (currentTime - lastLoginTime > YueCheHelper.LOGIN_SESSION_TIMEOUT_MILLISECOND) ){
 			boolean  isLoginSuccess = false;
 	        boolean first = true;
 	        do {
@@ -101,11 +102,14 @@ public class ScanYueCheTask extends YueCheTask {
                  first = false;
              }
         
-          int  result  = yuche(date, amPm,false);
+             Result ret =  yuche(date, amPm,false);
+             int  result  = ret.getRet();
+             
           if (result == YueChe.BOOK_CAR_SUCCESS){
               isSuccess = true;
-              System.out.println(date + YueCheHelper.AMPM.get(amPm)+"约车成功");
-              log.info(date +  YueCheHelper.AMPM.get(amPm)+"约车成功");
+              String info = xueYuan.getUserName() +":"+ret.getData()+":"+date+ YueCheHelper.AMPM.get(amPm)+"约车成功";
+              System.out.println(info);
+              log.info(info);
               xueYuan.setBookSuccess(isSuccess);
           }else if (result == YueChe.NO_CAR){  //无车
               System.out.println(date + YueCheHelper.AMPM.get(amPm)+"无车!");

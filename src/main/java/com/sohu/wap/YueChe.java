@@ -28,7 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sohu.wap.bo.DayCarInfo;
+import com.sohu.wap.bo.DayKaoShiInfo;
+import com.sohu.wap.bo.Result;
+import com.sohu.wap.bo.VerifyCode;
 import com.sohu.wap.http.HttpUtil4;
+import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.IO;
 import com.sohu.wap.util.MD5;
 import com.sohu.wap.util.MyImgFilter;
@@ -49,17 +53,22 @@ public class YueChe {
 	private static String LOGIN_URL = "http://haijia.bjxueche.net/";
 	private static String LOGOUT_URL = "http://haijia.bjxueche.net/Login.aspx?LoginOut=true";
 
-	private static String LOGIN_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=ImgCode&random=";
+	public static String LOGIN_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=ImgCode&random=";
 
 	private static String YUCHE_URL = "http://haijia.bjxueche.net/ych2.aspx";
-
+	private static String YUEKAO_URL = "http://haijia.bjxueche.net/yk2.aspx";
+	
 	private static String GET_CARS_URL = "http://haijia.bjxueche.net/Han/ServiceBooking.asmx/GetCars";
 	private static String BOOKING_CAR_URL = "http://haijia.bjxueche.net/Han/ServiceBooking.asmx/BookingCar";
-	private static String BOOKING_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=BookingCode&random=";
+	public  static String BOOKING_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=BookingCode&random=";
 
 	private static String __VIEWSTATE = "__VIEWSTATE";
 	private static String __EVENTVALIDATION = "__EVENTVALIDATION";
-
+	
+	private static String __EVENTARGUMENT = "__EVENTARGUMENT";
+    private static String __EVENTTARGET = "__EVENTTARGET";
+	
+	
 	private static String HIDDEN_KM = "hiddenKM";
 
 	public static int UNKNOWN_ERROR = -1;
@@ -80,8 +89,14 @@ public class YueChe {
 	private Element viewState;
 	private Element eventValid;
 	
+	private Element eventTarget;
+    private Element eventArgument;
+    
+	
 	
 	private Map<String, DayCarInfo> yueCheCarInfoMap = new HashMap<String, DayCarInfo>();
+	
+	private Map<String, DayKaoShiInfo> kaoShiInfoMap = new HashMap<String, DayKaoShiInfo>();
 	
 	/**
 	 * 
@@ -94,7 +109,7 @@ public class YueChe {
 		
 		//为了加快访问速度，只加载一次login页面
 		//如果没有访问过登录页面，或者上次访问登录页面超过了超时时间
-		if ( !isVisitedLoginUrl || (currentTime - visitLoginUrlTime > YueCheHelper.SESSION_TIMEOUT_MILLISECOND) ){
+		if (  !isVisitedLoginUrl || (currentTime - visitLoginUrlTime > YueCheHelper.LOGIN_SESSION_TIMEOUT_MILLISECOND) ){
 			String firstPage = httpUtil4.getContent(LOGIN_URL);
 			if (firstPage == null || firstPage.length()< 100) { //失败，一切不操作
 				return false;
@@ -143,6 +158,13 @@ public class YueChe {
 			//服务器失败的话，一直重试
 			String result = null;
 			
+			//进入creak 模式
+			 if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+			    
+			    ( (HttpUtil4Exposer)httpUtil4).addCookie(ImageCodeHelper.LOGIN_IMG_CODE, 
+			             ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.LOGIN_IMG_CODE).getCookie());
+			 }
+			
 			do{
 				 result = httpUtil4.post(LOGIN_URL, json);
 				 if (result == null){
@@ -189,10 +211,12 @@ public class YueChe {
 	 * -1 约车错误 0 约车成功 1 无车可约
 	 * 
 	 */
-	public  int yuche(String date, String amOrpm, boolean isGetHiddenKM)
+	public  Result<String> yuche(String date, String amOrpm, boolean isGetHiddenKM)
 			throws InterruptedException {
-
-		int result = UNKNOWN_ERROR;
+	    
+	    Result <String>result = new Result<String>(UNKNOWN_ERROR);
+	    
+		int resultN = UNKNOWN_ERROR;
 
 		// 页面中一个隐藏的输入，默认为2，可能更改
 		String hiddenKM = "2";
@@ -248,8 +272,9 @@ public class YueChe {
 			JSONArray carsArray = new JSONArray(carInfo);
 			System.out.println("可选的车有：" + carsArray.toString());
 			if (carsArray.length() == 0) {
-				result = NO_CAR;
-				return NO_CAR;
+				resultN = NO_CAR;
+				result.setRet(resultN);
+				return result;
 			}
 
 			// GetCar over
@@ -290,6 +315,13 @@ public class YueChe {
 					}
 					
 					ThreadUtil.sleep(1);
+					
+					//进入creak 模式
+		             if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+		                 HttpUtil4Exposer hu =     (HttpUtil4Exposer)httpUtil4;
+		                 hu.addCookie(ImageCodeHelper.BOOKING_IMG_CODE, 
+		                         ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.BOOKING_IMG_CODE).getCookie());
+		             }
 					//一直重试，知道返回结果
 					JSONObject bookResult = null;
 					do{
@@ -312,17 +344,19 @@ public class YueChe {
 
 					if (jbResult.getJSONObject(0).getBoolean("Result")) {
 						System.out.println("预约成功!...");
-						String info = "车辆信息:"+selectedCar.getString("YYRQ") + ":"
+						String info = "Info:"+selectedCar.getString("YYRQ") + ":"
 								+ selectedCar.getString("XNSD") + "-"
 								+ selectedCar.getString("CNBH");
+						result.setData(info);
 						System.out.println(info);
 						log.info(info);
-						result = BOOK_CAR_SUCCESS;
+						resultN = BOOK_CAR_SUCCESS;
+					
 					} else {
 						//TODO 如果今天已经约车车辆
 						String outMsg = jbResult.getJSONObject(0).getString("OutMSG");
 						if ("该日已预约过小时".equals(outMsg)){
-							result = ALREADY_BOOKED_CAR;
+							resultN = ALREADY_BOOKED_CAR;
 							break;
 						}
 						if("验证码错误！".equals(outMsg)){
@@ -334,12 +368,12 @@ public class YueChe {
 					}
 
 				}
-			} while (result != BOOK_CAR_SUCCESS && yucheTry <= YUCHE_RETRY_TIME);
+			} while (resultN != BOOK_CAR_SUCCESS && yucheTry <= YUCHE_RETRY_TIME);
 		} catch (JSONException e) {
 			log.error("error,", e);
 			e.printStackTrace();
 		}
-
+	    result.setRet(resultN);
 		return result;
 	}
 
@@ -355,7 +389,7 @@ public class YueChe {
 	 * 手动输入验证码
 	 * 
 	 */
-	private  String getImgCodeManual(String url) throws IOException {
+	    public   String getImgCodeManual(String url) throws IOException {
 
 		url = url + RandomUtil.getJSRandomDecimals();
 
@@ -420,11 +454,23 @@ public class YueChe {
 	
 	
 	private String getImgCode(String url)throws IOException{
-		if (YueCheHelper.IMAGE_CODE_INPUT_METHOD_IS_AUTO){
-			return getImgCodeAuto(url);
-		}else{
-			return	getImgCodeManual(url);
-		}
+	    if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+	        if (url.equals(LOGIN_IMG_URL)){
+	            VerifyCode  vcode=  ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.LOGIN_IMG_CODE);
+	            return vcode.getVcode();
+	        }else{
+	            VerifyCode  vcode=  ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.BOOKING_IMG_CODE);
+                return vcode.getVcode();
+	        }
+	       
+	    }else{
+	        if (YueCheHelper.IMAGE_CODE_INPUT_METHOD_IS_AUTO){
+	            return getImgCodeAuto(url);
+	        }else{
+	            return  getImgCodeManual(url);
+	        }
+	    }
+		
 	}
 	
 	private  String getImgCodeAuto(String url) throws IOException {
@@ -598,5 +644,70 @@ public class YueChe {
 		}
 		 return 4;
 	}
+
+	
+	
+//扫描table ，得到约车信息
+    
+    private   String getAvailableYueKaoInfo(){
+        String ykPage = null;
+        do{
+             ykPage = httpUtil4.getContent(YUEKAO_URL);
+             
+        }while(ykPage == null);
+        if (ykPage.equals("/login.aspx")){
+            return "notLogin";
+        }
+     
+        Document document = Jsoup.parse(ykPage);
+        viewState = document.getElementById(__VIEWSTATE);
+        eventValid = document.getElementById(__EVENTVALIDATION);
+        
+        Element table = document.getElementById("tblMain");
+        Elements trs = table.getElementsByTag("tr");
+        int size  = trs.size();
+        for (int i = 1; i < size; i ++){
+            Element tr = trs.get(i);
+            System.out.println(tr.text());
+            Elements tds = tr.getElementsByTag("td");
+            String date = tds.get(0).text();
+            String amPm = tds.get(1).text();
+            String remindNum = tds.get(2).text();
+            Element op =  tds.get(3);
+            Element a =op.getElementsByTag("a").get(0);
+            String href = a.attr("href");
+            int index = href.indexOf("&#39;");
+           
+            String kaoshi =href.substring( index ,href.indexOf("&#39;", index+5));
+            DayKaoShiInfo carInfo = new DayKaoShiInfo();
+            carInfo.setDate(date.replace("-", ""));
+            carInfo.setAmPm(amPm);
+            carInfo.setRemindNum(remindNum) ;
+            
+            carInfo.setKaoShi(kaoshi);
+            
+            kaoShiInfoMap.put(date,carInfo);
+            
+        }
+        return "getedYueKaoInfo";
+    }
+	
+	
+	Result<String > yueKao (String date){
+	    return null;
+	}
+    /**
+     * @return the httpUtil4
+     */
+    public HttpUtil4 getHttpUtil4() {
+        return httpUtil4;
+    }
+
+    /**
+     * @param httpUtil4 the httpUtil4 to set
+     */
+    public void setHttpUtil4(HttpUtil4 httpUtil4) {
+        this.httpUtil4 = httpUtil4;
+    }
 	
 }

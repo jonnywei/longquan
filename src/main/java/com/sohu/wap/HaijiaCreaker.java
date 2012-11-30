@@ -19,36 +19,35 @@ import com.sohu.wap.util.SystemConfigurations;
 
 
 /**
- * 约车主程序
+ * 
+ *
+ * 
+ * 
  *
  */
-public class HaijiaMain 
+public class HaijiaCreaker 
 {
-    private static Logger log = LoggerFactory.getLogger(HaijiaMain.class);
+    private static Logger log = LoggerFactory.getLogger(HaijiaCreaker.class);
    
     private static int nThreads = 10;
     
     public static void main( String[] args ) throws InterruptedException, IOException
     {
 
+        
     	ExecutorService executeService = Executors.newFixedThreadPool(nThreads);
         List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
         
         String date = DateUtil.getFetureDay(SystemConfigurations.getSystemIntProperty("system.yueche.date",7));
-      
-        System.out.println("抢车日期为:"+ date);
-       
-        if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
-            //进入破解模式
-//             速度肯定是最快的了
-//            * 利用海驾的验证码漏洞，事先输入验证码，之后约车
-            System.out.println("Open Creak Model");
-            log.info("Open Creak Model");
-            ImageCodeHelper.getImageCodeCookie();
-        }
-      
+          
+        System.out.println(date);
         
-        YueCheHelper.waitForService();
+     
+        
+        
+        YueCheHelper.IS_ENTER_CREAKER_MODEL = true;
+        
+        ImageCodeHelper.getImageCodeCookie();
         
         for (String accoutId: AccountMap.getInstance().getXueYuanAccountMap().keySet()){
             XueYuanAccount  xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);
@@ -76,6 +75,7 @@ public class HaijiaMain
         System.in.read();
       
     }
+    
     
    
     

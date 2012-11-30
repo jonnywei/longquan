@@ -50,12 +50,14 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -93,7 +95,7 @@ public class HttpUtil4
 	private  static HttpUtil4 _instance_haveCookie;
 	
 	//对象变量
-	private HttpClient httpClient;
+	protected DefaultHttpClient httpClient;
 	
 	private static String URL_ENCODE = "UTF-8";
 	/*
@@ -108,7 +110,7 @@ public class HttpUtil4
     /*
      * 
      */
-    private HttpUtil4(boolean haveCookie)
+    protected HttpUtil4(boolean haveCookie)
     {
         init(haveCookie);
     }
@@ -277,6 +279,8 @@ public class HttpUtil4
     public static HttpUtil4 createHttpClient(){
     	return  new HttpUtil4(true);
     }
+    
+  
     
     private static String encodeurl(String url)
     {

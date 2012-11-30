@@ -70,9 +70,13 @@ public class YueCheHelper
     
     public static String YUCHE_TIME = SystemConfigurations.getSystemStringProperty("system.yueche.time","am,pm") ;
     
-    
+     
+    public static boolean    IS_ENTER_CREAKER_MODEL = SystemConfigurations.getSystemBooleanProperty("system.open.creak.model",false) ;; 
     
     private static String    FK_YUECHE_BEGIN_TIME = "07:40";
+    
+    
+    private static String    CREAK_START_TIME ="07:34";
     
     private static String    SERVICE_BEGIN_TIME ="07:35";
     
@@ -80,12 +84,16 @@ public class YueCheHelper
     
     public  static int     WAITTING_SCAN_INTERVAL= 5;
     
-    public static  int SESSION_TIMEOUT_MILLISECOND  =  30 * 60 *1000;
+    public static  int LOGIN_SESSION_TIMEOUT_MILLISECOND  =  30 * 60 *1000;
     
+    public static  int IMAGE_CODE_TIMEOUT_MILLISECOND  =  10 * 60 *1000;
     
    
   public static   boolean isInServiceTime(){
     
+      if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+          return  DateUtil.isCurrTimeInTimeInterval(CREAK_START_TIME,SERVICE_END_TIME);
+      }
 	  return   isInServiceTime(null);
     	 
         
