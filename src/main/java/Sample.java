@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.xerial.db.sql.sqlite.SQLiteJDBCLoader;
+//import org.xerial.db.sql.sqlite.SQLiteJDBCLoader;
 
 
 public class Sample
@@ -13,7 +13,7 @@ public class Sample
   {
     // load the sqlite-JDBC driver using the current class loader
     Class.forName("org.sqlite.JDBC");
-    System.out.println(String.format("running in %s mode", SQLiteJDBCLoader.isNativeMode() ? "native" : "pure-java"));
+//    System.out.println(String.format("running in %s mode", SQLiteJDBCLoader.isNativeMode() ? "native" : "pure-java"));
 
     Connection connection = null;
     try

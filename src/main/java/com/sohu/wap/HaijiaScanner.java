@@ -67,8 +67,12 @@ public class HaijiaScanner
             if (YueCheHelper.isInServiceTime()){
             	
             	for (ScanYueCheTask yueCheTask: list){
-                     
-            		yueCheTask.scan();
+                    try{
+                    	yueCheTask.scan();
+                    }catch(Exception ex){
+                    	log.error("exception",ex);
+                    }
+            		
                     
                     ThreadUtil.sleep(  RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
                 }

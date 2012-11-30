@@ -32,12 +32,18 @@ public class ScanYueCheTask extends YueCheTask {
 		int yueCheInfo = canYueChe(xueYuan.getYueCheDate(),xueYuan.getYueCheAmPm());
 		
 		if (yueCheInfo == 0){
-			doYueche();
+			doYueche(YueCheHelper.AM_STR);
 		} else if (yueCheInfo == 1){
-			return ALREADY_YUECHE;
-		}else if (yueCheInfo == 2){
+			doYueche(YueCheHelper.PM_STR);
 			
+		}else if (yueCheInfo == 2){
+			doYueche(YueCheHelper.NI_STR);
 		}else if (yueCheInfo == 3){
+			return ALREADY_YUECHE;
+			
+		}else if (yueCheInfo == 4){
+		
+		}else if (yueCheInfo == 5){
 			isLogon =false;
 		}
 		
@@ -80,11 +86,11 @@ public class ScanYueCheTask extends YueCheTask {
      * @throws IOException 
      * 
      */
-    private  void  doYueche () throws InterruptedException {
+    private  void  doYueche ( String amPm ) throws InterruptedException {
     
 
     	  //按情况约车
-        String amPm = xueYuan.getYueCheAmPm();
+        amPm = YueCheHelper.AMPM.get(amPm);
         boolean  isSuccess = false;
         boolean first = true;
         do {
@@ -95,7 +101,7 @@ public class ScanYueCheTask extends YueCheTask {
                  first = false;
              }
         
-          int  result  = yuche(date, xueYuan.getYueCheAmPm(),false);
+          int  result  = yuche(date, amPm,false);
           if (result == YueChe.BOOK_CAR_SUCCESS){
               isSuccess = true;
               System.out.println(date + YueCheHelper.AMPM.get(amPm)+"约车成功");

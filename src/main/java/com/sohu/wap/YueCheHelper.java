@@ -28,8 +28,17 @@ public class YueCheHelper
     
     public static boolean IMAGE_CODE_INPUT_METHOD_IS_AUTO = true;
     
+    public static String AM_STR="am";
+    public static String PM_STR="pm";
+    public static String NI_STR="ni";
     
-    public  static String CAR_TYPE[]= new String[] {"als","byd","zdd","fk","stn"};
+    public  static String CAR_TYPE_ALS = "als";
+    public  static String CAR_TYPE_BYD = "byd";
+    public  static String CAR_TYPE_ZDD = "zdd";
+    public  static String CAR_TYPE_FK = "fk";
+    public  static String CAR_TYPE_STN = "stn";
+    
+    
     
     private static String[]  AM_PM_NUM ={"812","15","58"};
     private static String[]  AM_PM_STR={"上午","下午","晚上"};
@@ -59,11 +68,11 @@ public class YueCheHelper
    
     public static  int   MAX_SLEEP_TIME = SystemConfigurations.getSystemIntProperty("system.maxsleeptime", 3);
     
-    public static String YUCHE_TIME = SystemConfigurations.getSystemStringProperty("system.yueche.time","812,15") ;
+    public static String YUCHE_TIME = SystemConfigurations.getSystemStringProperty("system.yueche.time","am,pm") ;
     
     
     
-    private static String    BYD_YUECHE_BEGIN_TIME = "07:35";
+    private static String    FK_YUECHE_BEGIN_TIME = "07:40";
     
     private static String    SERVICE_BEGIN_TIME ="07:35";
     
@@ -75,10 +84,23 @@ public class YueCheHelper
     
     
    
+  public static   boolean isInServiceTime(){
     
-    public static   boolean isInServiceTime(){
+	  return   isInServiceTime(null);
+    	 
+        
+    }
+    
+    public static   boolean isInServiceTime(String carType){
     	
-        return   DateUtil.isCurrTimeInTimeInterval(SERVICE_BEGIN_TIME,SERVICE_END_TIME);
+    	if (carType == null || ( !CAR_TYPE_FK.equalsIgnoreCase(carType) && !CAR_TYPE_STN.equalsIgnoreCase(carType)) ){
+    		
+    		return   DateUtil.isCurrTimeInTimeInterval(SERVICE_BEGIN_TIME,SERVICE_END_TIME);
+    		
+    	}else{
+    		return   DateUtil.isCurrTimeInTimeInterval(FK_YUECHE_BEGIN_TIME,SERVICE_END_TIME);
+    	}
+        
     }
     
     public static  void waitForService(){

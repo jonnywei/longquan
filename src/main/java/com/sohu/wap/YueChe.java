@@ -27,7 +27,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sohu.wap.bo.YueCheCarInfo;
+import com.sohu.wap.bo.DayCarInfo;
 import com.sohu.wap.http.HttpUtil4;
 import com.sohu.wap.util.IO;
 import com.sohu.wap.util.MD5;
@@ -81,7 +81,7 @@ public class YueChe {
 	private Element eventValid;
 	
 	
-	private Map<String, YueCheCarInfo> yueCheCarInfoMap = new HashMap<String, YueCheCarInfo>();
+	private Map<String, DayCarInfo> yueCheCarInfoMap = new HashMap<String, DayCarInfo>();
 	
 	/**
 	 * 
@@ -169,7 +169,12 @@ public class YueChe {
 				}else if (result.indexOf("系统服务时间每天从07:35-20:00")!= -1  ){
 					System.out.println("系统服务时间每天从07:35-20:00;"+"enter sleep");
 					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
-				}else{
+				}else if (result.indexOf("桑塔纳、富康车型学员登陆时间为每天 07:40 以后!")!= -1  ){
+					System.out.println("桑塔纳、富康车型学员登陆时间为每天 07:40 以后!;"+"enter sleep");
+					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
+				}
+				
+				else{
 					
 				}
 //				
@@ -511,7 +516,7 @@ public class YueChe {
 	
 	//扫描table ，得到约车信息
 	
-	private   String getYueCheInfo(){
+	private   String getAvailableCarInfo(){
 		String yuchePage = null;
 		do{
 			 yuchePage = httpUtil4.getContent(YUCHE_URL);
@@ -534,38 +539,64 @@ public class YueChe {
 			String pmStatus = tds.get(2).text();
 			String niStatus = tds.get(3).text();
 			
-			YueCheCarInfo carInfo = new YueCheCarInfo();
+			DayCarInfo carInfo = new DayCarInfo();
 			carInfo.setDate(date.replace("-", ""));
 			carInfo.setAmCarInfo(amStatus);
 			carInfo.setPmCarInfo(pmStatus);
 			carInfo.setNiCarInfo(niStatus);
+			
+			carInfo.getCarInfo().put(YueCheHelper.AM_STR, amStatus);
+			carInfo.getCarInfo().put(YueCheHelper.PM_STR, pmStatus);
+			carInfo.getCarInfo().put(YueCheHelper.NI_STR, niStatus);
+			
 			yueCheCarInfoMap.put(date,carInfo);
 			
 		}
 		return "getedCarInfo";
 	}
 	/**
-	 * 0 可以
-	 * 1 该日已经约车
-	 * 2 无车
-	 * 3 登录超时
+	 * 0 上午可以
+	 * 1 下午可以
+	 * 2 晚上可以
+	 * 
+	 * 3 该日已经约车
+	 * 4 无车
+	 * 5 登录超时
 	 */
 	public int canYueChe (String yueCheDate,  String amPm){
-		String result = getYueCheInfo();
+		
+		String result = getAvailableCarInfo();
 		
 		if (result.equals("noLogin")){
-			return 3;
+			return 5;
 		}else{
-		    YueCheCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
+		    DayCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
 		    if (ycCarInfo != null){
-		        
+		    	String[] timeArray = amPm.split("[,;]");
+		        if (timeArray.length  <  0) {
+		        	timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
+		        }
+		        boolean havaCar = false;
+		        for (String amPmStr : timeArray){  //按情况约车
+		        	 String info = ycCarInfo.getCarInfo().get(amPmStr);
+		        	 if (info.equals("无")){
+		        		 
+		 	        }else if (info.equals("已约")){
+		 	            return 3;
+		 	        }else{
+		 	        	if (YueCheHelper.AM_STR.equals(amPmStr)){
+		 	        		return 0;
+		 	        	}else if (YueCheHelper.PM_STR.equals(amPmStr)){
+		 	        		return 1;
+		 	        	}else{
+		 	        		return 2;
+		 	        	}
+		 	        }
+		        }
 		    }
-		    if (result.equals("无")){
-	            return 2;
-	        }else if (result.equals("已约")){
-	            return 1;
-	        }
+		   
 		}
-		 return 0;
+		 return 4;
 	}
+	
 }

@@ -683,6 +683,7 @@ public class HttpUtil4
         httpPost.setHeader("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.7");
         httpPost.setHeader("Connection", "keep-alive");
         httpPost.setHeader("Referer", "http://haijia.bjxueche.net/");
+        
   	
 		try
 		{

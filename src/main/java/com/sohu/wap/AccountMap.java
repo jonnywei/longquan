@@ -166,7 +166,7 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
            sa.setUserName(key);
            sa.setPassword(password);
            sa.setYueCheDate(DateUtil.getCurrYearStr()+temp[1]);
-           sa.setYueCheAmPm(YueCheHelper.AMPM.get(temp[2]));
+           sa.setYueCheAmPm(temp[2]);
            sa.setCarType(temp[3]);
            scanXueYuanAccountMap.put(key, sa);
 //           log.info("add SohuAccounts " + sa);
