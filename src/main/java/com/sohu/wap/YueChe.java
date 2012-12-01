@@ -168,7 +168,7 @@ public class YueChe {
 			do{
 				 result = httpUtil4.post(LOGIN_URL, json);
 				 if (result == null){
-					 ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
+//					 ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
 				 }else{
 					 break;
 				 }
@@ -177,8 +177,8 @@ public class YueChe {
 			
 		
 			if (result != null) {
-				System.out.println(result);
-				log.debug(result);
+//				System.out.println(result);
+//				log.debug(result);
 				//登录成功
 				if (result.equals("/index.aspx")) {
 					isLoginSuccess =true;
@@ -187,17 +187,26 @@ public class YueChe {
 				}else if(result.indexOf("账号或密码错误")!= -1  ){  //失败的话 ，继续登录
 					System.out.println("账号或密码错误！登录失败.");
 					log.error("账号或密码错误"); //打印错误，直接退出
-					System.exit(1);
+					log.error("accountError:"+userName+","+passwd); //打印错误，直接退出
+					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
 				}else if (result.indexOf("系统服务时间每天从07:35-20:00")!= -1  ){
 					System.out.println("系统服务时间每天从07:35-20:00;"+"enter sleep");
-					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
+					ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
+//					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
 				}else if (result.indexOf("桑塔纳、富康车型学员登陆时间为每天 07:40 以后!")!= -1  ){
 					System.out.println("桑塔纳、富康车型学员登陆时间为每天 07:40 以后!;"+"enter sleep");
-					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
+					ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
+//					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
+				}else if(result.indexOf("您的IP地址被限制登录!")!= -1  ){  //失败的话 ，继续登录
+					System.out.println("您的IP地址被限制登录!");
+					log.error("您的IP地址被限制登录!"); //打印错误，直接退出
+					System.exit(1);
 				}
 				
+				
 				else{
-					
+					log.debug(result);
+					System.out.println(result);
 				}
 //				
 			 
@@ -242,6 +251,7 @@ public class YueChe {
 				carsJson = httpUtil4.postJson(GET_CARS_URL, json);
 				if (carsJson == null) {
 					log.error("get car info error");
+					ThreadUtil.sleep(1);
 				}else{
 					break;
 				}
@@ -253,12 +263,20 @@ public class YueChe {
 			JSONObject selectedCar = null;
 
 			String data = carsJson.getString("d");
-
+			log.info("carInfo:"+data);
+			if(data.equals("LoginOut:您的IP地址被禁止!")){
+				log.error("LoginOut:您的IP地址被禁止!");
+				ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
+				System.exit(1);
+				
+			}
 			int splitPosition = data.indexOf("_");
 			String carInfo = data.substring(0, splitPosition);
 			String nu = data.substring(splitPosition + 1);
+			
 			int totalNum = Integer.valueOf(nu);
-
+			
+			log.info("totalPage:"+totalNum);
 			// {
 			//
 			// "YYRQ": "20121126",
@@ -271,6 +289,7 @@ public class YueChe {
 
 			JSONArray carsArray = new JSONArray(carInfo);
 			System.out.println("可选的车有：" + carsArray.toString());
+			log.info("availableCar：" + carsArray.toString());
 			if (carsArray.length() == 0) {
 				resultN = NO_CAR;
 				result.setRet(resultN);
@@ -286,6 +305,7 @@ public class YueChe {
 				selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
 
 				if (selectedCar != null) {
+					log.info("选择的车是：" + selectedCar.toString());
 					System.out.println("选择的车是：" + selectedCar.toString());
 					String imageCode = "";
 					try {
@@ -314,12 +334,11 @@ public class YueChe {
 						e.printStackTrace();
 					}
 					
-					ThreadUtil.sleep(1);
+//					ThreadUtil.sleep(1);
 					
 					//进入creak 模式
 		             if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
-		                 HttpUtil4Exposer hu =     (HttpUtil4Exposer)httpUtil4;
-		                 hu.addCookie(ImageCodeHelper.BOOKING_IMG_CODE, 
+		               ((HttpUtil4Exposer)httpUtil4).addCookie(ImageCodeHelper.BOOKING_IMG_CODE, 
 		                         ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.BOOKING_IMG_CODE).getCookie());
 		             }
 					//一直重试，知道返回结果
@@ -353,22 +372,31 @@ public class YueChe {
 						resultN = BOOK_CAR_SUCCESS;
 					
 					} else {
-						//TODO 如果今天已经约车车辆
+						
 						String outMsg = jbResult.getJSONObject(0).getString("OutMSG");
-						if ("该日已预约过小时".equals(outMsg)){
+						log.info("book car return msg:"+outMsg);
+						if ("该日已预约过小时".equals(outMsg) ){
 							resultN = ALREADY_BOOKED_CAR;
 							break;
 						}
+						if ("非法操作".equals(outMsg)){
+							resultN = ALREADY_BOOKED_CAR;
+							break;
+						}
+						
 						if("验证码错误！".equals(outMsg)){
 							System.out.println(outMsg+"不计入retry次数");
-							yucheTry--; //验证码错误，不计入retry次数
+							//yucheTry--; //验证码错误，不计入retry次数
+						}
+						if(outMsg.indexOf("该车时段已经被约") != -1){
+							yucheTry++; //该页面可能都被约了
 						}
 						System.out.println("book car return error:"+outMsg);
 						log.error("book car return error:"+outMsg);
 					}
 
 				}
-			} while (resultN != BOOK_CAR_SUCCESS && yucheTry <= YUCHE_RETRY_TIME);
+			} while (resultN != BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
 		} catch (JSONException e) {
 			log.error("error,", e);
 			e.printStackTrace();
@@ -408,6 +436,7 @@ public class YueChe {
 		String storeAddress = imgDir  + File.separator + fileName;
 
 		ByteBuffer bytes = null;
+		
 		// 重试三次
 		int loop = 0;
 		do {
@@ -429,22 +458,27 @@ public class YueChe {
 		try {
 			w = process.waitFor();
 		} catch (InterruptedException e) {
-
 			e.printStackTrace();
 		}
 
-		System.out.println("请输入验证码\r\n");
+		System.out.println("请输入验证码...");
 
 		do {
 			BufferedReader strin2 = new BufferedReader(new InputStreamReader(
 					System.in));
 			imageCode = strin2.readLine().trim();
-			System.out.println("输入为:" + imageCode + "; 正确按任意键，错误按R/r \r\n");
+			System.out.println("输入为:" + imageCode + ";输入错误按R/r,重新下载验证码按D/d,任意键OK");
 			String command = strin2.readLine().trim().toLowerCase();
-			if (!command.equals("r")) {
+			if (command.equals("r")) {
+				System.out.println("重新输入...");
+				continue;
+			}else if(command.equals("d")){
+				System.out.println("重新下载验证码...");
+				return null;
+			}else{
 				break;
 			}
-			System.out.println("重新输入\r\n");
+			
 		} while (true);
 
 		IO.deleteFile(storeAddress);

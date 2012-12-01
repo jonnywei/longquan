@@ -3,6 +3,7 @@ package com.sohu.wap;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,11 +75,12 @@ public class YueCheHelper
     public static boolean    IS_ENTER_CREAKER_MODEL = SystemConfigurations.getSystemBooleanProperty("system.open.creak.model",false) ;; 
     
     private static String    FK_YUECHE_BEGIN_TIME = "07:40";
-    
+//    private static String    FK_YUECHE_BEGIN_TIME = "00:50";
     
     private static String    CREAK_START_TIME ="07:34";
     
     private static String    SERVICE_BEGIN_TIME ="07:35";
+//    private static String    SERVICE_BEGIN_TIME ="00:49";
     
     private static String   SERVICE_END_TIME ="20:00";
     
@@ -121,5 +123,35 @@ public class YueCheHelper
             	break;
             }
         }while (true);
+    }
+    
+    
+    
+    public static void waiting(String carType){
+    	Date beginDate = DateUtil.getTodayTime(SERVICE_BEGIN_TIME);
+    	
+    	if ( CAR_TYPE_FK.equalsIgnoreCase(carType)  || CAR_TYPE_STN.equalsIgnoreCase(carType)){
+    		beginDate = DateUtil.getTodayTime(FK_YUECHE_BEGIN_TIME);
+    	}
+    	long beginTime = beginDate.getTime();
+    	
+    	do {
+    		long distance = beginTime - System.currentTimeMillis();
+            //在服务时间内
+    		System.out.println("等待...");
+            if ( distance  >  YueCheHelper.MAX_SCAN_INTEVAL*1000 ){
+            	ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
+            	
+            }else if ( distance > 10000 ){
+            	ThreadUtil.sleep(MAX_SLEEP_TIME);
+            }else{
+            	break;
+            }
+        }while (true);
+    }
+    
+    public static void main (String[] args){
+    	waiting("fk");
+       
     }
 }

@@ -105,6 +105,18 @@ public class DateUtil
      * @return 
      */
     public static  boolean isCurrTimeInTimeInterval(String startHourMin, String endHourMin){
+     
+    	return isCurrTimeInTimeInterval(getTodayTime(startHourMin), getTodayTime(endHourMin));
+    }
+    
+    /**
+     * 根据分钟得到当天的时间 24小时制
+     * @author jianjunwei
+     * @param startHourMin 开始的小时和分钟
+     * @param  endHourMin  结束的小时和分钟
+     * @return 
+     */
+    public static  Date getTodayTime(String hourMin){
         
         Calendar ca =   Calendar.getInstance(Locale.CHINA);
         
@@ -113,9 +125,9 @@ public class DateUtil
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm", Locale.CHINA);
        
         try {
-            Date startDate =  sdf.parse(now+startHourMin);
-            Date endDate = sdf.parse(now+endHourMin);
-            return isCurrTimeInTimeInterval(startDate, endDate);
+            Date startDate =  sdf.parse(now+hourMin);
+            
+            return startDate;
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -124,7 +136,7 @@ public class DateUtil
         
         
         
-        return false;
+        return null;
     }
     
     

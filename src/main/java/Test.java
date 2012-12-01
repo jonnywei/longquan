@@ -2,6 +2,8 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
+import com.sohu.wap.YueCheHelper;
+
 
 public class Test {
 
@@ -23,6 +25,17 @@ public class Test {
 		cookie.setVersion(1);
 		
 		httpClient.getCookieStore().addCookie(cookie);
+		
+		
+		String[] timeArray = "am,pm,ni".split("[,;]");
+        if (timeArray.length  <  0) {
+        	timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
+        }
+        
+        for (String amPm : timeArray){  //按情况约车
+        	amPm =  YueCheHelper.AMPM.get(amPm);
+        	System.out.println(amPm);
+        }
 	}
 
 }

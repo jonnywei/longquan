@@ -130,9 +130,10 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
          
            sa.setUserName(key);
            sa.setPassword(password);
-           sa.setCarType(carType);
-           sa.setYueCheAmPm(amPm);
           
+           sa.setYueCheAmPm(amPm);
+           sa.setCarType(carType);
+           
            xueYuanAccountMap.put(key, sa);
 //           log.info("add SohuAccounts " + sa);
          }

@@ -10,6 +10,7 @@ import com.sohu.wap.bo.Result;
 import com.sohu.wap.http.HttpUtil4;
 import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.RandomUtil;
+import com.sohu.wap.util.ThreadUtil;
 
 public class YueCheTask  extends YueChe implements Callable<Integer> {
 
@@ -34,6 +35,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	@Override
 	public Integer call() throws Exception {
 	    
+		 YueCheHelper.waiting(xueYuan.getCarType());
 		 doLogin();
          doYuche();
          if (xueYuan.isBookSuccess()){
@@ -49,7 +51,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
       do {
              if (!first){
                  log.error("login error. retry!");
-                 Thread.sleep(1000 * RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
+                 ThreadUtil.sleep( RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
              }else{
                  first = false;
              }
@@ -72,14 +74,14 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
         	timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
         }
         
-        for (String amPm : timeArray){  //按情况约车
-            amPm  =  YueCheHelper.AMPM.get(amPm);
+        for (String amPm1 : timeArray){  //按情况约车
+            String amPm  =  YueCheHelper.AMPM.get(amPm1);
             boolean  isSuccess = false;
             boolean first = true;
             do {
                  if (!first){
                      log.error("yuche  error. retry!");
-                     Thread.sleep(1000 * RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
+                     ThreadUtil.sleep( RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
                  }else{
                      first = false;
                  }
@@ -105,7 +107,9 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
               
              }while (!isSuccess);
             
-            
+            if (isSuccess){ //如果约车成功的话，退出
+            	break;
+            }
             
         }    
          
