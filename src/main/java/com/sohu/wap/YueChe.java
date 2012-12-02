@@ -563,7 +563,7 @@ public class YueChe {
 		if (OSUtil.getOSType() ==OSUtil.LINUX){
 			comand =  "tesseract "+ destAddress +" " + textImg ; //命令行
 		}else{
-			comand =  "d:/program/tesseract/tesseract "+ destAddress +" " + textImg ; //命令行
+			comand =  "tesseract "+ destAddress +" " + textImg ; //命令行
 		}
 	
 
