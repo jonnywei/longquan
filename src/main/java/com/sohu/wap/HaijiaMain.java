@@ -26,7 +26,7 @@ public class HaijiaMain
 {
     private static Logger log = LoggerFactory.getLogger(HaijiaMain.class);
    
-    private static int nThreads = 10;
+    private static int nThreads = 50;
     
     public static void main( String[] args ) throws InterruptedException, IOException
     {

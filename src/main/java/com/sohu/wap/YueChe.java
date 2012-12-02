@@ -267,7 +267,7 @@ public class YueChe {
 			if(data.equals("LoginOut:您的IP地址被禁止!")){
 				log.error("LoginOut:您的IP地址被禁止!");
 				ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
-				System.exit(1);
+//				System.exit(1);
 				
 			}
 			int splitPosition = data.indexOf("_");
