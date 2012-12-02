@@ -34,7 +34,7 @@ public class HaijiaMain
     	ExecutorService executeService = Executors.newFixedThreadPool(nThreads);
         List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
         
-        String date = DateUtil.getFetureDay(SystemConfigurations.getSystemIntProperty("system.yueche.date",7));
+        String date = SystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(7));
       
         System.out.println("抢车日期为:"+ date);
        
