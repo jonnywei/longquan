@@ -559,8 +559,13 @@ public class YueChe {
 //
 //			e.printStackTrace();
 //		}
-
-		comand =  "tesseract "+ destAddress +" " + textImg ; //命令行
+		
+		if (OSUtil.getOSType() ==OSUtil.LINUX){
+			comand =  "tesseract "+ destAddress +" " + textImg ; //命令行
+		}else{
+			comand =  "d:/program/tesseract/tesseract "+ destAddress +" " + textImg ; //命令行
+		}
+	
 
 		Process process1 = Runtime.getRuntime().exec(comand);
 

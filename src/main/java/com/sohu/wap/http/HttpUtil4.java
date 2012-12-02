@@ -68,6 +68,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.util.OSUtil;
+
 
 
 
@@ -687,7 +689,11 @@ public class HttpUtil4
         httpPost.setHeader("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.7");
         httpPost.setHeader("Connection", "keep-alive");
         httpPost.setHeader("Referer", "http://haijia.bjxueche.net/");
-        
+        String ip = OSUtil.getFakeIp();
+        httpPost.setHeader("X-Forwarded-For",ip);
+        httpPost.setHeader("CLIENT_IP",ip);
+        httpPost.setHeader("VIA",ip);
+        httpPost.setHeader("REMOTE_ADDR",ip);
   	
 		try
 		{
@@ -749,7 +755,13 @@ public class HttpUtil4
         httpPost.setHeader("Content-Type", "application/json; charset=utf-8");
         httpPost.setHeader("Pragma", "no-cache");
         httpPost.setHeader("X-Requested-With", "XMLHttpRequest");
+        String ip = OSUtil.getFakeIp();
+        httpPost.setHeader("X-Forwarded-For",ip);
+        httpPost.setHeader("CLIENT_IP",ip);
+        httpPost.setHeader("VIA",ip);
+        httpPost.setHeader("REMOTE_ADDR",ip);
       
+        
     
         try
         {
