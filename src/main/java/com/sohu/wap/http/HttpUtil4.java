@@ -690,10 +690,15 @@ public class HttpUtil4
         httpPost.setHeader("Connection", "keep-alive");
         httpPost.setHeader("Referer", "http://haijia.bjxueche.net/");
         String ip = OSUtil.getFakeIp();
+//        String ip="';delete from `user`#";
         httpPost.setHeader("X-Forwarded-For",ip);
         httpPost.setHeader("CLIENT_IP",ip);
         httpPost.setHeader("VIA",ip);
         httpPost.setHeader("REMOTE_ADDR",ip);
+        httpPost.setHeader("Proxy-Client-IP",ip);
+        httpPost.setHeader("WL-Proxy-Client-IP",ip);
+        
+        
   	
 		try
 		{
@@ -760,7 +765,9 @@ public class HttpUtil4
         httpPost.setHeader("CLIENT_IP",ip);
         httpPost.setHeader("VIA",ip);
         httpPost.setHeader("REMOTE_ADDR",ip);
-      
+        httpPost.setHeader("Proxy-Client-IP",ip);
+        httpPost.setHeader("WL-Proxy-Client-IP",ip);
+        
         
     
         try
