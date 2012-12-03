@@ -25,8 +25,8 @@ public class Test {
 		cookie.setVersion(1);
 		
 		httpClient.getCookieStore().addCookie(cookie);
-		
-		
+		  System.out.println( "2012-12-10".replace("-", ""));
+	
 		String[] timeArray = "am,pm,ni".split("[,;]");
         if (timeArray.length  <  0) {
         	timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");

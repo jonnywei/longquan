@@ -115,6 +115,9 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
    
         while(itor.hasNext())
         {
+            
+           XueYuanAccount sa= new XueYuanAccount();
+           
            String key = ((String)itor.next()).trim() ;
       
            String value =(String) mapdb.get(key);
@@ -124,10 +127,11 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
            String password = temp[0];
            String  amPm = temp[1];
            String carType =temp[2];
+           if(temp.length > 3){
+               String whiteCar = temp[3];
+               sa.setWhiteCar(whiteCar);
+           }
            
-
-           XueYuanAccount sa= new XueYuanAccount();
-         
            sa.setUserName(key);
            sa.setPassword(password);
           
@@ -160,15 +164,16 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
         
            String temp [] =  value.split(";");
            
-           String password = temp[0];
+           String userName = temp[0];
+           String password = temp[1];
 
            XueYuanAccount sa= new XueYuanAccount();
-         
-           sa.setUserName(key);
+           sa.setId(Integer.valueOf(key));
+           sa.setUserName(userName);
            sa.setPassword(password);
-           sa.setYueCheDate(DateUtil.getCurrYearStr()+temp[1]);
-           sa.setYueCheAmPm(temp[2]);
-           sa.setCarType(temp[3]);
+           sa.setYueCheDate(temp[2]);
+           sa.setYueCheAmPm(temp[3]);
+           sa.setCarType(temp[4]);
            scanXueYuanAccountMap.put(key, sa);
 //           log.info("add SohuAccounts " + sa);
          }

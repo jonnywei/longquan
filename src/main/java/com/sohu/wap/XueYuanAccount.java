@@ -21,6 +21,9 @@ public class XueYuanAccount {
     
     private String amPm;
     
+    private String whiteCar;
+    
+    
     private boolean isBookSuccess = false;
     /**
      * @return the id
@@ -88,4 +91,16 @@ public class XueYuanAccount {
 	public void setYueCheAmPm(String amPm) {
 		this.amPm = amPm;
 	}
+    /**
+     * @param whiteCar the whiteCar to set
+     */
+    public void setWhiteCar(String whiteCar) {
+        this.whiteCar = whiteCar;
+    }
+    /**
+     * @return the whiteCar
+     */
+    public String getWhiteCar() {
+        return whiteCar;
+    }
 }

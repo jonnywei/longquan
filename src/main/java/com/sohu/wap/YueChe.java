@@ -624,8 +624,9 @@ public class YueChe {
 			String pmStatus = tds.get(2).text();
 			String niStatus = tds.get(3).text();
 			
+			date =date.replace("-", "");
 			DayCarInfo carInfo = new DayCarInfo();
-			carInfo.setDate(date.replace("-", ""));
+			carInfo.setDate(date);
 			carInfo.setAmCarInfo(amStatus);
 			carInfo.setPmCarInfo(pmStatus);
 			carInfo.setNiCarInfo(niStatus);

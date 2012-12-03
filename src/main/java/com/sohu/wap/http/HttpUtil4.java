@@ -35,6 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -46,6 +47,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -68,6 +70,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.YueCheHelper;
 import com.sohu.wap.util.OSUtil;
 
 
@@ -170,14 +173,23 @@ public class HttpUtil4
 		       
 		httpClient = new DefaultHttpClient(connManager);
 		
+	
+		
 		HttpParams httpParams =httpClient.getParams();
+		//使用http代理
+		 if (YueCheHelper.IS_USE_PROXY){
+		     HttpHost proxy = new HttpHost(YueCheHelper.PROXY_IP, YueCheHelper.PROXY_PORT);
+		     httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+		 }
+		
+		
 		if (haveCookie){
 		    HttpClientParams.setCookiePolicy(httpParams, CookiePolicy.BROWSER_COMPATIBILITY);
         }else{
           //ignore cookies
             HttpClientParams.setCookiePolicy(httpParams, CookiePolicy.IGNORE_COOKIES);
         }
-	
+	 
 		HttpConnectionParams.setSoTimeout(httpParams, TIME_OUT);
 		HttpConnectionParams.setConnectionTimeout(httpParams, TIME_OUT);
 		HttpConnectionParams.setStaleCheckingEnabled(httpParams, false);

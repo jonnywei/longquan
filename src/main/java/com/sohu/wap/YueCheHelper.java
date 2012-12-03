@@ -90,7 +90,14 @@ public class YueCheHelper
     
     public static  int IMAGE_CODE_TIMEOUT_MILLISECOND  =  10 * 60 *1000;
     
-   
+    
+   public static  String   PROXY_IP = SystemConfigurations.getSystemStringProperty("system.proxy.ip", "127.0.0.1");
+    
+   public static  int   PROXY_PORT = SystemConfigurations.getSystemIntProperty("system.proxy.port", 8089);
+    
+    public static boolean   IS_USE_PROXY = SystemConfigurations.getSystemBooleanProperty("system.use.proxy",false) ;; 
+    
+    
   public static   boolean isInServiceTime(){
     
       if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
