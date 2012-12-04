@@ -1,4 +1,5 @@
 #!/bin/sh
+baseDirForScriptSelf=$(cd "$(dirname "$0")"; pwd)
 
 TWITTER_HOME=/home/wjj/haijia
 TWITTER_LOG_HOME=/home/wjj/log
@@ -18,11 +19,5 @@ CLASSPATH=$TWITTER_HOME/config:$CLASSPATH
 
 export CLASSPATH
 
-#ARCHIVE_SUFFIX=`date +%Y%m%d-%H%M`
-#mv $TWITTER_LOG_HOME/stdout.log $TWITTER_LOG_HOME/stdout.log.${ARCHIVE_SUFFIX} 
-#mv $TWITTER_LOG_HOME/stderr.log $TWITTER_LOG_HOME/stderr.log.${ARCHIVE_SUFFIX} 
-#mv $TWITTER_LOG_HOME/rmi_gc.log $TWITTER_LOG_HOME/rmi_gc.log.${ARCHIVE_SUFFIX} 
-
-java -server -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -XX:NewSize=20m -XX:PermSize=80m  -XX:MaxPermSize=256m -Xss128K -Xms40m -Xmx1000m -Dsun.rmi.transport.tcp.responseTimeout=5000 -Dsun.rmi.dgc.server.gcInterval=3600000 -XX:+DisableExplicitGC -verbose:GC -Xloggc:$TWITTER_LOG_HOME/rmi_gc.log com.sohu.wap.HaijiaMain   2>&1  
+java -server -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -XX:NewSize=20m -XX:PermSize=80m  -XX:MaxPermSize=256m -Xss128K -Xms40m -Xmx500m -Dsun.rmi.transport.tcp.responseTimeout=5000 -Dsun.rmi.dgc.server.gcInterval=3600000 -XX:+DisableExplicitGC -verbose:GC -Xloggc:$TWITTER_LOG_HOME/rmi_gc.log com.sohu.wap.HaijiaMain   2>&1  
 echo "Start Haijia-Yuche SUCCESS!"
-#java -server   -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -XX:NewSize=1500m -XX:PermSize=80m  -XX:MaxPermSize=256m -Xss128K -Xms6000m -Xmx6000m -Dsun.rmi.transport.tcp.responseTimeout=5000 -Dsun.rmi.dgc.server.gcInterval=3600000 -XX:+DisableExplicitGC -verbose:GC -Xloggc:$TWITTER_LOG_HOME/rmi_gc.log com.chinaren.twitter.innerapi.server.RmiServer 1>$TWITTER_LOG_HOME/stdout.log  2>$TWITTER_LOG_HOME/stderr.log&
