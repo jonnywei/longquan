@@ -29,16 +29,18 @@ public class ScanYueCheTask extends YueCheTask {
 	public int scan() throws InterruptedException{
 		
 		doLogin () ;
+		System.out.println(xueYuan.getUserName());
+		Result<String> result = canYueChe(xueYuan.getYueCheDate(),xueYuan.getYueCheAmPm());
 		
-		int yueCheInfo = canYueChe(xueYuan.getYueCheDate(),xueYuan.getYueCheAmPm());
+		int yueCheInfo = result.getRet();
 		
 		if (yueCheInfo == 0){
-			doYueche(YueCheHelper.AM_STR);
+			doYueche(result.getData(), YueCheHelper.AM_STR);
 		} else if (yueCheInfo == 1){
-			doYueche(YueCheHelper.PM_STR);
+			doYueche(result.getData(),YueCheHelper.PM_STR);
 			
 		}else if (yueCheInfo == 2){
-			doYueche(YueCheHelper.NI_STR);
+			doYueche(result.getData(),YueCheHelper.NI_STR);
 		}else if (yueCheInfo == 3){
 			return ALREADY_YUECHE;
 			
@@ -87,7 +89,7 @@ public class ScanYueCheTask extends YueCheTask {
      * @throws IOException 
      * 
      */
-    private  void  doYueche ( String amPm ) throws InterruptedException {
+    private  void  doYueche ( String date, String amPm ) throws InterruptedException {
     
 
     	  //按情况约车
@@ -126,9 +128,6 @@ public class ScanYueCheTask extends YueCheTask {
          }while (!isSuccess);
         
         
-        
-    
-     
     
        log.info("yuche finish !");
         return ;

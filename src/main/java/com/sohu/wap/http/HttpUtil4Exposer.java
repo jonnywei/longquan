@@ -30,6 +30,12 @@ public class HttpUtil4Exposer extends HttpUtil4
      
     }
     
+    private HttpUtil4Exposer(boolean haveCookie,String proxyIp, int port)
+    {
+        super(haveCookie, proxyIp,  port);
+     
+    }
+    
     
     /**
      * 
@@ -40,6 +46,15 @@ public class HttpUtil4Exposer extends HttpUtil4
         return  new HttpUtil4Exposer(true);
     }
     
+    
+    /**
+     * 
+     *工厂方法，产生httpClient实例 
+     * 
+     */
+    public static HttpUtil4Exposer createHttpClient(String proxyIp, int port){
+        return  new HttpUtil4Exposer(true , proxyIp, port);
+    }
     
     
     public void addCookie(String name, String value){

@@ -161,8 +161,8 @@ public class YueChe {
 			//进入creak 模式
 			 if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
 			    
-			    ( (HttpUtil4Exposer)httpUtil4).addCookie(ImageCodeHelper.LOGIN_IMG_CODE, 
-			             ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.LOGIN_IMG_CODE).getCookie());
+			    ( (HttpUtil4Exposer)httpUtil4).addCookie(ImageCodeHelper.COOKIE_IMG_CODE_KEY, 
+			             ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.COOKIE_IMG_CODE_KEY).getCookie());
 			 }
 			
 			do{
@@ -338,8 +338,8 @@ public class YueChe {
 					
 					//进入creak 模式
 		             if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
-		               ((HttpUtil4Exposer)httpUtil4).addCookie(ImageCodeHelper.BOOKING_IMG_CODE, 
-		                         ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.BOOKING_IMG_CODE).getCookie());
+		               ((HttpUtil4Exposer)httpUtil4).addCookie(ImageCodeHelper.COOKIE_BOOKING_CODE_KEY, 
+		                         ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.COOKIE_BOOKING_CODE_KEY).getCookie());
 		             }
 					//一直重试，知道返回结果
 					JSONObject bookResult = null;
@@ -490,10 +490,10 @@ public class YueChe {
 	private String getImgCode(String url)throws IOException{
 	    if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
 	        if (url.equals(LOGIN_IMG_URL)){
-	            VerifyCode  vcode=  ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.LOGIN_IMG_CODE);
+	            VerifyCode  vcode=  ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.COOKIE_IMG_CODE_KEY);
 	            return vcode.getVcode();
 	        }else{
-	            VerifyCode  vcode=  ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.BOOKING_IMG_CODE);
+	            VerifyCode  vcode=  ImageCodeHelper.getImageCodeCookie().get(ImageCodeHelper.COOKIE_BOOKING_CODE_KEY);
                 return vcode.getVcode();
 	        }
 	       
@@ -649,40 +649,56 @@ public class YueChe {
 	 * 4 无车
 	 * 5 登录超时
 	 */
-	public int canYueChe (String yueCheDate,  String amPm){
+	public Result<String>  canYueChe (String yueCheDateArray,  String amPm){
 		
+	    Result<String> ret = new Result<String>(4);
+	    
 		String result = getAvailableCarInfo();
 		
 		if (result.equals("noLogin")){
-			return 5;
+		    ret.setRet(5);
+			return ret;
 		}else{
-		    DayCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
-		    if (ycCarInfo != null){
-		    	String[] timeArray = amPm.split("[,;]");
-		        if (timeArray.length  <  0) {
-		        	timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
-		        }
-		        boolean havaCar = false;
-		        for (String amPmStr : timeArray){  //按情况约车
-		        	 String info = ycCarInfo.getCarInfo().get(amPmStr);
-		        	 if (info.equals("无")){
-		        		 
-		 	        }else if (info.equals("已约")){
-		 	            return 3;
-		 	        }else{
-		 	        	if (YueCheHelper.AM_STR.equals(amPmStr)){
-		 	        		return 0;
-		 	        	}else if (YueCheHelper.PM_STR.equals(amPmStr)){
-		 	        		return 1;
-		 	        	}else{
-		 	        		return 2;
-		 	        	}
-		 	        }
-		        }
+		    String[] array =  yueCheDateArray.split("[,]");
+		    for(String yueCheDate : array){
+		          DayCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
+		            if (ycCarInfo != null){
+		                String[] timeArray = amPm.split("[,;]");
+		                if (timeArray.length  <  0) {
+		                    timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
+		                }
+		                boolean havaCar = false;
+		                for (String amPmStr : timeArray){  //按情况约车
+		                     String info = ycCarInfo.getCarInfo().get(amPmStr);
+		                     if (info.equals("无")){
+		                         
+		                    }else if (info.equals("已约")){
+		                        ret.setRet(3);
+		                        return ret;
+		                    }else{
+		                        ret.setData(yueCheDate); //设置约车日期
+		                        if (YueCheHelper.AM_STR.equals(amPmStr)){
+		                            ret.setRet(0);
+		                           
+		                            return ret;
+		                        
+		                        }else if (YueCheHelper.PM_STR.equals(amPmStr)){
+		                           ret.setRet(1);
+		                           return ret;
+		                        }else{
+		                           ret.setRet(2);
+		                           return ret;
+		                        }
+		                    }
+		                }
+		            }
 		    }
+		    
+
 		   
 		}
-		 return 4;
+		 ret.setRet(4);
+         return ret;
 	}
 
 	

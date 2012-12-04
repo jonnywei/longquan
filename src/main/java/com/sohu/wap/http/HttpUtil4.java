@@ -97,6 +97,8 @@ public class HttpUtil4
 
 	private  static HttpUtil4 _instance;
 	
+	private  static HttpUtil4 _instance_useProxy;
+	
 	private  static HttpUtil4 _instance_haveCookie;
 	
 	//对象变量
@@ -111,6 +113,23 @@ public class HttpUtil4
 		init(false);
 	}
 	
+	
+	/*
+     * 
+     */
+    private HttpUtil4(String proxyIp, int port)
+    {
+        init(false, proxyIp,port);
+    }
+	
+    
+    /*
+     * 
+     */
+    protected HttpUtil4(boolean haveCookie,String proxyIp, int port)
+    {
+        init(haveCookie,proxyIp,port);
+    }
 
     /*
      * 
@@ -194,6 +213,71 @@ public class HttpUtil4
 		HttpConnectionParams.setConnectionTimeout(httpParams, TIME_OUT);
 		HttpConnectionParams.setStaleCheckingEnabled(httpParams, false);
 	}
+	
+	private void init(boolean haveCookie ,String proxyIp, int port)
+    {
+        
+        X509TrustManager tm = new X509TrustManager() {  
+          //在原始的TrustManger中，如果certificate是非法，则会抛出CertificateException   
+          //这里，无论是合法还是非法的，都不抛异常，跳过检查  
+          public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {  
+          }  
+             
+          public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {  
+          }  
+             
+          public X509Certificate[] getAcceptedIssuers() {  
+          return null;  
+          }  
+          };  
+      SSLContext sslcontext =null;
+    try {
+        sslcontext = SSLContext.getInstance(SSLSocketFactory.TLS);
+        sslcontext.init(null  , new   TrustManager[]{tm}, null);
+    } catch (NoSuchAlgorithmException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    } catch (KeyManagementException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    
+      //这里需要忽略掉HostName的比较，否则访问一些网站时，会报异常  
+      SSLSocketFactory ssf = new SSLSocketFactory(sslcontext , SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);  
+      SchemeRegistry schemeRegistry = new SchemeRegistry();
+    
+        
+        schemeRegistry.register(
+                new Scheme("http", 80,PlainSocketFactory.getSocketFactory()));
+                schemeRegistry.register(
+                new Scheme("https", 443,ssf ));
+        
+        ThreadSafeClientConnManager connManager = new ThreadSafeClientConnManager(schemeRegistry);
+        connManager.setMaxTotal(500);
+        connManager.setDefaultMaxPerRoute(160);
+               
+        httpClient = new DefaultHttpClient(connManager);
+        
+    
+        
+        HttpParams httpParams =httpClient.getParams();
+       
+         HttpHost proxy = new HttpHost(proxyIp, port);
+         httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+       
+        
+        if (haveCookie){
+            HttpClientParams.setCookiePolicy(httpParams, CookiePolicy.BROWSER_COMPATIBILITY);
+        }else{
+          //ignore cookies
+            HttpClientParams.setCookiePolicy(httpParams, CookiePolicy.IGNORE_COOKIES);
+        }
+     
+        HttpConnectionParams.setSoTimeout(httpParams, TIME_OUT);
+        HttpConnectionParams.setConnectionTimeout(httpParams, TIME_OUT);
+        HttpConnectionParams.setStaleCheckingEnabled(httpParams, false);
+    }
+	
 	
 	private void init(int timeout)
 	{
@@ -285,6 +369,28 @@ public class HttpUtil4
         return _instance;
     }
 	
+    
+    /**
+     * 
+     *得到实例 
+     * 
+     */
+    public static HttpUtil4 getInstance(String proxyIp, int port)
+    {
+        if(_instance_useProxy == null)
+        {
+            synchronized(HttpUtil4.class )
+            {
+                if(_instance_useProxy == null)
+                {
+                    _instance_useProxy = new HttpUtil4(proxyIp,port);
+                }
+            }
+        }
+        return _instance_useProxy;
+    }
+    
+    
     /**
      * 
      *工厂方法，产生httpClient实例 
@@ -799,7 +905,7 @@ public class HttpUtil4
             HttpEntity httpEntity =  httpResponse.getEntity();
             
             String content = EntityUtils.toString(httpEntity);
-           
+           System.out.println(content);
             rj = new JSONObject(content);
             
         }
