@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import com.sohu.wap.YueCheHelper;
 import com.sohu.wap.http.HttpUtil4;
+import com.sohu.wap.http.HttpUtil4Exposer;
 
 
 public class Test {
@@ -41,9 +42,10 @@ public class Test {
 //        	System.out.println(amPm);
 //        }
 //        
-        
-        YueCheHelper.IS_USE_PROXY = false;
-        String url ="http://localhost:8888/bookcar";
+        int  port =80;
+        String proxyIp ="61.55.141.10";
+     
+        String url ="http://dev.w.sohu.com/t2/reqinfo.do";
         JSONObject json = new JSONObject();
        
             json.put("yyrq", "date");
@@ -52,7 +54,11 @@ public class Test {
             json.put("pageSize", 35);
             json.put("pageNum", 1);
         
-            JSONObject result = HttpUtil4.getInstanceHaveCookie().postJson(url, json);
+            HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient(proxyIp, port);
+            httpUtil4.addCookie("asdf", "ddfsssssssssssssss","dev.w.sohu.com");
+            String result = httpUtil4.getContent(url);
+            System.out.println(result);
+            System.out.println(httpUtil4.getCookieValue("asdf"));
        
 	}
 

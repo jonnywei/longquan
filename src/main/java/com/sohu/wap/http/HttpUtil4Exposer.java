@@ -58,6 +58,10 @@ public class HttpUtil4Exposer extends HttpUtil4
     
     
     public void addCookie(String name, String value){
+    	addCookie(name,value,null);        
+    }
+    
+    public void addCookie(String name, String value,String domain){
         BasicClientCookie cookie =null;
       
         List<Cookie> list = httpClient.getCookieStore().getCookies();
@@ -75,13 +79,17 @@ public class HttpUtil4Exposer extends HttpUtil4
             cookie = new BasicClientCookie(name, value);
             cookie.setPath("/");
             cookie.setVersion(0);
-            cookie.setDomain("haijia.bjxueche.net");
+            if (domain != null){
+            	cookie.setDomain(domain);
+            }else{
+            	cookie.setDomain("haijia.bjxueche.net");
+            }
+            
         }
         
         httpClient.getCookieStore().addCookie(cookie);
         
     }
-    
     
     public String getCookieValue(String name){
         

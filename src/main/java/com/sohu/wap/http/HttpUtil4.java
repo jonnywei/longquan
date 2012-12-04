@@ -101,6 +101,8 @@ public class HttpUtil4
 	
 	private  static HttpUtil4 _instance_haveCookie;
 	
+	private  static HttpUtil4 _instance_haveCookie_useProxy;
+	
 	//对象变量
 	protected DefaultHttpClient httpClient;
 	
@@ -349,6 +351,28 @@ public class HttpUtil4
 		return _instance_haveCookie;
 	}
 	
+	 /**
+     * 
+     *得到实例 
+     * 
+     */
+    public static HttpUtil4 getInstanceHaveCookie(String proxyIp, int port)
+    {
+        if(_instance_haveCookie_useProxy == null)
+        {
+            synchronized(HttpUtil4.class )
+            {
+                if(_instance_haveCookie_useProxy == null)
+                {
+                	_instance_haveCookie_useProxy = new HttpUtil4(true, proxyIp,port);
+                }
+            }
+        }
+        return _instance_haveCookie_useProxy;
+    }
+    
+	
+	
 	/**
      * 
      *得到实例 
@@ -398,6 +422,15 @@ public class HttpUtil4
      */
     public static HttpUtil4 createHttpClient(){
     	return  new HttpUtil4(true);
+    }
+    
+    /**
+     * 
+     *工厂方法，产生httpClient实例 
+     * 
+     */
+    public static HttpUtil4 createHttpClient(String proxyIp, int port){
+    	return  new HttpUtil4(true,proxyIp,port);
     }
     
   
@@ -905,7 +938,7 @@ public class HttpUtil4
             HttpEntity httpEntity =  httpResponse.getEntity();
             
             String content = EntityUtils.toString(httpEntity);
-           System.out.println(content);
+            System.out.println(content);
             rj = new JSONObject(content);
             
         }
