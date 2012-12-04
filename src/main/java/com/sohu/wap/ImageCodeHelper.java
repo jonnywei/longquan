@@ -31,9 +31,15 @@ public class ImageCodeHelper {
     
     private static Map <String ,VerifyCode> IMAGE_CODE_COOKIE = new HashMap<String,VerifyCode>();
     
-    public static String LOGIN_IMG_CODE ="ImgCode";
+    public static String COOKIE_IMG_CODE_KEY ="ImgCode";
     
-    public static String BOOKING_IMG_CODE ="BookingCode";
+    public static String COOKIE_BOOKING_CODE_KEY ="BookingCode";
+    
+    public static String COOKIE__LOGINON_KEY ="LoginOn";
+    
+    public static String COOKIE_ASP_NET_SESSION_ID_KEY ="ASP.NET_SessionId";
+    
+    
     
     private static boolean isGeted = false;
     
@@ -80,12 +86,12 @@ public class ImageCodeHelper {
           
         }while(imageCode == null || imageCode.length() < 4 );
         
-        String cookieValue =  httpUtil4.getCookieValue(ImageCodeHelper.LOGIN_IMG_CODE);
+        String cookieValue =  httpUtil4.getCookieValue(ImageCodeHelper.COOKIE_IMG_CODE_KEY);
        
        
         VerifyCode vc = new  VerifyCode(imageCode, cookieValue);
         
-        ImageCodeHelper.IMAGE_CODE_COOKIE.put(ImageCodeHelper.LOGIN_IMG_CODE, vc);
+        ImageCodeHelper.IMAGE_CODE_COOKIE.put(ImageCodeHelper.COOKIE_IMG_CODE_KEY, vc);
         
         imageCode = null;
         
@@ -99,11 +105,11 @@ public class ImageCodeHelper {
         }while(imageCode == null || imageCode.length() < 4 );
         
         
-        String bcookieValue =  httpUtil4.getCookieValue(ImageCodeHelper.BOOKING_IMG_CODE);
+        String bcookieValue =  httpUtil4.getCookieValue(ImageCodeHelper.COOKIE_BOOKING_CODE_KEY);
         
         VerifyCode bcookie = new  VerifyCode(imageCode, bcookieValue);
         
-        ImageCodeHelper.IMAGE_CODE_COOKIE.put(ImageCodeHelper.BOOKING_IMG_CODE, bcookie);
+        ImageCodeHelper.IMAGE_CODE_COOKIE.put(ImageCodeHelper.COOKIE_BOOKING_CODE_KEY, bcookie);
         
         
         
