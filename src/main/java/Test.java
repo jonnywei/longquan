@@ -43,7 +43,7 @@ public class Test {
 //        }
 //        
         int  port =80;
-        String proxyIp ="61.55.141.10";
+        String proxyIp ="106.3.98.89";
      
         String url ="http://dev.w.sohu.com/t2/reqinfo.do";
         JSONObject json = new JSONObject();

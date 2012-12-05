@@ -108,7 +108,10 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
               }else if (result == YueChe.GET_CAR_ERROR){  //无车
                   System.out.println("得到车辆信息错误！重试！");
               }else if (result == YueChe.ALREADY_BOOKED_CAR){  //无车
-                  System.out.println(date+"该日已经预约车辆。不能在约车了！");
+            	  String info = xueYuan.getUserName() +":"+ret.getData()+":"+date+ YueCheHelper.AMPM.get(amPm)+
+            	  "该日已经预约车辆。不能在约车了！";
+            	  log.info(info);
+                  System.out.println(info);
                   break;
               }else {  //无车
                   System.out.println("未知错误！重试!RUSULT="+result);
