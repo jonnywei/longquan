@@ -22,11 +22,11 @@ import com.sohu.wap.http.HttpUtil4Exposer;
  * @author jianjunwei
  *
  */
-public class ImageCodeHelper {
+public class CookieImgCodeHelper {
 
     
     
-    private static Logger log = LoggerFactory.getLogger(ImageCodeHelper.class);
+    private static Logger log = LoggerFactory.getLogger(CookieImgCodeHelper.class);
     
     
     private static Map <String ,VerifyCode> IMAGE_CODE_COOKIE = new HashMap<String,VerifyCode>();
@@ -35,7 +35,7 @@ public class ImageCodeHelper {
     
     public static String COOKIE_BOOKING_CODE_KEY ="BookingCode";
     
-    public static String COOKIE__LOGINON_KEY ="LoginOn";
+    public static String COOKIE_LOGINON_KEY ="LoginOn";
     
     public static String COOKIE_ASP_NET_SESSION_ID_KEY ="ASP.NET_SessionId";
     
@@ -86,12 +86,12 @@ public class ImageCodeHelper {
           
         }while(imageCode == null || imageCode.length() < 4 );
         
-        String cookieValue =  httpUtil4.getCookieValue(ImageCodeHelper.COOKIE_IMG_CODE_KEY);
+        String cookieValue =  httpUtil4.getCookieValue(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY);
        
        
         VerifyCode vc = new  VerifyCode(imageCode, cookieValue);
         
-        ImageCodeHelper.IMAGE_CODE_COOKIE.put(ImageCodeHelper.COOKIE_IMG_CODE_KEY, vc);
+        CookieImgCodeHelper.IMAGE_CODE_COOKIE.put(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, vc);
         
         imageCode = null;
         
@@ -105,11 +105,11 @@ public class ImageCodeHelper {
         }while(imageCode == null || imageCode.length() < 4 );
         
         
-        String bcookieValue =  httpUtil4.getCookieValue(ImageCodeHelper.COOKIE_BOOKING_CODE_KEY);
+        String bcookieValue =  httpUtil4.getCookieValue(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY);
         
         VerifyCode bcookie = new  VerifyCode(imageCode, bcookieValue);
         
-        ImageCodeHelper.IMAGE_CODE_COOKIE.put(ImageCodeHelper.COOKIE_BOOKING_CODE_KEY, bcookie);
+        CookieImgCodeHelper.IMAGE_CODE_COOKIE.put(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, bcookie);
         
         
         
@@ -121,7 +121,7 @@ public class ImageCodeHelper {
      */
     public static void main(String[] args) {
         getImageCodeCookie();
-        Iterator it =  ImageCodeHelper.IMAGE_CODE_COOKIE.keySet().iterator();
+        Iterator it =  CookieImgCodeHelper.IMAGE_CODE_COOKIE.keySet().iterator();
        
     }
 

@@ -91,6 +91,10 @@ public class HttpUtil4
 	
 	//设置时间的instance map
     private static Map<Integer , HttpUtil4>   _instanceWithTimeoutMap = new HashMap<Integer , HttpUtil4>();
+    
+  //设置时间的instance map
+    private static Map<String , HttpUtil4>   _instanceUseProxyMap = new HashMap<String , HttpUtil4>();
+    
 	
     private static final Pattern META_CHARSET_PATTERN =
 		Pattern.compile("<meta\\s*.*charset\\s*=\\s*[\"']?([^\"\\s]+)[\\s\"';]{1}",Pattern.CASE_INSENSITIVE);
@@ -329,7 +333,28 @@ public class HttpUtil4
 	
 	
 	
-	
+	/**
+     * 
+     *得到设置超时时间的httpclient实例 
+     *@author jianjunwei
+     *@param timeout  超时时间单位毫秒
+     * 
+     */
+    public static HttpUtil4 getProxyInstance(String proxyIp, int port)
+    {
+        String key =proxyIp +"_"+port;
+        HttpUtil4  _instanceTime = _instanceUseProxyMap.get(key);
+        if (_instanceTime == null) {
+            synchronized (_instanceUseProxyMap) {
+                if (_instanceTime == null) {
+                    _instanceTime = new HttpUtil4(true,proxyIp, port);
+                    _instanceUseProxyMap.put(key, _instanceTime);
+                }
+            }
+        }
+        return _instanceTime;
+    }
+    
 	
 	/**
 	 * 

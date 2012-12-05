@@ -21,20 +21,12 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	String date;
 	
 	public YueCheTask(XueYuanAccount xueYuan, String date){
-	    if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
-	    	if (YueCheHelper.IS_USE_PROXY){
+	  
+
+	    if (YueCheHelper.IS_USE_PROXY){
 	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient(YueCheHelper.PROXY_IP,YueCheHelper.PROXY_PORT);
-	    	}else{
-	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient();
-	    	}
-	       
 	    }else{
-	    	if (YueCheHelper.IS_USE_PROXY){
-	    		 httpUtil4 = HttpUtil4.createHttpClient(YueCheHelper.PROXY_IP,YueCheHelper.PROXY_PORT);
-	    	}else{
-	    		 httpUtil4 = HttpUtil4.createHttpClient();
-	    	}
-	       
+	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient();
 	    }
 	
 		this.xueYuan = xueYuan;

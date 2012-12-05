@@ -46,9 +46,9 @@ import com.sohu.wap.util.Util;
  * @author jianjunwei
  * 
  */
-public class YueChe {
+public class YueChe2 {
 
-	private static Logger log = LoggerFactory.getLogger(YueChe.class);
+	private static Logger log = LoggerFactory.getLogger(YueChe2.class);
 
 	public static String LOGIN_URL = "http://haijia.bjxueche.net/";
 	private static String LOGOUT_URL = "http://haijia.bjxueche.net/Login.aspx?LoginOut=true";

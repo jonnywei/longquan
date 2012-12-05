@@ -103,6 +103,9 @@ public class YueCheHelper
    public static  int   GAE_PROXY_PORT = SystemConfigurations.getSystemIntProperty("system.gae.proxy.port", 8087);
     
     
+   public static boolean   IS_USE_PROXY_BOOK_CAR = SystemConfigurations.getSystemBooleanProperty("system.use.proxy.bookcar",false) ;; 
+   
+   
   public static   boolean isInServiceTime(){
     
       if (YueCheHelper.IS_ENTER_CREAKER_MODEL){

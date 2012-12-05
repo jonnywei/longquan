@@ -47,7 +47,7 @@ public class HaijiaCreaker
         
         YueCheHelper.IS_ENTER_CREAKER_MODEL = true;
         
-        ImageCodeHelper.getImageCodeCookie();
+        CookieImgCodeHelper.getImageCodeCookie();
         
         for (String accoutId: AccountMap.getInstance().getXueYuanAccountMap().keySet()){
             XueYuanAccount  xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);

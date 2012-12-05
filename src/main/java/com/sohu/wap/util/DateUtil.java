@@ -1,6 +1,9 @@
 package com.sohu.wap.util;
 
+import java.text.DateFormat;
+import java.text.FieldPosition;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -165,9 +168,33 @@ public class DateUtil
     }
     
     
+    /**
+     * 获取未来时间 7天的周六和周日
+     * @return yyyyMMdd
+     */
+    public static Date getDate(String dstr, String format){
+       
+        SimpleDateFormat df =new SimpleDateFormat(format, Locale.US);
+        try {
+            Date time =   df.parse(dstr);
+            
+            Calendar ca =   Calendar.getInstance(Locale.CHINA);
+            ca.setTime(time);
+            ca.add(Calendar.HOUR_OF_DAY, 4);
+            return ca.getTime();
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return   new Date();
+    }
+    
+    
     public static void main (String[] args){
         System.out.println(getSATURDAYDay());
         System.out.println( isCurrTimeInTimeInterval("07:35","18:00"));
+        
+        System.out.println(getDate("05-dec-2012 06:39","dd-MMM-yyyy HH:mm"));
        
     }
 }

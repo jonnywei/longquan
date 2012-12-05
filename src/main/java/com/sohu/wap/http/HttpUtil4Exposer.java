@@ -7,7 +7,9 @@ package com.sohu.wap.http;
  */
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -24,6 +26,11 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 public class HttpUtil4Exposer extends HttpUtil4
 { 
     
+    
+    //设置时间的instance map
+      private static Map<String , HttpUtil4Exposer>   _instanceUseProxyMap = new HashMap<String , HttpUtil4Exposer>();
+     
+    
     private HttpUtil4Exposer(boolean haveCookie)
     {
         super(haveCookie);
@@ -35,6 +42,29 @@ public class HttpUtil4Exposer extends HttpUtil4
         super(haveCookie, proxyIp,  port);
      
     }
+    
+    /**
+     * 
+     *得到设置超时时间的httpclient实例 
+     *@author jianjunwei
+     *@param timeout  超时时间单位毫秒
+     * 
+     */
+    public static HttpUtil4Exposer getProxyInstance(String proxyIp, int port)
+    {
+        String key =proxyIp +"_"+port;
+        HttpUtil4Exposer  _instanceTime = _instanceUseProxyMap.get(key);
+        if (_instanceTime == null) {
+            synchronized (_instanceUseProxyMap) {
+                if (_instanceTime == null) {
+                    _instanceTime = new HttpUtil4Exposer(true,proxyIp, port);
+                    _instanceUseProxyMap.put(key, _instanceTime);
+                }
+            }
+        }
+        return _instanceTime;
+    }
+    
     
     
     /**

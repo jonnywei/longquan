@@ -1,3 +1,7 @@
+import java.util.Iterator;
+
+import javax.script.ScriptException;
+
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -7,6 +11,8 @@ import org.json.JSONObject;
 import com.sohu.wap.YueCheHelper;
 import com.sohu.wap.http.HttpUtil4;
 import com.sohu.wap.http.HttpUtil4Exposer;
+import com.sohu.wap.proxy.Host;
+import com.sohu.wap.proxy.HttpProxy;
 
 
 public class Test {
@@ -42,10 +48,14 @@ public class Test {
 //        	System.out.println(amPm);
 //        }
 //        
+		   String url ="http://dev.w.sohu.com/t2/reqinfo.do";
         int  port =80;
-        String proxyIp ="106.3.98.89";
-     
-        String url ="http://dev.w.sohu.com/t2/reqinfo.do";
+        String proxyIp ="125.39.66.150";
+        HttpUtil4Exposer httpUtil5 = HttpUtil4Exposer.createHttpClient(proxyIp , port);
+        httpUtil5.addCookie("asdf", "test",".sohu.com");
+        String result1 = httpUtil5.getContent(url);
+        
+        System.out.println(result1);
         JSONObject json = new JSONObject();
        
             json.put("yyrq", "date");
@@ -54,11 +64,20 @@ public class Test {
             json.put("pageSize", 35);
             json.put("pageNum", 1);
         
-            HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient(proxyIp, port);
-            httpUtil4.addCookie("asdf", "ddfsssssssssssssss","dev.w.sohu.com");
-            String result = httpUtil4.getContent(url);
-            System.out.println(result);
-            System.out.println(httpUtil4.getCookieValue("asdf"));
+            Iterator  iterator = HttpProxy.getHttpProxy().keySet().iterator();
+            while(iterator.hasNext()){
+                String key = (String) iterator.next();
+               Host  host =  HttpProxy.getHttpProxy().get(key);
+               
+               HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp() , host.getPort());
+               httpUtil4.addCookie("asdf", "test",".sohu.com");
+               String result = httpUtil4.getContent(url);
+            
+               System.out.println(key +"="+result);
+               System.out.println(httpUtil4.getCookieValue("asdf"));
+               System.out.println( httpUtil4.getCookieValue("cookie_test"));
+            }
+            
        
 	}
 
