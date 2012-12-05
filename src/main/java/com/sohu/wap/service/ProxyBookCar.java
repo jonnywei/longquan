@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,16 +37,17 @@ public class ProxyBookCar extends YueChe {
      
        Entry<String, Host>  entry =    (Entry<String, Host>) array[RandomUtil.getRandomInt(array.length)];
       
+       
        Host host = entry.getValue();
        
        HttpUtil4Exposer httpUtil =   HttpUtil4Exposer.getProxyInstance(host.getIp(), host.getPort());
-        
+      
        httpUtil.addCookie(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY));
        httpUtil.addCookie(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY));
        httpUtil.addCookie(CookieImgCodeHelper.COOKIE_LOGINON_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_LOGINON_KEY));
        httpUtil.addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
-       
-        return  httpUtil.postJson(BOOKING_CAR_URL, carInfo);
+      
+       return  httpUtil.postJson(BOOKING_CAR_URL, carInfo);
       
     }
     

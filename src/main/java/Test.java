@@ -50,10 +50,32 @@ public class Test {
 //        
 		   String url ="http://dev.w.sohu.com/t2/reqinfo.do";
         int  port =80;
-        String proxyIp ="125.39.66.150";
+        String proxyIp ="115.236.98.101";
+        
+//        String proxyIp ="61.55.141.10"; 
+//        String proxyIp ="125.39.66.150";
+//        system.proxy.ip=61.55.141.10
+//        system.proxy.port=80
+        
+//        #system.proxy.ip=61.55.141.10
+//        system.proxy.ip=125.39.66.150
+//        #system.proxy.ip=221.176.14.72
+//        #system.proxy.ip=125.39.66.147
+//        #system.proxy.ip=115.236.98.101
+        
         HttpUtil4Exposer httpUtil5 = HttpUtil4Exposer.createHttpClient(proxyIp , port);
-        httpUtil5.addCookie("asdf", "test",".sohu.com");
+        httpUtil5.addCookie("client_cookie", "client_cookie", ".sohu.com");
         String result1 = httpUtil5.getContent(url);
+        if (httpUtil5.getCookieValue("client_cookie").equals("client_cookie")
+                && httpUtil5.getCookieValue("cookie_test") != null
+                && httpUtil5.getCookieValue("cookie_test").equals("true")) {
+            System.out.println(proxyIp + " check ok!");
+            
+        } else {
+            System.out.println(proxyIp + "cookie  test error,remove");
+           
+        }
+        
         
         System.out.println(result1);
         JSONObject json = new JSONObject();
@@ -70,12 +92,18 @@ public class Test {
                Host  host =  HttpProxy.getHttpProxy().get(key);
                
                HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp() , host.getPort());
-               httpUtil4.addCookie("asdf", "test",".sohu.com");
+               httpUtil4.addCookie("client_cookie", "client_cookie", ".sohu.com");
                String result = httpUtil4.getContent(url);
             
-               System.out.println(key +"="+result);
-               System.out.println(httpUtil4.getCookieValue("asdf"));
-               System.out.println( httpUtil4.getCookieValue("cookie_test"));
+               if (httpUtil4.getCookieValue("client_cookie").equals("client_cookie")
+                       && httpUtil4.getCookieValue("cookie_test") != null
+                       && httpUtil4.getCookieValue("cookie_test").equals("true")) {
+                   System.out.println(host + "check ok!");
+                   
+               } else {
+                   System.out.println(host + "cookie  test error,remove");
+                  
+               }
             }
             
        

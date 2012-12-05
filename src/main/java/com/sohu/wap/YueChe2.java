@@ -12,9 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -71,11 +69,7 @@ public class YueChe2 {
 	
 	private static String HIDDEN_KM = "hiddenKM";
 
-	public static int UNKNOWN_ERROR = -1;
-	public static int BOOK_CAR_SUCCESS = 0;
-	public static int NO_CAR = 1;
-	public static int GET_CAR_ERROR = 2;
-	public static int ALREADY_BOOKED_CAR=3;
+	
 	
 	public static int YUCHE_RETRY_TIME = 3;
 
@@ -216,17 +210,7 @@ public class YueChe2 {
 		return true;
 	}
 
-	/**
-	 * -1 约车错误 0 约车成功 1 无车可约
-	 * 
-	 */
-	public  Result<String> yuche(String date, String amOrpm, boolean isGetHiddenKM)
-			throws InterruptedException {
-	    
-	    Result <String>result = new Result<String>(UNKNOWN_ERROR);
-	    
-		int resultN = UNKNOWN_ERROR;
-
+	String getHiddenKM(boolean isGetHiddenKM){
 		// 页面中一个隐藏的输入，默认为2，可能更改
 		String hiddenKM = "2";
 		if (isGetHiddenKM) {
@@ -235,7 +219,40 @@ public class YueChe2 {
 			Element hkm = document.getElementById(HIDDEN_KM);
 			hiddenKM = hkm.attr("value");
 		}
+		return hiddenKM;
+	}
+	
+	String getImgCode(){
+		
+		String imageCode = null;
+		
+		do{
+			try {
+				imageCode = getImgCode(BOOKING_IMG_URL);
+				} catch (IOException e1) {
+					log.error("get book image code error", e1);
+					imageCode =null;
+				}
+		}while(imageCode == null);
+		return imageCode;
+	}
+	
+	
+	
+	/**
+	 * -1 约车错误 0 约车成功 1 无车可约
+	 * 
+	 */
+	public  Result<String> yuche(String date, String amOrpm, boolean isGetHiddenKM)
+			throws InterruptedException {
+	    
+	    Result <String>result = new Result<String>(BookCarUtil.UNKNOWN_ERROR);
+	    
+		int resultN = BookCarUtil.UNKNOWN_ERROR;
 
+		// 页面中一个隐藏的输入，默认为2，可能更改
+		String hiddenKM = getHiddenKM(isGetHiddenKM);
+	
 		// {"yyrq":"20121126","yysd":"58","xllxID":"2","pageSize":35,"pageNum":1}
 		JSONObject json = new JSONObject();
 		try {
@@ -244,12 +261,15 @@ public class YueChe2 {
 			json.put("xllxID", hiddenKM);
 			json.put("pageSize", 35);
 			json.put("pageNum", 1);
-			
-			JSONObject carsJson = null;
+		
+			Result<JSONArray> carRet ;
+		
 			do{
 				// 得到某天的信息
-				carsJson = httpUtil4.postJson(GET_CARS_URL, json);
-				if (carsJson == null) {
+				JSONObject carsJson = httpUtil4.postJson(GET_CARS_URL, json);
+				carRet = BookCarUtil.carsResult(carsJson);
+			
+				if (BookCarUtil.GET_CAR_ERROR == carRet.getRet() ) {
 					log.error("get car info error");
 					ThreadUtil.sleep(1);
 				}else{
@@ -257,155 +277,101 @@ public class YueChe2 {
 				}
 			}while(true);
 			
-
-			// System.out.println(carsJson.toString());
-
-			JSONObject selectedCar = null;
-
-			String data = carsJson.getString("d");
-			log.info("carInfo:"+data);
-			if(data.equals("LoginOut:您的IP地址被禁止!")){
-				log.error("LoginOut:您的IP地址被禁止!");
+			
+			JSONArray carsArray = new JSONArray();
+			if (carRet.getRet() == BookCarUtil.HAVE_CAR){
+				carsArray = carRet.getData();
+				
+			}else if(carRet.getRet() == BookCarUtil.IP_FORBIDDEN ){
 				ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
 //				System.exit(1);
 				
-			}
-			int splitPosition = data.indexOf("_");
-			String carInfo = data.substring(0, splitPosition);
-			String nu = data.substring(splitPosition + 1);
-			
-			int totalNum = Integer.valueOf(nu);
-			
-			log.info("totalPage:"+totalNum);
-			// {
-			//
-			// "YYRQ": "20121126",
-			//
-			// "XNSD": "58",
-			//
-			// "CNBH": "06143"
-			//
-			// },
-
-			JSONArray carsArray = new JSONArray(carInfo);
-			System.out.println("可选的车有：" + carsArray.toString());
-			log.info("availableCar：" + carsArray.toString());
-			if (carsArray.length() == 0) {
-				resultN = NO_CAR;
+			} else if (carRet.getRet() == BookCarUtil.NO_CAR ){
+				resultN = BookCarUtil.NO_CAR;
 				result.setRet(resultN);
 				return result;
+			}else {
+				
 			}
-
+		
+			JSONObject	selectedCar = null;
 			// GetCar over
 
 			// 下一步，约车
 			int yucheTry = 0;
+			
+			
+			//如果是 creak 模式
+            if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+              ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, 
+                        CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY).getCookie());
+            }
+            
+            JSONObject cookieJson = new JSONObject();
+            cookieJson.put(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY));
+            cookieJson.put(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY));
+            cookieJson.put(CookieImgCodeHelper.COOKIE_LOGINON_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_LOGINON_KEY));
+            cookieJson.put(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
+        
 
 			do {
-				selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
-
-				if (selectedCar != null) {
-					log.info("选择的车是：" + selectedCar.toString());
-					System.out.println("选择的车是：" + selectedCar.toString());
-					String imageCode = "";
-					try {
+				
+				if (YueCheHelper.IS_USE_PROXY_BOOK_CAR){
+					BookCar.book(carsArray, cookieJson);
+					
+				}else{
+					selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
+					if (selectedCar != null) {
+						log.info("选择的车是：" + selectedCar.toString());
+						System.out.println("选择的车是：" + selectedCar.toString());
+						
+						String imageCode = getImgCode();
+						JSONObject bookCarJson = getBookCarJson(selectedCar, imageCode ,hiddenKM);
+						
+//						ThreadUtil.sleep(1);
+			             
+			            int intResult = 0; 
+						
 						do{
-							imageCode = getImgCode(BOOKING_IMG_URL);
-						}while(imageCode == null);
+							JSONObject bookResult = httpUtil4.postJson(BOOKING_CAR_URL, bookCarJson);
+							 intResult = BookCarUtil.bookResult(bookResult);
+							if (intResult == BookCarUtil.BOOK_CAR_TIMEOUT) {
+								System.out.println("book car timeout or error");
+								log.error("book car timeout or error");
+								ThreadUtil.sleep(1);
+							}
+						}while(intResult == BookCarUtil.BOOK_CAR_TIMEOUT);
 						
-					} catch (IOException e1) {
-						log.error("get book image code error", e1);
-						continue;
-					}
-
-					String md5Code = MD5.crypt(imageCode.toUpperCase());
-
-					// {"yyrq":"20121126","xnsd":"58","cnbh":"06204","imgCode":"d32926ad20c3ef9b703472edba4d413d","KMID":"2"}
-					JSONObject bookCarJson = new JSONObject();
-					try {
-						bookCarJson.put("yyrq", selectedCar.getString("YYRQ"));
-						bookCarJson.put("xnsd", selectedCar.getString("XNSD"));
-						bookCarJson.put("cnbh", selectedCar.getString("CNBH"));
-						bookCarJson.put("imgCode", md5Code);
-						bookCarJson.put("KMID", hiddenKM);
-
-					} catch (JSONException e) {
-
-						e.printStackTrace();
-					}
+						yucheTry++;
 					
-//					ThreadUtil.sleep(1);
-					
-					//如果是 creak 模式
-		             if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
-		               ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, 
-		                         CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY).getCookie());
-		             }
-		             
-		             JSONObject cookieJson = new JSONObject();
-		             cookieJson.put(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY));
-		             cookieJson.put(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY));
-		             cookieJson.put(CookieImgCodeHelper.COOKIE_LOGINON_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_LOGINON_KEY));
-		             cookieJson.put(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
-                    
-		             
-		             
-					//一直重试，知道返回结果
-					JSONObject bookResult = null;
-					do{
-						bookResult = httpUtil4.postJson(BOOKING_CAR_URL, bookCarJson);
-						if (bookResult == null) {
-							System.out.println("book car timeout or error");
-							log.error("book car timeout or error");
-							ThreadUtil.sleep(1);
-						}
-					}while(bookResult == null);
-					
-					yucheTry++;
-					
-
-					System.out.println(bookResult.toString());
-
-					JSONArray jbResult = new JSONArray(bookResult.getString("d"));
-
-					// {"d":"[\r\n  {\r\n    \"Result\": true,\r\n    \"OutMSG\": \"\"\r\n  }\r\n]"}
-
-					if (jbResult.getJSONObject(0).getBoolean("Result")) {
-						System.out.println("预约成功!...");
-						String info = "Info:"+selectedCar.getString("YYRQ") + ":"
-								+ selectedCar.getString("XNSD") + "-"
-								+ selectedCar.getString("CNBH");
-						result.setData(info);
-						System.out.println(info);
-						log.info(info);
-						resultN = BOOK_CAR_SUCCESS;
-					
-					} else {
+						if (BookCarUtil.BOOK_CAR_SUCCESS == intResult) {
+							System.out.println("预约成功!...");
+							String info = "Info:"+selectedCar.getString("YYRQ") + ":"
+									+ selectedCar.getString("XNSD") + "-"
+									+ selectedCar.getString("CNBH");
+							result.setData(info);
+							System.out.println(info);
+							log.info(info);
+							resultN =BookCarUtil.BOOK_CAR_SUCCESS;
 						
-						String outMsg = jbResult.getJSONObject(0).getString("OutMSG");
-						log.info("book car return msg:"+outMsg);
-						if ("该日已预约过小时".equals(outMsg) ){
-							resultN = ALREADY_BOOKED_CAR;
-							break;
-						}
-						if ("非法操作".equals(outMsg)){
-							resultN = ALREADY_BOOKED_CAR;
-							break;
-						}
-						
-						if("验证码错误！".equals(outMsg)){
-							System.out.println(outMsg+"不计入retry次数");
-							//yucheTry--; //验证码错误，不计入retry次数
-						}
-						if(outMsg.indexOf("该车时段已经被约") != -1){
-							yucheTry++; //该页面可能都被约了
-						}
-						System.out.println("book car return error:"+outMsg);
-						log.error("book car return error:"+outMsg);
-					}
+						} else {
+							
+							if (BookCarUtil.TODAY_ALREADY_BOOKED_CAR == intResult 
+									|| BookCarUtil.BOOK_INVAILD_OPERATION == intResult ){
+								break;
+							} else if ( BookCarUtil.BOOK_CAR_IMAGE_CODE_ERROR == intResult){
+								System.out.println("验证码错误！不计入retry次数");
+							} else if(BookCarUtil.CAR_BOOKED  == intResult){
+								yucheTry++;  //该页面可能都被约了
+							} else {
+								log.error("book car return error:"+intResult);
+							}
+					 }
 
+					}
 				}
-			} while (resultN != BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
+					
+			} while (resultN != BookCarUtil.BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
 		} catch (JSONException e) {
 			log.error("error,", e);
 			e.printStackTrace();
@@ -414,6 +380,25 @@ public class YueChe2 {
 		return result;
 	}
 
+	public JSONObject getBookCarJson (JSONObject selectedCar , String imageCode,  String hiddenKM ){
+	
+		String md5Code = MD5.crypt(imageCode.toUpperCase());
+		// {"yyrq":"20121126","xnsd":"58","cnbh":"06204","imgCode":"d32926ad20c3ef9b703472edba4d413d","KMID":"2"}
+		JSONObject bookCarJson = new JSONObject();
+		try {
+			bookCarJson.put("yyrq", selectedCar.getString("YYRQ"));
+			bookCarJson.put("xnsd", selectedCar.getString("XNSD"));
+			bookCarJson.put("cnbh", selectedCar.getString("CNBH"));
+			bookCarJson.put("imgCode", md5Code);
+			bookCarJson.put("KMID", hiddenKM);
+
+		} catch (JSONException e) {
+			log.error("error",e);
+		}
+		return bookCarJson;
+	}
+	
+	
 	public  boolean logout() {
 
 		String logout = httpUtil4.getContent(LOGOUT_URL);
