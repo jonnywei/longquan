@@ -100,8 +100,8 @@ public class HttpProxy {
                                     if ( HttpProxy.getHttpProxy().size() < min_proxy_size &&  time < max_request_time){
                                         log.error("proxy list size too small. not remove .size =" +HttpProxy.getHttpProxy().size());
                                     }else{
-                                        log.error(key +" time="+time +" extend " + max_request_time);
-                                        System.out.println(key +" time="+time +" extend " + max_request_time);
+                                        log.error(key +" time="+time +" extend " + long_request_time);
+                                        System.out.println(key +" time="+time +" extend " + long_request_time);
                                         iterator.remove();
                                         continue;
                                     }
@@ -166,7 +166,7 @@ public class HttpProxy {
                     }
                 }; 
                 
-                timer.scheduleAtFixedRate(task, 0, 5 * 60 * 1000);
+                timer.scheduleAtFixedRate(task, 0, 30 * 60 * 1000);
                 timer.scheduleAtFixedRate(loadTask, 60 * 60 * 1000, 60 * 60 * 1000);
                 isInit = true;
             }

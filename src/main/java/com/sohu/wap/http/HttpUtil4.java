@@ -575,6 +575,7 @@ public class HttpUtil4
 		{
 			HttpResponse  httpResponse = httpClient.execute(httpGet);
 			if (httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE){
+				httpGet.abort();
 				return null;
 			}else if (httpResponse.getStatusLine().getStatusCode() ==HttpStatus.SC_MOVED_TEMPORARILY){ //302跳转的话
 				return content =httpResponse.getFirstHeader("Location").getValue();
@@ -618,6 +619,7 @@ public class HttpUtil4
         try {
                 response = httpClient.execute(httpGet);
                 if (response.getStatusLine().getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE){
+                	httpGet.abort();
     				return null;
     			}
                 HttpEntity entity = response.getEntity();
@@ -888,6 +890,7 @@ public class HttpUtil4
 			if (httpResponse.getStatusLine().getStatusCode() ==HttpStatus.SC_MOVED_TEMPORARILY){ //302跳转的话
 			    content =httpResponse.getFirstHeader("Location").getValue();
 			} else if (httpResponse.getStatusLine().getStatusCode() >= HttpStatus.SC_INTERNAL_SERVER_ERROR){
+				httpPost.abort();
 				return null;  //server error
 			} else{
 			    HttpEntity httpEntity =  httpResponse.getEntity();
@@ -957,6 +960,7 @@ public class HttpUtil4
             HttpResponse  httpResponse = httpClient.execute(httpPost);
             
             if (httpResponse.getStatusLine().getStatusCode() >= HttpStatus.SC_INTERNAL_SERVER_ERROR){
+            	httpPost.abort();
 				return null;  //server error
 			} 
             
