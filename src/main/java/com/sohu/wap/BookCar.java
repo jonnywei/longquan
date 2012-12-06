@@ -42,7 +42,7 @@ public class BookCar {
         }
         
         for (Future<Integer> future : resultList) {
-        	 int result = BookCarUtil.UNDEFINE;
+            Integer result = BookCarUtil.UNDEFINE;
             try {  
                 result = future.get(BOOK_TIME_OUT, TimeUnit.MILLISECONDS);  // 打印各个线程（任务）执行的结果  
                 

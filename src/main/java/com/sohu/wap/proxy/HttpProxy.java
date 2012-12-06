@@ -76,12 +76,9 @@ public class HttpProxy {
                 try {
                     // 初始化hash map
                     loadHostProxyMap();
-
                 } catch (ScriptException e) {
                     log.error("script execute error", e);
-
                 }
-
                 TimerTask task = new TimerTask() {
                     @Override
                     public void run() {
@@ -90,10 +87,8 @@ public class HttpProxy {
                             while (iterator.hasNext()) {
                                 String key = (String) iterator.next();
                                 Host host = HttpProxy.getHttpProxy().get(key);
-                                HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp(), host.getPort());
-                                httpUtil4.addCookie("client_cookie", "client_cookie", ".sohu.com");
                                 long begin = System.currentTimeMillis();
-                                String result = httpUtil4.getContent(TEST_URL);
+                                boolean canUse = ProxyHelper.testProxy(host.getIp(), host.getPort());
                                 long time = (System.currentTimeMillis() - begin);
                                 System.out.println("request time=" + time);
                                 if (time > long_request_time){
@@ -105,35 +100,12 @@ public class HttpProxy {
                                         iterator.remove();
                                         continue;
                                     }
-                                  
                                 }
-                               
-                                if (result == null) {
-                                    System.out.println(host + "test error,remove");
-                                    log.error(host + "test error,remove");
+                                if (! canUse) {
+                                    log.error(host + "can not Use,remove");
                                     iterator.remove();
                                 } else {
-                                    
-                                    System.out.println(key + "=" + result);
-                                    try{
-                                        JSONObject rj = new JSONObject(result);
-                                    } catch (Exception ex) {
-                                        log.error("result error", ex);
-                                        iterator.remove();
-                                        continue;
-                                    }
-                                    
-                                 
-                                    if (httpUtil4.getCookieValue("client_cookie").equals("client_cookie")
-                                            && httpUtil4.getCookieValue("cookie_test") != null
-                                            && httpUtil4.getCookieValue("cookie_test").equals("true")) {
-                                        System.out.println(host + "check ok!");
-                                        log.info(host + " check ok!");
-                                    } else {
-                                        System.out.println(host + "cookie  test error,remove");
-                                        log.error(host + "cookie  test error,remove");
-                                        iterator.remove();
-                                    }
+                                      log.info(host + " check ok!");
                                 }
                                 // 海驾的测试可用取消，速度太慢了
                                 // long hjbegin = System.currentTimeMillis();

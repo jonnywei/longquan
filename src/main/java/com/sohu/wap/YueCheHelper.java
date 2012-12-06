@@ -97,7 +97,9 @@ public class YueCheHelper
     
    public static boolean   IS_USE_PROXY = SystemConfigurations.getSystemBooleanProperty("system.use.proxy",false) ;; 
     
-    
+   public static  int   PROXY_NUM_PER_USER = SystemConfigurations.getSystemIntProperty("system.proxy.num.per.user", 2);
+   
+   
    public static  String   GAE_PROXY_IP = SystemConfigurations.getSystemStringProperty("system.gae.proxy.ip", "127.0.0.1");
    
    public static  int   GAE_PROXY_PORT = SystemConfigurations.getSystemIntProperty("system.gae.proxy.port", 8087);

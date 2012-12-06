@@ -613,7 +613,7 @@ public class HttpUtil4
         httpGet.setHeader("Connection", "keep-alive");
     
         ByteBuffer byteBuffer =null;
-        
+        InputStream instream = null;
         byte[]  buffer = new  byte[2048];
         HttpResponse response;
         try {
@@ -625,7 +625,7 @@ public class HttpUtil4
                 HttpEntity entity = response.getEntity();
                 if (entity != null) 
                 {
-                    InputStream instream = entity.getContent();
+                    instream = entity.getContent();
                     long picSize = entity.getContentLength();
                     byteBuffer = ByteBuffer.allocate( (int)picSize+1024 );
                     int readlength =-1;
@@ -644,6 +644,15 @@ public class HttpUtil4
        }
         catch (IOException e) {
             log.error(pictureUrl);
+       }finally{
+           if (instream != null){
+               try {
+                instream.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+           }
        }
          return byteBuffer;
     }
@@ -680,7 +689,8 @@ public class HttpUtil4
 		{
 			log.error("innerapi return not jsonobject! " +e.getMessage(), e);
 			
-		}
+		} 
+		
 		
 		return json;
 	}

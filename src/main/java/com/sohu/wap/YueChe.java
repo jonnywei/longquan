@@ -77,6 +77,7 @@ public class YueChe {
 	public static int GET_CAR_ERROR = 2;
 	public static int ALREADY_BOOKED_CAR=3;
 	
+	public static int KEMU2_NO_TIME=10003;
 	public static int YUCHE_RETRY_TIME = 3;
 
 	
@@ -392,6 +393,11 @@ public class YueChe {
 							resultN = ALREADY_BOOKED_CAR;
 							break;
 						}
+						
+						  if(outMsg.indexOf("科目二剩余小时不足") != -1){
+						      resultN = KEMU2_NO_TIME;
+	                            break;
+	                      }
 						
 						if("验证码错误！".equals(outMsg)){
 							System.out.println(outMsg+"不计入retry次数");
