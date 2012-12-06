@@ -400,6 +400,7 @@ public class YueChe {
 						if(outMsg.indexOf("该车时段已经被约") != -1){
 							yucheTry++; //该页面可能都被约了
 						}
+						//{"d":"[\r\n  {\r\n    \"Result\": false,\r\n    \"OutMSG\": \"科目二剩余小时不足 !\"\r\n  }\r\n]"}
 						System.out.println("book car return error:"+outMsg);
 						log.error("book car return error:"+outMsg);
 					}
