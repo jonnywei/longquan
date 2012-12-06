@@ -23,7 +23,7 @@ public class Host {
     private String name;
     private Date checkDate;
     
-    private int speed;
+    private long speed;
     
     
     /**
@@ -129,15 +129,15 @@ public class Host {
     /**
      * @return the speed
      */
-    public int getSpeed() {
+    public long getSpeed() {
         return speed;
     }
 
     /**
-     * @param speed the speed to set
+     * @param time the speed to set
      */
-    public void setSpeed(int speed) {
-        this.speed = speed;
+    public void setSpeed(long time) {
+        this.speed = time;
     }
 
     /**

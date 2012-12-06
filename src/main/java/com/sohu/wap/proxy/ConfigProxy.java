@@ -93,7 +93,7 @@ public class ConfigProxy {
                 resultList.add( checkService.submit(new Callable<Boolean>() {
                      @Override
                     public Boolean call() throws Exception {
-                          return Boolean.valueOf(ProxyHelper.testProxy(host.getIp(), host.getPort())) ;
+                          return Boolean.valueOf(ProxyHelper.testProxy( host )) ;
                    }
                 }));
             }

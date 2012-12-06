@@ -1,5 +1,6 @@
 import org.json.JSONException;
 
+import com.sohu.wap.proxy.Host;
 import com.sohu.wap.proxy.ProxyHelper;
 
 public class Test {
@@ -54,7 +55,9 @@ public class Test {
 
             }
         }
-
+        final 	Host host = new Host(proxyIp, port);
+        host.setAnonymity("AMXXX");
+        System.out.println(host);
 //        JSONObject json = new JSONObject();
 //
 //        json.put("yyrq", "date");
