@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -40,16 +41,19 @@ public class ConfigProxy {
    
     private static Logger  log = LoggerFactory.getLogger(ConfigProxy.class);
     
-    
     private static ConcurrentHashMap<String, Host> HOST_MAP = new ConcurrentHashMap<String, Host>();
     
-   
+    private static ExecutorService checkService =  CheckProxyThreadPool.getInstance().getExecutorService();
+    
+    private static ScheduledExecutorService scheduledService =   ScheduledThreadPool.getInstance().getScheduledExecutorService();
+    
+    
     //单例对象
     private static  ConfigProxy  _instance;
     
     private PropConfigurations  proxy;
     
-    private static long initialDelay = 1;
+    private static long initialDelay = 0;
     
     private static  long delay  =10*60;
     
@@ -64,63 +68,68 @@ public class ConfigProxy {
             synchronized (ConfigProxy.class){
                 if (_instance == null){
                     _instance  = new ConfigProxy();
+                    ProxyChecker proxyChecker = new ProxyChecker();
+//                    proxyChecker.run();
+                    scheduledService.scheduleWithFixedDelay(proxyChecker,initialDelay, delay, TimeUnit.SECONDS);
                     
-                    System.out.println("_instance");
-                    ScheduledThreadPool.getInstance().getScheduledExecutorService().
-                    scheduleWithFixedDelay( new Runnable (){
-                        @Override
-                        public void run() {
-                            List<Future<Boolean>> resultList = new ArrayList<Future<Boolean>>();  
-                            ExecutorService checkService =  CheckProxyThreadPool.getInstance().getExecutorService();
-                            Entry<String, Host> []  proxyArray =  ( Entry<String, Host>[]) HOST_MAP.entrySet().toArray();
-                            int index =0;
-                            for (index =0; index < proxyArray.length; index++ ){
-                                 final Entry<String, Host> entry = proxyArray[index];
-                                resultList.add( checkService.submit(new Callable<Boolean>() {
-                                     @Override
-                                    public Boolean call() throws Exception {
-                                          return Boolean.valueOf(ProxyHelper.testProxy(entry.getValue().getIp(), entry.getValue().getPort())) ;
-                                   }
-                                }));
-                                System.out.println("check");
-                            }
-                            for (index =0; index < resultList.size(); index++ ){
-                                Entry<String, Host> current = proxyArray[index];
-                                Future<Boolean> fs  =   resultList.get(index);
-                                try {  
-                                    Boolean checkOk = fs.get(2, TimeUnit.SECONDS);
-                                    if (!checkOk){
-                                        HOST_MAP.remove(current.getKey());
-                                    }
-                                } catch (InterruptedException e) {  
-                                    e.printStackTrace();  
-                                } catch (ExecutionException e) {  
-                                
-                                }  catch (TimeoutException e) {
-                                    //超时删除
-                                    HOST_MAP.remove(current.getKey());
-                                }
-                            }  
-                            
-                            
-                        }},initialDelay, delay, TimeUnit.SECONDS);
-                    
-                }
+                 }
             }
         }
       return   _instance;
     }
     
+    
+    public static class ProxyChecker implements Runnable {
+        @Override
+        public void run() {
+            List<Future<Boolean>> resultList = new ArrayList<Future<Boolean>>(); 
+            System.out.println("check proxy task");
+            Object []  proxyArray =  HOST_MAP.keySet().toArray();
+            System.out.println("check");
+            int index =0;
+            for (index =0; index < proxyArray.length; index++ ){
+                 final String key  = (String )proxyArray[index];
+                 final Host host  = HOST_MAP.get(key);
+                resultList.add( checkService.submit(new Callable<Boolean>() {
+                     @Override
+                    public Boolean call() throws Exception {
+                          return Boolean.valueOf(ProxyHelper.testProxy(host.getIp(), host.getPort())) ;
+                   }
+                }));
+            }
+            for (index =0; index < resultList.size(); index++ ){
+            	 final String key  = (String )proxyArray[index];
+                Future<Boolean> fs  =   resultList.get(index);
+                try {  
+                    Boolean checkOk = fs.get(2, TimeUnit.SECONDS);
+                    if (!checkOk){
+                        HOST_MAP.remove(key);
+                    }
+                } catch (InterruptedException e) {  
+                    e.printStackTrace();  
+                } catch (ExecutionException e) {  
+                
+                }  catch (TimeoutException e) {
+                    //超时删除
+                	log.error(key+" timeout! remove");
+                    HOST_MAP.remove(key);
+                }
+            }  
+            log.info("schedule check over! size="+ HOST_MAP.size() );
+            
+            
+            
+        }}
     public  ConcurrentHashMap  <String, Host>   getProxy(){
+    	 
               return HOST_MAP;
       }
     
     
     public  Host  getRandomHost(){
-        Entry<String, Host>  [] entryArray =( Entry<String, Host>[]) HOST_MAP.entrySet().toArray();
-        Entry<String, Host> random = entryArray[RandomUtil.getRandomInt(entryArray.length)];
-        return random.getValue();
-}
+    	 Object []  proxyArray =  HOST_MAP.keySet().toArray();
+    	 return  HOST_MAP.get( proxyArray[RandomUtil.getRandomInt(proxyArray.length)]);
+   }
     
     /**
      * 
@@ -135,9 +144,7 @@ public class ConfigProxy {
     
     private void initProxy(){
         Properties mapdb =  proxy.getProperties();
-       
         Iterator itor =mapdb.keySet().iterator();
-   
         while(itor.hasNext())
         {
            String key = ((String)itor.next()).trim() ;
@@ -156,13 +163,19 @@ public class ConfigProxy {
            HOST_MAP.putIfAbsent(ip, host);
          }
          
-        log.info("initConfigProxy over!" );
+        log.info("initConfigProxy over! size="+ HOST_MAP.size() );
     }
     
     public static void main (String [] args){
         ConfigProxy.getInstance().getProxy();
+        while(true){
+        	System.out.println( ConfigProxy.getInstance().getRandomHost());
+        }
+       
+//        log.info("initConfigProxy over! size="+ HOST_MAP.size() );
     }
-    
+
+ 
     
 }
 

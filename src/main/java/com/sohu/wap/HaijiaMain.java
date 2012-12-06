@@ -12,6 +12,8 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.proxy.ConfigProxy;
+import com.sohu.wap.proxy.Host;
 import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.SystemConfigurations;
 import com.sohu.wap.util.ThreadPool;
@@ -35,9 +37,11 @@ public class HaijiaMain
         
         String date = SystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(7));
       
+        Host host = ConfigProxy.getInstance().getRandomHost();
+        
         System.out.println("抢车日期为:"+ date);
        
-        YueCheHelper.waitForService();
+//        YueCheHelper.waitForService();
         
         if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
           //进入破解模式

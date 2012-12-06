@@ -201,7 +201,7 @@ public class YueChe {
 				}else if(result.indexOf("您的IP地址被限制登录!")!= -1  ){  //失败的话 ，继续登录
 					System.out.println("您的IP地址被限制登录!");
 					log.error("您的IP地址被限制登录!"); //打印错误，直接退出
-					System.exit(1);
+//					System.exit(1);
 				}
 				
 				
