@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sohu.wap.bo.Result;
 import com.sohu.wap.http.HttpUtil4Exposer;
-import com.sohu.wap.proxy.ConfigProxy;
+import com.sohu.wap.proxy.ConfigHttpProxy;
 import com.sohu.wap.proxy.Host;
 import com.sohu.wap.util.RandomUtil;
 import com.sohu.wap.util.ThreadUtil;
@@ -25,7 +25,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	  
 
 	    if (YueCheHelper.IS_USE_PROXY){
-	            Host host = ConfigProxy.getInstance().getRandomHost();
+	            Host host = ConfigHttpProxy.getInstance().getRandomHost();
 	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp(),host.getPort());
 	    }else{
 	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient();

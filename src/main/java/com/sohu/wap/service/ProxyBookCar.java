@@ -19,7 +19,7 @@ import com.sohu.wap.YueChe;
 import com.sohu.wap.http.HttpUtil4;
 import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.proxy.Host;
-import com.sohu.wap.proxy.HttpProxy;
+import com.sohu.wap.proxy.SpysHttpProxy;
 import com.sohu.wap.util.RandomUtil;
 
 /**
@@ -32,7 +32,7 @@ public class ProxyBookCar extends YueChe {
 
     public static JSONObject book(JSONObject carInfo , JSONObject cookieInfo ){
        
-       Set<Entry<String, Host>> set =  HttpProxy.getHttpProxy().entrySet();
+       Set<Entry<String, Host>> set =  SpysHttpProxy.getInstance().getProxy().entrySet();
        Set<Entry<String, Host>> [] array =   (Set<Entry<String, Host>>[]) set.toArray();
      
        Entry<String, Host>  entry =    (Entry<String, Host>) array[RandomUtil.getRandomInt(array.length)];

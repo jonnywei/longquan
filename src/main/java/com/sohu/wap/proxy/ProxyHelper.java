@@ -19,7 +19,7 @@ import com.sohu.wap.http.HttpUtil4Exposer;
  */
 public class ProxyHelper {
 
-    private static Logger log = LoggerFactory.getLogger(HttpProxy.class);
+    private static Logger log = LoggerFactory.getLogger(SpysHttpProxy.class);
 
     
     private static String TEST_PROXY_URL = "http://dev.w.sohu.com/t2/reqinfo.do";
