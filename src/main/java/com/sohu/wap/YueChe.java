@@ -178,8 +178,8 @@ public class YueChe {
 			
 		
 			if (result != null) {
-//				System.out.println(result);
-//				log.debug(result);
+				System.out.println(result);
+				log.debug(result);
 				//登录成功
 				if (result.equals("/index.aspx")) {
 					isLoginSuccess =true;

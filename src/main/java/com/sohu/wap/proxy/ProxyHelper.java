@@ -53,20 +53,21 @@ public class ProxyHelper {
         boolean  isCanUse = false;
         HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient(proxyIp, port);
         httpUtil4.addCookie("client_cookie", "client_cookie", ".sohu.com");
-        String result = httpUtil4.getContent(TEST_PROXY_URL);
+        JSONObject rj = new JSONObject();
+        JSONObject result = httpUtil4.postJson( TEST_PROXY_URL ,rj);
         log.debug(proxyIp + " result=" + result);
         if (result == null) {
              log.error(proxyIp + " test error");
             isCanUse= false;
         } else {
-
-            try {
-                JSONObject rj = new JSONObject(result);
-            } catch (Exception ex) {
-                log.error("result error", ex);
-                isCanUse= false;
-                return isCanUse;
-            }
+//
+//            try {
+//                JSONObject rj = new JSONObject(result);
+//            } catch (Exception ex) {
+//                log.error("result error", ex);
+//                isCanUse= false;
+//                return isCanUse;
+//            }
             
             if (httpUtil4.getCookieValue("client_cookie").equals("client_cookie")
                     && httpUtil4.getCookieValue("cookie_test") != null
