@@ -14,7 +14,7 @@ public class ConfigProxyTest {
 		// TODO Auto-generated method stub
 		ConcurrentHashMap  <String, Host>  hostMap = ConfigHttpProxy.getInstance().getProxy();
 		System.out.println(ConfigHttpProxy.getInstance().getRandomHost());
-		System.exit(0);
+//		System.exit(0);
 		ThreadUtil.sleep(60);
 		Iterator<String> iter = hostMap.keySet().iterator();
 		int index =0;

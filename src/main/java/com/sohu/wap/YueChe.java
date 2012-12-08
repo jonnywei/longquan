@@ -76,7 +76,7 @@ public class YueChe {
 	public static int NO_CAR = 1;
 	public static int GET_CAR_ERROR = 2;
 	public static int ALREADY_BOOKED_CAR=3;
-	
+	public static int BOOK_INVAILD_OPERATION = 5;
 	public static int KEMU2_NO_TIME=10003;
 	public static int YUCHE_RETRY_TIME = 3;
 
@@ -390,7 +390,7 @@ public class YueChe {
 							break;
 						}
 						if ("非法操作".equals(outMsg)){
-							resultN = ALREADY_BOOKED_CAR;
+							resultN = BOOK_INVAILD_OPERATION;
 							break;
 						}
 						

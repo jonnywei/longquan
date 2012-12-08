@@ -115,7 +115,12 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   System.out.println(info);
                   log.info(info);
                   break;
-              }  else {  //无车
+              } else if (result == YueChe. BOOK_INVAILD_OPERATION){  //无车
+                  String info = uinfo +"非法操作!";
+                  System.out.println(info);
+                  log.info(info);
+                  break;
+              } else {  //无车
                   System.out.println("未知错误！重试! RESULT="+result);
               }
               
