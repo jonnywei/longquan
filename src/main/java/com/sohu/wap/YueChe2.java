@@ -625,9 +625,9 @@ public class YueChe2 {
 			carInfo.setPmCarInfo(pmStatus);
 			carInfo.setNiCarInfo(niStatus);
 			
-			carInfo.getCarInfo().put(YueCheHelper.AM_STR, amStatus);
-			carInfo.getCarInfo().put(YueCheHelper.PM_STR, pmStatus);
-			carInfo.getCarInfo().put(YueCheHelper.NI_STR, niStatus);
+			carInfo.getCarInfo().put(Constants.AM_STR, amStatus);
+			carInfo.getCarInfo().put(Constants.PM_STR, pmStatus);
+			carInfo.getCarInfo().put(Constants.NI_STR, niStatus);
 			
 			yueCheCarInfoMap.put(date,carInfo);
 			
@@ -671,12 +671,12 @@ public class YueChe2 {
 		                        return ret;
 		                    }else{
 		                        ret.setData(yueCheDate); //设置约车日期
-		                        if (YueCheHelper.AM_STR.equals(amPmStr)){
+		                        if (Constants.AM_STR.equals(amPmStr)){
 		                            ret.setRet(0);
 		                           
 		                            return ret;
 		                        
-		                        }else if (YueCheHelper.PM_STR.equals(amPmStr)){
+		                        }else if (Constants.PM_STR.equals(amPmStr)){
 		                           ret.setRet(1);
 		                           return ret;
 		                        }else{

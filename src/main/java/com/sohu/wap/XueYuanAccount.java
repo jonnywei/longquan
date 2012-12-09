@@ -23,6 +23,7 @@ public class XueYuanAccount {
     
     private String whiteCar;
     
+    private String km ="km2";
     
     private boolean isBookSuccess = false;
     /**
@@ -103,4 +104,23 @@ public class XueYuanAccount {
     public String getWhiteCar() {
         return whiteCar;
     }
+	public String getAmPm() {
+		return amPm;
+	}
+	public void setAmPm(String amPm) {
+		this.amPm = amPm;
+	}
+	public String getKm() {
+		return km;
+	}
+	public void setKm(String km) {
+		this.km = km;
+	}
+	@Override
+	public String toString() {
+		return "XueYuanAccount [amPm=" + amPm + ", carType=" + carType
+				+ ", id=" + id + ", isBookSuccess=" + isBookSuccess + ", km="
+				+ km + ", password=" + password + ", userName=" + userName
+				+ ", whiteCar=" + whiteCar + ", yueCheDate=" + yueCheDate + "]";
+	}
 }

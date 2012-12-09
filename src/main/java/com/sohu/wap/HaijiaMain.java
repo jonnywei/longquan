@@ -41,7 +41,7 @@ public class HaijiaMain
         
         System.out.println("抢车日期为:"+ date);
        
-//        YueCheHelper.waitForService();
+        YueCheHelper.waitForService();
         
         if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
           //进入破解模式

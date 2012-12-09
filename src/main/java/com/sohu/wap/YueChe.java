@@ -77,6 +77,8 @@ public class YueChe {
 	public static int GET_CAR_ERROR = 2;
 	public static int ALREADY_BOOKED_CAR=3;
 	public static int BOOK_INVAILD_OPERATION = 5;
+	
+	public static int NOT_BOOK_WEEKEND_CAR = 800005;
 	public static int KEMU2_NO_TIME=10003;
 	public static int YUCHE_RETRY_TIME = 3;
 
@@ -221,20 +223,21 @@ public class YueChe {
 	 * -1 约车错误 0 约车成功 1 无车可约
 	 * 
 	 */
-	public  Result<String> yuche(String date, String amOrpm, boolean isGetHiddenKM)
+	public  Result<String> yuche(String date, String amOrpm, boolean isKM3 )
 			throws InterruptedException {
 	    
 	    Result <String>result = new Result<String>(UNKNOWN_ERROR);
 	    
 		int resultN = UNKNOWN_ERROR;
 
-		// 页面中一个隐藏的输入，默认为2，可能更改
+		// 页面中一个隐藏的输入，默认为2，可能更改,其实是科目信息，亲
 		String hiddenKM = "2";
-		if (isGetHiddenKM) {
-			String yuchePage = httpUtil4.getContent(YUCHE_URL);
-			Document document = Jsoup.parse(yuchePage);
-			Element hkm = document.getElementById(HIDDEN_KM);
-			hiddenKM = hkm.attr("value");
+		if (isKM3) {
+//			String yuchePage = httpUtil4.getContent(YUCHE_URL);
+//			Document document = Jsoup.parse(yuchePage);
+//			Element hkm = document.getElementById(HIDDEN_KM);
+//			hiddenKM = hkm.attr("value");
+			hiddenKM="3";
 		}
 
 		// {"yyrq":"20121126","yysd":"58","xllxID":"2","pageSize":35,"pageNum":1}
@@ -393,11 +396,15 @@ public class YueChe {
 							resultN = BOOK_INVAILD_OPERATION;
 							break;
 						}
+						if ("所在班种不能约周六日车辆".equals(outMsg)){
+							resultN = NOT_BOOK_WEEKEND_CAR;
+							break;
+						}
 						
-						  if(outMsg.indexOf("科目二剩余小时不足") != -1){
+						if(outMsg.indexOf("科目二剩余小时不足") != -1){
 						      resultN = KEMU2_NO_TIME;
 	                            break;
-	                      }
+	                    }
 						
 						if("验证码错误！".equals(outMsg)){
 							System.out.println(outMsg+"不计入retry次数");
@@ -407,7 +414,6 @@ public class YueChe {
 							yucheTry++; //该页面可能都被约了
 						}
 						//{"d":"[\r\n  {\r\n    \"Result\": false,\r\n    \"OutMSG\": \"科目二剩余小时不足 !\"\r\n  }\r\n]"}
-						System.out.println("book car return error:"+outMsg);
 						log.error("book car return error:"+outMsg);
 					}
 
@@ -647,9 +653,9 @@ public class YueChe {
 			carInfo.setPmCarInfo(pmStatus);
 			carInfo.setNiCarInfo(niStatus);
 			
-			carInfo.getCarInfo().put(YueCheHelper.AM_STR, amStatus);
-			carInfo.getCarInfo().put(YueCheHelper.PM_STR, pmStatus);
-			carInfo.getCarInfo().put(YueCheHelper.NI_STR, niStatus);
+			carInfo.getCarInfo().put(Constants.AM_STR, amStatus);
+			carInfo.getCarInfo().put(Constants.PM_STR, pmStatus);
+			carInfo.getCarInfo().put(Constants.NI_STR, niStatus);
 			
 			yueCheCarInfoMap.put(date,carInfo);
 			
@@ -693,12 +699,12 @@ public class YueChe {
 		                        return ret;
 		                    }else{
 		                        ret.setData(yueCheDate); //设置约车日期
-		                        if (YueCheHelper.AM_STR.equals(amPmStr)){
+		                        if (Constants.AM_STR.equals(amPmStr)){
 		                            ret.setRet(0);
 		                           
 		                            return ret;
 		                        
-		                        }else if (YueCheHelper.PM_STR.equals(amPmStr)){
+		                        }else if (Constants.PM_STR.equals(amPmStr)){
 		                           ret.setRet(1);
 		                           return ret;
 		                        }else{

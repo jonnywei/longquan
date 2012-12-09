@@ -128,7 +128,12 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
            String  amPm = temp[1];
            String carType =temp[2];
            if(temp.length > 3){
-               String whiteCar = temp[3];
+               String km = temp[3];
+               sa.setKm(km);
+           }
+           
+           if(temp.length > 4){
+               String whiteCar = temp[4];
                sa.setWhiteCar(whiteCar);
            }
            

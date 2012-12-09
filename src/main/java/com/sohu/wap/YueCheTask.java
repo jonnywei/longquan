@@ -88,7 +88,12 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                  }else{
                      first = false;
                  }
-               Result<String> ret =  yuche(date, amPm,false);
+                 Result<String> ret =  null;
+                 if(Constants.KM3.equals(xueYuan.getKm())){
+                	 ret =  yuche(date, amPm,true);
+                 }else{
+                	 ret =  yuche(date, amPm,false);
+                 }
                
                String uinfo = xueYuan.getUserName() +":"+date+ YueCheHelper.AMPM.get(amPm);
                
@@ -118,6 +123,10 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
               } else if (result == YueChe. BOOK_INVAILD_OPERATION){  //无车
                   String info = uinfo +"非法操作!";
                   System.out.println(info);
+                  log.info(info);
+                  break;
+              }else if (result == YueChe. NOT_BOOK_WEEKEND_CAR){  //所在班种不能约周六日车辆
+                  String info = uinfo +"所在班种不能约周六日车辆";
                   log.info(info);
                   break;
               } else {  //无车

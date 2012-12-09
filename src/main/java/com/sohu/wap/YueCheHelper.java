@@ -29,15 +29,7 @@ public class YueCheHelper
     
     public static boolean IMAGE_CODE_INPUT_METHOD_IS_AUTO = true;
     
-    public static String AM_STR="am";
-    public static String PM_STR="pm";
-    public static String NI_STR="ni";
-    
-    public  static String CAR_TYPE_ALS = "als";
-    public  static String CAR_TYPE_BYD = "byd";
-    public  static String CAR_TYPE_ZDD = "zdd";
-    public  static String CAR_TYPE_FK = "fk";
-    public  static String CAR_TYPE_STN = "stn";
+   
     
     
     
@@ -120,7 +112,7 @@ public class YueCheHelper
     
     public static   boolean isInServiceTime(String carType){
     	
-    	if (carType == null || ( !CAR_TYPE_FK.equalsIgnoreCase(carType) && !CAR_TYPE_STN.equalsIgnoreCase(carType)) ){
+    	if (carType == null || ( !Constants.CAR_TYPE_FK.equalsIgnoreCase(carType) && !Constants.CAR_TYPE_STN.equalsIgnoreCase(carType)) ){
     		
     		return   DateUtil.isCurrTimeInTimeInterval(SERVICE_BEGIN_TIME,SERVICE_END_TIME);
     		
@@ -147,7 +139,7 @@ public class YueCheHelper
     public static void waiting(String carType){
     	Date beginDate = DateUtil.getTodayTime(SERVICE_BEGIN_TIME);
     	
-    	if ( CAR_TYPE_FK.equalsIgnoreCase(carType)  || CAR_TYPE_STN.equalsIgnoreCase(carType)){
+    	if ( Constants.CAR_TYPE_FK.equalsIgnoreCase(carType)  || Constants.CAR_TYPE_STN.equalsIgnoreCase(carType)){
     		beginDate = DateUtil.getTodayTime(FK_YUECHE_BEGIN_TIME);
     	}
     	long beginTime = beginDate.getTime();

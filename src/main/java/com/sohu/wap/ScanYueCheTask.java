@@ -35,12 +35,12 @@ public class ScanYueCheTask extends YueCheTask {
 		int yueCheInfo = result.getRet();
 		
 		if (yueCheInfo == 0){
-			doYueche(result.getData(), YueCheHelper.AM_STR);
+			doYueche(result.getData(), Constants.AM_STR);
 		} else if (yueCheInfo == 1){
-			doYueche(result.getData(),YueCheHelper.PM_STR);
+			doYueche(result.getData(),Constants.PM_STR);
 			
 		}else if (yueCheInfo == 2){
-			doYueche(result.getData(),YueCheHelper.NI_STR);
+			doYueche(result.getData(),Constants.NI_STR);
 		}else if (yueCheInfo == 3){
 			return ALREADY_YUECHE;
 			
