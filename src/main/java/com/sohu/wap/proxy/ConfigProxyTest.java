@@ -24,6 +24,7 @@ public class ConfigProxyTest {
 			Host host =hostMap.get(key);
 			System.out.println(index+"="+host.getIp()+":"+host.getPort());
 		}
+		System.exit(1);
 	}
 
 }

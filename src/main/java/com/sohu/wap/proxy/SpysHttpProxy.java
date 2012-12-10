@@ -269,6 +269,7 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
 			Host host =hostMap.get(key);
 			System.out.println(index+"="+host.getIp()+":"+host.getPort());
 		}
+		System.exit(0);
     }
 
 

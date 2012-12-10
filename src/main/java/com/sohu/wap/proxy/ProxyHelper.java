@@ -37,7 +37,7 @@ public class ProxyHelper {
        long start = System.currentTimeMillis();
        boolean result = 	testProxy(host.getIp(), host.getPort());
        long time = System.currentTimeMillis() - start;
-       log.debug(host.getIp() + " time=" + time);
+//       log.debug(host.getIp() + " time=" + time);
        host.setSpeed(time);
        return result;
     }
@@ -76,7 +76,7 @@ public class ProxyHelper {
                 log.info(proxyIp + " check ok!");
                 isCanUse= true;
             } else {
-                System.out.println(proxyIp + "cookie  test error");
+                
                 log.error(proxyIp + "cookie  test error");
             }
 
