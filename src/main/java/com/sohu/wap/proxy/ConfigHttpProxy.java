@@ -57,7 +57,7 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
      * 初始化 account 对象 
      *
      */
-    private  void init (){
+      protected  void init (){
         proxy = new PropConfigurations("proxy.properties");
         initProxy();
     }

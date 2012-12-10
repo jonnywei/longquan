@@ -271,4 +271,15 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
 		}
     }
 
+
+
+    /* (non-Javadoc)
+     * @see com.sohu.wap.proxy.AbstractHttpProxy#init()
+     */
+    @Override
+    protected void init() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

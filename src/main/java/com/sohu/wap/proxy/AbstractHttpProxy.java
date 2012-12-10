@@ -40,6 +40,8 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 	    
 	 static long max_request_time = 6;
 	 
+	 
+	 protected abstract  void  init();
 
 	protected class ProxyChecker implements Runnable {
 		@Override
@@ -78,6 +80,10 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 				}
 			}
 			log.info("schedule check over! size=" + HOST_MAP.size());
+			//如果代理数目小于30，重新加载
+			if (HOST_MAP.size() < 30){
+			    init();
+			}
 
 		}
 	}
