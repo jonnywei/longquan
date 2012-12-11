@@ -33,6 +33,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	
 		this.xueYuan = xueYuan;
 		this.date = date; 
+		log.info(this.xueYuan.getUserName()+"init thread");
 	}
 	
 	@Override
