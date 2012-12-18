@@ -8,8 +8,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+
 
 /**
  * 
@@ -26,6 +29,10 @@ public final class PropConfigurations {
 	
 	private  URL   confFileUrl;
 	
+	
+	
+	
+	private  NetChangedReloadingStrategy strategy;
 	
 	
 	
@@ -46,11 +53,24 @@ public final class PropConfigurations {
             throw new RuntimeException("WARNING: Could not find "+confFileName+" file in class path. ");
         }
         
-     
+        strategy = new NetChangedReloadingStrategy();
+        
+        strategy.setMonitoredFileURI(temp);
+        
+//        strategy.init();
         
 	}
 	
 	
+	/**
+	 * 
+	 *检查文件是否修改过 
+	 * 
+	 */
+	 public  boolean isChanged (){
+	     
+	   return  strategy.reloadingRequired();
+	 }
 	
 	 
 	 
@@ -72,7 +92,7 @@ public final class PropConfigurations {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-	        
+//	             strategy.reloadingPerformed();
 	         }
 	  
 	     return confProperties;

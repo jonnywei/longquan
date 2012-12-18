@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sohu.wap.util.DateUtil;
+import com.sohu.wap.util.NetSystemConfigurations;
 import com.sohu.wap.util.RandomUtil;
 import com.sohu.wap.util.SystemConfigurations;
 import com.sohu.wap.util.ThreadUtil;
@@ -25,12 +26,56 @@ public class YueCheHelper
 {
     private static Logger log = LoggerFactory.getLogger(YueCheHelper.class);
     
-    private static String  IMAGE_CODE_INPUT_METHOD =SystemConfigurations.getSystemStringProperty("system.imagecode.inputmethod","auto") ;
     
-    public static boolean IMAGE_CODE_INPUT_METHOD_IS_AUTO = true;
+    
+    public static  String  getImageCodeInputMethod(){
+          
+        String  IMAGE_CODE_INPUT_METHOD =NetSystemConfigurations.getSystemStringProperty("system.imagecode.inputmethod","auto") ;
+        return IMAGE_CODE_INPUT_METHOD;
+        
+    }
+    
+    //遗留的，删除
+    public static  boolean    IS_ENTER_CREAKER_MODEL = false;
+    
+    public static  boolean  isImageCodeInputMethodAuto(){
+        boolean IMAGE_CODE_INPUT_METHOD_IS_AUTO = true;
+        if(! getImageCodeInputMethod().equals("auto")){
+            IMAGE_CODE_INPUT_METHOD_IS_AUTO = false;
+        }
+        return IMAGE_CODE_INPUT_METHOD_IS_AUTO;
+    }
     
    
+    public static boolean isEnterCreakerModel(){
+        boolean    IS_ENTER_CREAKER_MODEL = NetSystemConfigurations.getSystemBooleanProperty("system.open.creak.model",false) ;; 
+        return IS_ENTER_CREAKER_MODEL;
+    }
     
+    //遗留的，删除
+    public static boolean IS_USE_PROXY= false;
+    
+    public static boolean isUseProxy(){
+        
+        boolean   IS_USE_PROXY = NetSystemConfigurations.getSystemBooleanProperty("system.use.proxy",false) ;; 
+        
+        return IS_USE_PROXY;
+    }
+    
+    
+    public static int  getProxyNumPreUser(){
+        
+        int   PROXY_NUM_PER_USER = NetSystemConfigurations.getSystemIntProperty("system.proxy.num.per.user", 2);
+        
+        return PROXY_NUM_PER_USER;
+    }
+    
+    
+    
+    
+    
+   
+    private static Map<String, String>  IS_EXECUTE_TASK = new HashMap<String, String>();
     
     
     private static String[]  AM_PM_NUM ={"812","15","58"};
@@ -47,24 +92,20 @@ public class YueCheHelper
     		AMPM.put(AM_PM_STR2[i], AM_PM_NUM[i]);
     	}
     	
-    	if(! IMAGE_CODE_INPUT_METHOD.equals("auto")){
-    		IMAGE_CODE_INPUT_METHOD_IS_AUTO = false;
-    	}
+    
     	
     	
     }
     
-    public static  int   MIN_SCAN_INTEVAL = SystemConfigurations.getSystemIntProperty("system.scan.min.interval", 60);
+    public static  int   MIN_SCAN_INTEVAL = NetSystemConfigurations.getSystemIntProperty("system.scan.min.interval", 60);
     
-    public static  int   MAX_SCAN_INTEVAL = SystemConfigurations.getSystemIntProperty("system.scan.max.interval", 180);
+    public static  int   MAX_SCAN_INTEVAL = NetSystemConfigurations.getSystemIntProperty("system.scan.max.interval", 180);
     
-   
-    public static  int   MAX_SLEEP_TIME = SystemConfigurations.getSystemIntProperty("system.maxsleeptime", 3);
+    public static  int   MAX_SLEEP_TIME = NetSystemConfigurations.getSystemIntProperty("system.maxsleeptime", 3);
     
-    public static String YUCHE_TIME = SystemConfigurations.getSystemStringProperty("system.yueche.time","am,pm") ;
+    public static String YUCHE_TIME = NetSystemConfigurations.getSystemStringProperty("system.yueche.time","am,pm") ;
     
      
-    public static boolean    IS_ENTER_CREAKER_MODEL = SystemConfigurations.getSystemBooleanProperty("system.open.creak.model",false) ;; 
     
     private static String    FK_YUECHE_BEGIN_TIME = "07:40";
 //    private static String    FK_YUECHE_BEGIN_TIME = "00:50";
@@ -83,26 +124,23 @@ public class YueCheHelper
     public static  int IMAGE_CODE_TIMEOUT_MILLISECOND  =  10 * 60 *1000;
     
     
-   public static  String   PROXY_IP = SystemConfigurations.getSystemStringProperty("system.proxy.ip", "127.0.0.1");
+   public static  String   PROXY_IP = NetSystemConfigurations.getSystemStringProperty("system.proxy.ip", "127.0.0.1");
     
-   public static  int   PROXY_PORT = SystemConfigurations.getSystemIntProperty("system.proxy.port", 8087);
+   public static  int   PROXY_PORT = NetSystemConfigurations.getSystemIntProperty("system.proxy.port", 8087);
     
-   public static boolean   IS_USE_PROXY = SystemConfigurations.getSystemBooleanProperty("system.use.proxy",false) ;; 
-    
-   public static  int   PROXY_NUM_PER_USER = SystemConfigurations.getSystemIntProperty("system.proxy.num.per.user", 2);
+  
    
-   
-   public static  String   GAE_PROXY_IP = SystemConfigurations.getSystemStringProperty("system.gae.proxy.ip", "127.0.0.1");
-   
-   public static  int   GAE_PROXY_PORT = SystemConfigurations.getSystemIntProperty("system.gae.proxy.port", 8087);
+//   public static  String   GAE_PROXY_IP = NetSystemConfigurations.getSystemStringProperty("system.gae.proxy.ip", "127.0.0.1");
+//   
+//   public static  int   GAE_PROXY_PORT = NetSystemConfigurations.getSystemIntProperty("system.gae.proxy.port", 8087);
+//    
     
-    
-   public static boolean   IS_USE_PROXY_BOOK_CAR = SystemConfigurations.getSystemBooleanProperty("system.use.proxy.bookcar",false) ;; 
+   public static boolean   IS_USE_PROXY_BOOK_CAR = NetSystemConfigurations.getSystemBooleanProperty("system.use.proxy.bookcar",false) ;; 
    
    
   public static   boolean isInServiceTime(){
     
-      if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+      if (YueCheHelper.isEnterCreakerModel()){
           return  DateUtil.isCurrTimeInTimeInterval(CREAK_START_TIME,SERVICE_END_TIME);
       }
 	  return   isInServiceTime(null);
@@ -122,8 +160,39 @@ public class YueCheHelper
         
     }
     
+    
+    /**
+     *设置今天任务已经完成 
+     * 
+     */
+    public static void setTodayTaskExecuteOver(){
+        IS_EXECUTE_TASK.put(DateUtil.getNowDay(), "over");
+    }
+    
+    
+    
+    
+    
+    /**
+     * 
+     *得到今日任务完成状态
+     * 
+     */
+    public static boolean  isTodayTaskExecuteOver(){
+        
+        
+        if (IS_EXECUTE_TASK.containsKey(DateUtil.getNowDay())){  //今日已经执行完毕
+            return true;
+        }
+        
+        return false;
+        
+    }
+    
+    
+    
     public static  void waitForService(){
-    	 // 选择周六周末
+    	  
         do {
             //在服务时间内
             if (!YueCheHelper.isInServiceTime()){

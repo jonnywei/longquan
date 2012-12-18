@@ -41,7 +41,8 @@ public class AccountMap {
     
     private PropConfigurations xueYuan;
     
-private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   = new ConcurrentHashMap<String, XueYuanAccount> ();
+
+    private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   = new ConcurrentHashMap<String, XueYuanAccount> ();
    
     
     private PropConfigurations scanXueYuan;
@@ -179,6 +180,9 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
            sa.setYueCheDate(temp[2]);
            sa.setYueCheAmPm(temp[3]);
            sa.setCarType(temp[4]);
+           if(temp.length > 5){
+               sa.setKm(temp[5]);
+           }
            scanXueYuanAccountMap.put(key, sa);
 //           log.info("add SohuAccounts " + sa);
          }

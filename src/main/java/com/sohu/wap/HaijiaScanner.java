@@ -39,7 +39,7 @@ public class HaijiaScanner
     
     public static void main( String[] args ) throws InterruptedException, IOException
     {
-        
+        YueCheHelper.IS_USE_PROXY = false;
         
     	scan();
         

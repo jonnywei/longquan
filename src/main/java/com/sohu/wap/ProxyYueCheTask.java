@@ -23,7 +23,7 @@ public class ProxyYueCheTask  extends YueChe2 implements Callable<Integer> {
 	public ProxyYueCheTask(XueYuanAccount xueYuan, String date){
 	  
 
-	    if (YueCheHelper.IS_USE_PROXY){
+	    if (YueCheHelper.isUseProxy()){
 	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient(YueCheHelper.PROXY_IP,YueCheHelper.PROXY_PORT);
 	    }else{
 	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient();

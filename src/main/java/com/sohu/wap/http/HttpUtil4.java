@@ -201,12 +201,12 @@ public class HttpUtil4
 	
 		
 		HttpParams httpParams =httpClient.getParams();
-		//使用http代理
-		 if (YueCheHelper.IS_USE_PROXY){
-		     HttpHost proxy = new HttpHost(YueCheHelper.PROXY_IP, YueCheHelper.PROXY_PORT);
-		     httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-		 }
-		
+//		//使用http代理
+//		 if (YueCheHelper.IS_USE_PROXY){
+//		     HttpHost proxy = new HttpHost(YueCheHelper.PROXY_IP, YueCheHelper.PROXY_PORT);
+//		     httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+//		 }
+//		
 		
 		if (haveCookie){
 		    HttpClientParams.setCookiePolicy(httpParams, CookiePolicy.BROWSER_COMPATIBILITY);

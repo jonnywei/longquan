@@ -1,7 +1,6 @@
 
 package com.sohu.wap.util;
 
-import java.io.StringBufferInputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.Properties;
@@ -16,14 +15,19 @@ import com.sohu.wap.http.HttpUtil4Exposer;
  * @author jianjunwei
  */
 
-public final class SystemConfigurations {
+public final class NetSystemConfigurations {
     
-    private static Logger  log = LoggerFactory.getLogger(SystemConfigurations.class);
+    private static Logger  log = LoggerFactory.getLogger(NetSystemConfigurations.class);
+    
+    private  static  NetChangedReloadingStrategy strategy  = new NetChangedReloadingStrategy();
 
  	private static Properties system = new Properties();
 
+ 	
+ 	
 	
 	public static String getSystemStringProperty(String key, String defaultValue) {
+	    reload();
 		if (system == null || system.getProperty(key) == null) {
 			return defaultValue;
 		}
@@ -31,6 +35,7 @@ public final class SystemConfigurations {
 	}
 
 	public static int getSystemIntProperty(String key, int defaultValue) {
+	    reload();
 		if (system == null || system.getProperty(key) == null) {
 			return defaultValue;
 		}
@@ -38,6 +43,7 @@ public final class SystemConfigurations {
 	}
 	
 	public static short getSystemShortProperty(String key, short defaultValue) {
+	    reload();
 		if (system == null || system.getProperty(key) == null) {
 			return defaultValue;
 		}
@@ -45,6 +51,7 @@ public final class SystemConfigurations {
 	}
 
 	public static long getLongProperty(String key, long defaultValue) {
+	    reload();
 		if (system == null || system.getProperty(key) == null) {
 			return defaultValue;
 		}
@@ -52,6 +59,7 @@ public final class SystemConfigurations {
 	}
 	
 	public static boolean getSystemBooleanProperty(String key, boolean defaultValue) {
+	    reload();
 		if (system == null || system.getProperty(key) == null) {
 			return defaultValue;
 		}
@@ -60,31 +68,58 @@ public final class SystemConfigurations {
 	
 
 	 
-
+	
+	
+	
+    //初始化加载
 	static {
 	  
-		try {
-		     
-		   String sp = HttpUtil4Exposer.getInstance().getContent(Constants.CONFIG_URL);
-		 
-		   StringReader  sr = new StringReader(sp);
-		   
-			system.load(SystemConfigurations.class.getClassLoader().getResourceAsStream("system.properties"));
-			system.load(sr);
-		} catch (Exception e) {
-			system = null;
-			System.err.println("WARNING: Could not find system.properties  file in class path.");
-			 
-		}
+	    reload();
 		
 	}
 	
+	
+	
+	//网络设置覆盖本地设置
+	
+	private  static  void reload(){
+	    try {
+            
+	          if (strategy.reloadingRequired()){
+	                 
+	                String sp = HttpUtil4Exposer.getInstance().getContent(Constants.CONFIG_URL);
+	              
+	                if (sp == null){
+	                    log.error("load config from net eror");
+	                    sp="";
+	                }
+	                StringReader  sr = new StringReader(sp);
+	               
+	                system.load(NetSystemConfigurations.class.getClassLoader().getResourceAsStream("system.properties"));
+	                
+	                system.load(sr);
+	          }
+	           
+	        } catch (Exception e) {
+	            log.error("load error",e);
+	            system = null;
+	            System.err.println("ERROR:load erorr.");
+	             
+	        }
+	}
+	
+	
+	
 	public static void main(String [] args){
-	   Iterator iter =  system.keySet().iterator();
-	    while(iter.hasNext()){
-	        String key = (String) iter.next();
-	        System.out.println(key +"="+ system.getProperty(key ))  ;
+	    while(true){
+	        Iterator iter =  system.keySet().iterator();
+	        while(iter.hasNext()){
+	            String key = (String) iter.next();
+	            System.out.println(key +"="+ getSystemStringProperty(key,"aa"))  ;
+	        }
+	        ThreadUtil.sleep(60);
 	    }
+	  
 	 
 	}
 	

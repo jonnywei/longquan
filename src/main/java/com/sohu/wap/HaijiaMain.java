@@ -43,7 +43,7 @@ public class HaijiaMain
        
         YueCheHelper.waitForService();
         
-        if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+        if (YueCheHelper.isEnterCreakerModel()){
           //进入破解模式
           //  速度肯定是最快的了
           //  利用海驾的验证码漏洞，事先输入验证码，之后约车
@@ -56,8 +56,8 @@ public class HaijiaMain
         for (String accoutId: AccountMap.getInstance().getXueYuanAccountMap().keySet()){
             XueYuanAccount  xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);
             if ( xy!=null){
-                if (YueCheHelper.IS_USE_PROXY){
-                    for ( int num = 0 ; num < YueCheHelper.PROXY_NUM_PER_USER; num++){
+                if (YueCheHelper.isUseProxy()){
+                    for ( int num = 0 ; num < YueCheHelper.getProxyNumPreUser(); num++){
                         YueCheTask yueCheTask = new YueCheTask(xy,date);
                         resultList.add(executeService.submit(yueCheTask) );
                     }

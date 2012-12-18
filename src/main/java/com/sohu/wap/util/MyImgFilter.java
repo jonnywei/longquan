@@ -7,6 +7,14 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;  
 import java.awt.image.BufferedImage;  
 import javax.imageio.ImageIO;  
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
+
+import com.sun.media.jai.codec.BMPEncodeParam;
+import com.sun.media.jai.codec.ImageCodec;
+import com.sun.media.jai.codec.ImageEncoder;
+import com.sun.media.jai.codec.TIFFEncodeParam;
+
 import java.awt.Toolkit;  
 import java.awt.Image;  
   
@@ -249,23 +257,36 @@ public class MyImgFilter {
          flt.getBrighten();  
          bi=flt.getProcessedImg();  
          File file = new File(destImg);  
+         
+         OutputStream os = new FileOutputStream(file);
+//         toTiff(bi,os);
          ImageIO.write(bi, "jpg", file); 
     }
     
+    public static void toTiff(RenderedImage src, OutputStream  os) throws IOException{
+        /*tif转换到bmp格式*/  
+        TIFFEncodeParam param = new TIFFEncodeParam();  
+        ImageEncoder enc = ImageCodec.createImageEncoder("TIFF", os,param);  
+        enc.encode(src);  
+        os.close();//关闭流 
+    }
+    
+    
+    
     public static void main(String[] args) throws IOException {  
-    	MyImgFilter.transformImg("/home/wjj/haijia/img/110eff88a7374c9c91d7cae6dc80398b.gif", "/home/wjj/d");
-        FileInputStream fin=new FileInputStream(args[0]);  
-        BufferedImage bi=ImageIO.read(fin);  
-        MyImgFilter flt=new MyImgFilter(bi);  
-        flt.changeGrey();  
-        flt.getGrey();  
-       flt.getBrighten();  
-        bi=flt.getProcessedImg();  
-        flt.changeGrey();  
-        bi=flt.getProcessedImg();  
-        String pname=args[0].substring(0,args[0].lastIndexOf("."));  
-        File file = new File(pname +".jpg");  
-        ImageIO.write(bi, "jpg", file);  
+    	MyImgFilter.transformImg("d:/i/_3.jpg", "d:/3.tiff");
+//        FileInputStream fin=new FileInputStream(args[0]);  
+//        BufferedImage bi=ImageIO.read(fin);  
+//        MyImgFilter flt=new MyImgFilter(bi);  
+//        flt.changeGrey();  
+//        flt.getGrey();  
+//       flt.getBrighten();  
+//        bi=flt.getProcessedImg();  
+//        flt.changeGrey();  
+//        bi=flt.getProcessedImg();  
+//        String pname=args[0].substring(0,args[0].lastIndexOf("."));  
+//        File file = new File(pname +".jpg");  
+//        ImageIO.write(bi, "jpg", file);  
     }  
   
 }  

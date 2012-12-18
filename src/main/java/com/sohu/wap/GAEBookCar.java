@@ -33,7 +33,7 @@ public class GAEBookCar {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return  HttpUtil4.getInstance(YueCheHelper.GAE_PROXY_IP,YueCheHelper.GAE_PROXY_PORT).postJson(GAE_BOOK_CAR_URL, all);
+        return  HttpUtil4.getInstance("YueCheHelper.GAE_PROXY_IP",80).postJson(GAE_BOOK_CAR_URL, all);
       
     }
     

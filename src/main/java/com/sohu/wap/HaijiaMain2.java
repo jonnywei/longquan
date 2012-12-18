@@ -42,7 +42,7 @@ public class HaijiaMain2
        
         YueCheHelper.waitForService();
         
-        if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+        if (YueCheHelper.isEnterCreakerModel()){
           //进入破解模式
           //  速度肯定是最快的了
           //  利用海驾的验证码漏洞，事先输入验证码，之后约车

@@ -162,7 +162,7 @@ public class YueChe {
 			String result = null;
 			
 			//进入creak 模式
-			 if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+			 if (YueCheHelper.isEnterCreakerModel()){
 			    
 			    ( (HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, 
 			             CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY).getCookie());
@@ -341,7 +341,7 @@ public class YueChe {
 //					ThreadUtil.sleep(1);
 					
 					//如果是 creak 模式
-		             if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+		             if (YueCheHelper.isEnterCreakerModel()){
 		               ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, 
 		                         CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY).getCookie());
 		             }
@@ -510,7 +510,7 @@ public class YueChe {
 	
 	
 	private String getImgCode(String url)throws IOException{
-	    if (YueCheHelper.IS_ENTER_CREAKER_MODEL){
+	    if (YueCheHelper.isEnterCreakerModel()){
 	        if (url.equals(LOGIN_IMG_URL)){
 	            VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY);
 	            return vcode.getVcode();
@@ -520,7 +520,7 @@ public class YueChe {
 	        }
 	       
 	    }else{
-	        if (YueCheHelper.IMAGE_CODE_INPUT_METHOD_IS_AUTO){
+	        if (YueCheHelper.isImageCodeInputMethodAuto()){
 	            return getImgCodeAuto(url);
 	        }else{
 	            return  getImgCodeManual(url);
