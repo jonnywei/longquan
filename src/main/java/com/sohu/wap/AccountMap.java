@@ -118,7 +118,8 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
             
            XueYuanAccount sa= new XueYuanAccount();
            
-           String key = ((String)itor.next()).trim() ;
+           //身份证号码X必须大写
+           String key = ((String)itor.next()).trim().toUpperCase() ;
       
            String value =(String) mapdb.get(key);
         
@@ -163,7 +164,7 @@ private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   
    
         while(itor.hasNext())
         {
-           String key = ((String)itor.next()).trim() ;
+           String key = ((String)itor.next()).trim().toUpperCase() ;
       
            String value =(String) mapdb.get(key);
         
