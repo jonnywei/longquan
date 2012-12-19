@@ -3,6 +3,7 @@ package com.sohu.wap;
 import java.io.IOException;
 
 import com.sohu.wap.bo.Result;
+import com.sohu.wap.core.Constants;
 import com.sohu.wap.util.RandomUtil;
 import com.sohu.wap.util.ThreadUtil;
 

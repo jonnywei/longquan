@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sohu.wap.bo.Result;
+import com.sohu.wap.core.Constants;
 import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.proxy.ConfigHttpProxy;
 import com.sohu.wap.proxy.Host;
@@ -25,7 +26,8 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	  
 
 	    if (YueCheHelper.isUseProxy()){
-	            Host host = ConfigHttpProxy.getInstance().getRandomHost();
+	             Host host = ConfigHttpProxy.getInstance().getRandomHost();
+	            
 	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp(),host.getPort());
 	    }else{
 	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient();
@@ -33,7 +35,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	
 		this.xueYuan = xueYuan;
 		this.date = date; 
-		log.info(this.xueYuan.getUserName()+"init thread");
+		log.info(this.xueYuan.getUserName()+" init thread");
 	}
 	
 	@Override
@@ -49,9 +51,10 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	}
 	
 	
-	private  void  doLogin ( ) throws InterruptedException{
+	private  void  doLogin () throws InterruptedException{
         boolean  isLogin = false;
         boolean first = true;
+        int count =0;
       do {
              if (!first){
                  log.error("login error. retry!");
@@ -60,8 +63,18 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                  first = false;
              }
              
-             isLogin =  login(xueYuan.getUserName() , xueYuan.getPassword());
+             isLogin = login(xueYuan.getUserName() , xueYuan.getPassword());
             
+             count ++;
+             
+             if(count % 10 == 0){
+            	int ycResult =  YueCheHelper.getYueCheBookInfo(xueYuan.getId());
+            	if(ycResult == XueYuanAccount.BOOK_CAR_SUCCESS || 
+            			ycResult == XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR ){
+            		break;
+            	}
+             }
+             
        }while (!isLogin);
         log.info("login success!");
        return ;
@@ -77,12 +90,23 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
         if (timeArray.length  <  0) {
         	timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
         }
-        
+        int count =0;
         for (String amPm1 : timeArray){  //按情况约车
             String amPm  =  YueCheHelper.AMPM.get(amPm1);
             boolean  isSuccess = false;
             boolean first = true;
+            
             do {
+            	 count ++; //十次就测试
+                 if(count % 10 == 0){
+                	int ycResult =  YueCheHelper.getYueCheBookInfo(xueYuan.getId());
+                	if(ycResult == XueYuanAccount.BOOK_CAR_SUCCESS || 
+               			ycResult == XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR ){
+                		isSuccess =true;
+                		break;
+               		}
+                 }
+            	
                  if (!first){
                      log.error("yuche  error. retry!");
                      ThreadUtil.sleep( RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
@@ -105,6 +129,9 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   String info =uinfo +"约车成功";
                   System.out.println(info);
                   log.info(info);
+                  
+                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_SUCCESS, info);
+                  
                   xueYuan.setBookSuccess(isSuccess);
               }else if (result == YueChe.NO_CAR){  //无车
                   System.out.println(uinfo+"无车!");
@@ -115,6 +142,8 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
             	  String info = uinfo+ "该日已经预约车辆。不能在约车了！";
             	  log.info(info);
                   System.out.println(info);
+                  isSuccess = true;
+                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR, info);
                   break;
               }else if (result == YueChe. KEMU2_NO_TIME){  //无车
                   String info = uinfo +"科目二剩余小时不足!";

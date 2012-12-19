@@ -29,6 +29,7 @@ import com.sohu.wap.bo.DayCarInfo;
 import com.sohu.wap.bo.DayKaoShiInfo;
 import com.sohu.wap.bo.Result;
 import com.sohu.wap.bo.VerifyCode;
+import com.sohu.wap.core.Constants;
 import com.sohu.wap.http.HttpUtil4;
 import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.IO;
@@ -344,7 +345,7 @@ public class YueChe2 {
 						
 						yucheTry++;
 					
-						if (BookCarUtil.BOOK_CAR_SUCCESS == intResult) {
+						if (XueYuanAccount.BOOK_CAR_SUCCESS == intResult) {
 							System.out.println("预约成功!...");
 							String info = "Info:"+selectedCar.getString("YYRQ") + ":"
 									+ selectedCar.getString("XNSD") + "-"
@@ -352,7 +353,7 @@ public class YueChe2 {
 							result.setData(info);
 							System.out.println(info);
 							log.info(info);
-							resultN =BookCarUtil.BOOK_CAR_SUCCESS;
+							resultN =XueYuanAccount.BOOK_CAR_SUCCESS;
 						
 						} else {
 							
@@ -371,7 +372,7 @@ public class YueChe2 {
 					}
 				}
 					
-			} while (resultN != BookCarUtil.BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
+			} while (resultN != XueYuanAccount.BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
 		} catch (JSONException e) {
 			log.error("error,", e);
 			e.printStackTrace();

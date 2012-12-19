@@ -10,12 +10,12 @@ import com.sohu.wap.bo.Result;
 import com.sohu.wap.util.ThreadUtil;
 
 public class BookCarUtil {
+	
 	private static Logger log = LoggerFactory.getLogger(BookCarUtil.class);
 	public static int UNDEFINE = -1000;
 	public static int RETURN_FORMAT_ERROR = -2;
 	public static int UNKNOWN_ERROR = -1;
-	public static int BOOK_CAR_SUCCESS = 0;
-	public static int BOOK_CAR_ERROR = -3;
+	
 	public static int NO_CAR = 1;
 	public static int GET_CAR_ERROR = 2;
 	public static int TODAY_ALREADY_BOOKED_CAR = 3;
@@ -26,6 +26,7 @@ public class BookCarUtil {
 	public static int SELECT_CAR_ERROR = 8;
 	public static int HAVE_CAR = 100;
 	public static int IP_FORBIDDEN = 101;
+	public static int SERVER_ERROR =102;
 
 	public static Result<JSONArray> carsResult(JSONObject carsJson) {
 		Result<JSONArray> ret = new Result<JSONArray>(HAVE_CAR);
@@ -103,7 +104,7 @@ public class BookCarUtil {
 			jbResult = new JSONArray(bookResult.getString("d"));
 
 			if (jbResult.getJSONObject(0).getBoolean("Result")) {
-				resultN = BOOK_CAR_SUCCESS;
+				resultN = XueYuanAccount.BOOK_CAR_SUCCESS;
 
 			} else {
 				String outMsg = jbResult.getJSONObject(0).getString("OutMSG");

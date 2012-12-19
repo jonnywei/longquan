@@ -6,13 +6,31 @@
  */
 package com.sohu.wap;
 
+import org.json.JSONObject;
+
+import com.sohu.wap.core.Constants;
+
 /**
+ * 
  * @author jianjunwei
  *
  */
 public class XueYuanAccount {
-    private int id;
+	
+	
+	
+	public static int BOOK_CAR_SUCCESS = 0;
+	
+	public static int BOOK_CAR_ALREADY_BOOKED_CAR=1;
+    
+	//1开始
+	public static int BOOK_CAR_NOT_SET = 3;
+	public static int BOOK_CAR_ERROR = 3;
+	
+	private int id;
+    
     private String userName;
+    
     private String password;
     
     private String carType;
@@ -23,9 +41,67 @@ public class XueYuanAccount {
     
     private String whiteCar;
     
+    private String blackCar;
+    
     private String km ="km2";
     
+    private int ycResult;
+    
+    private String ycResultInfo;
+    
+    
     private boolean isBookSuccess = false;
+    
+    
+//  [
+//  {
+//      "pk": 1,
+//      "model": "yueche.yueche",
+//      "fields": {
+//          "car_type": "als",
+//          "yc_date": "2012-12-25",
+//          "black_car": "",
+//          "passwd": "23456789",
+//          "id_num": "234567890-",
+//          "xue_yuan": 1,
+//          "yc_info": "",
+//          "white_car": "",
+//          "yc_km": "km2",
+//          "yc_result": null,
+//          "phone_num": "",
+//          "create_date": "2012-12-18T15:09:51Z",
+//          "yc_time": "am",
+//          "update_date": "2012-12-18T15:17:29Z",
+//          "reserve": ""
+//      }
+//  }
+//]
+ 
+    public static  XueYuanAccount jsonToXueYuanAccount(JSONObject json){
+    	
+    	XueYuanAccount yc= new XueYuanAccount();
+    	
+    	yc.setId(json.optInt("pk"));
+    	JSONObject field = json.optJSONObject("fields");
+    	yc.setUserName(field.optString("id_num").toUpperCase());
+    	yc.setPassword(field.optString("passwd"));
+    	yc.setKm(field.optString("yc_km",Constants.KM2));
+    	yc.setAmPm(field.optString("yc_time"));
+    	yc.setCarType(field.optString("car_type"));
+    	yc.setWhiteCar(field.optString("white_car"));
+    	yc.setBlackCar(field.optString("black_car"));
+    	if(field.isNull("yc_result")){
+    		yc.setYcResult(BOOK_CAR_NOT_SET);
+    	}else{
+    		yc.setYcResult(field.optInt("yc_result"));
+    	}
+    	yc.setYcResultInfo(field.optString("yc_info"));
+    	
+    	return yc;
+    }
+    
+    
+    
     /**
      * @return the id
      */
@@ -118,9 +194,28 @@ public class XueYuanAccount {
 	}
 	@Override
 	public String toString() {
-		return "XueYuanAccount [amPm=" + amPm + ", carType=" + carType
-				+ ", id=" + id + ", isBookSuccess=" + isBookSuccess + ", km="
-				+ km + ", password=" + password + ", userName=" + userName
-				+ ", whiteCar=" + whiteCar + ", yueCheDate=" + yueCheDate + "]";
+		return "XueYuanAccount [amPm=" + amPm + ", blackCar=" + blackCar
+				+ ", carType=" + carType + ", id=" + id + ", isBookSuccess="
+				+ isBookSuccess + ", km=" + km + ", password=" + password
+				+ ", userName=" + userName + ", whiteCar=" + whiteCar
+				+ ", yueCheDate=" + yueCheDate + "]";
+	}
+	public String getBlackCar() {
+		return blackCar;
+	}
+	public void setBlackCar(String blackCar) {
+		this.blackCar = blackCar;
+	}
+	public int getYcResult() {
+		return ycResult;
+	}
+	public void setYcResult(int ycResult) {
+		this.ycResult = ycResult;
+	}
+	public String getYcResultInfo() {
+		return ycResultInfo;
+	}
+	public void setYcResultInfo(String ycResultInfo) {
+		this.ycResultInfo = ycResultInfo;
 	}
 }

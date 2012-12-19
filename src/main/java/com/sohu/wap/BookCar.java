@@ -55,15 +55,15 @@ public class BookCar {
             } 
             
             
-            if (BookCarUtil.BOOK_CAR_SUCCESS == result || BookCarUtil.TODAY_ALREADY_BOOKED_CAR  == result) {
-				return  BookCarUtil.BOOK_CAR_SUCCESS;
+            if (XueYuanAccount.BOOK_CAR_SUCCESS == result || BookCarUtil.TODAY_ALREADY_BOOKED_CAR  == result) {
+				return  XueYuanAccount.BOOK_CAR_SUCCESS;
 			
 			} else {
 		 }
 
         }  
         
-       return BookCarUtil.BOOK_CAR_ERROR; 
+       return XueYuanAccount.BOOK_CAR_ERROR; 
         
     }
     

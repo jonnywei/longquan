@@ -7,13 +7,13 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;  
 import java.awt.image.BufferedImage;  
 import javax.imageio.ImageIO;  
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-
-import com.sun.media.jai.codec.BMPEncodeParam;
-import com.sun.media.jai.codec.ImageCodec;
-import com.sun.media.jai.codec.ImageEncoder;
-import com.sun.media.jai.codec.TIFFEncodeParam;
+//import javax.media.jai.JAI;
+//import javax.media.jai.RenderedOp;
+//
+//import com.sun.media.jai.codec.BMPEncodeParam;
+//import com.sun.media.jai.codec.ImageCodec;
+//import com.sun.media.jai.codec.ImageEncoder;
+//import com.sun.media.jai.codec.TIFFEncodeParam;
 
 import java.awt.Toolkit;  
 import java.awt.Image;  
@@ -263,13 +263,13 @@ public class MyImgFilter {
          ImageIO.write(bi, "jpg", file); 
     }
     
-    public static void toTiff(RenderedImage src, OutputStream  os) throws IOException{
-        /*tif转换到bmp格式*/  
-        TIFFEncodeParam param = new TIFFEncodeParam();  
-        ImageEncoder enc = ImageCodec.createImageEncoder("TIFF", os,param);  
-        enc.encode(src);  
-        os.close();//关闭流 
-    }
+//    public static void toTiff(RenderedImage src, OutputStream  os) throws IOException{
+//        /*tif转换到bmp格式*/  
+//        TIFFEncodeParam param = new TIFFEncodeParam();  
+//        ImageEncoder enc = ImageCodec.createImageEncoder("TIFF", os,param);  
+//        enc.encode(src);  
+//        os.close();//关闭流 
+//    }
     
     
     

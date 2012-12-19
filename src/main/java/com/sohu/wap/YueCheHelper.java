@@ -7,13 +7,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.core.Constants;
+import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.NetSystemConfigurations;
 import com.sohu.wap.util.RandomUtil;
-import com.sohu.wap.util.SystemConfigurations;
 import com.sohu.wap.util.ThreadUtil;
 
 
@@ -112,8 +117,8 @@ public class YueCheHelper
     
     private static String    CREAK_START_TIME ="07:34";
     
-    private static String    SERVICE_BEGIN_TIME ="07:35";
-//    private static String    SERVICE_BEGIN_TIME ="00:49";
+//    private static String    SERVICE_BEGIN_TIME ="01:52";
+    private static String    SERVICE_BEGIN_TIME ="07:34";
     
     private static String   SERVICE_END_TIME ="20:00";
     
@@ -123,10 +128,12 @@ public class YueCheHelper
     
     public static  int IMAGE_CODE_TIMEOUT_MILLISECOND  =  10 * 60 *1000;
     
+    //网络重试次数
+    public static int NET_RETRY_LIMIT = 100;
     
-   public static  String   PROXY_IP = NetSystemConfigurations.getSystemStringProperty("system.proxy.ip", "127.0.0.1");
+    public static  String   PROXY_IP = NetSystemConfigurations.getSystemStringProperty("system.proxy.ip", "127.0.0.1");
     
-   public static  int   PROXY_PORT = NetSystemConfigurations.getSystemIntProperty("system.proxy.port", 8087);
+    public static  int   PROXY_PORT = NetSystemConfigurations.getSystemIntProperty("system.proxy.port", 8087);
     
   
    
@@ -196,6 +203,7 @@ public class YueCheHelper
         do {
             //在服务时间内
             if (!YueCheHelper.isInServiceTime()){
+            	System.out.println("waitting task begin!");
                 ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
             }else{
             	break;
@@ -228,8 +236,78 @@ public class YueCheHelper
         }while (true);
     }
     
+    /**
+     * 
+     *得到用户的约车信息 
+     * 
+     */
+    public static int  getYueCheBookInfo(int ycId){
+    	int result = BookCarUtil.UNKNOWN_ERROR;
+    	
+    	try {
+       	 JSONArray ycArray = new JSONArray();
+       	 String ycURL =String.format(Constants.YUECHE_DETAIL_URL, ycId);
+       	 
+       	 String  ycInfo  = HttpUtil4Exposer.getInstance().getContent(ycURL);
+       	 
+       	 if(ycInfo != null){
+       		 	ycArray  = new JSONArray(ycInfo);
+   			
+       	 }else{
+       		 log.error("get yucheinfo from server error");
+       		 result = BookCarUtil.SERVER_ERROR;
+       		 return result;
+       	 }
+       	 
+       	 for (int index =0; index < ycArray.length(); index ++){
+       		
+       		JSONObject yc =  ycArray.getJSONObject(index);
+       		
+       		XueYuanAccount xyAccount = XueYuanAccount.jsonToXueYuanAccount(yc);
+       		log.debug(xyAccount.toString());
+       		result = xyAccount.getYcResult();
+       		
+       	 }
+       	} catch (JSONException e) {
+   			log.error("load yueche account from net error", e);
+   		}
+       	
+       	return result;
+    }
+    
+    
+    public static void updateYueCheBookInfo(int ycId, int ycResult, String ycResultInfo){
+    	try {
+    		
+          	 JSONObject  param = new JSONObject();
+          	 
+          	 param.put("yc_result", ycResult);
+          	 param.put("yc_info", ycResultInfo);
+          	 
+          	 
+          	 String ycURL =String.format(Constants.YUECHE_UPDATE_URL, ycId);
+          	
+          	 String  ycInfo  = HttpUtil4Exposer.getInstance().getContent(ycURL,param);
+		  
+          	 System.out.println(ycInfo);
+          	 
+          	} catch (JSONException e) {
+      			log.error("error", e);
+      		} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+          	
+    }
+    
+    
     public static void main (String[] args){
-    	waiting("fk");
+//    	waiting("fk");
+    	System.out.println(getYueCheBookInfo(2));
+//    	updateYueCheBookInfo(2,0,"371312198511084844:Info:20121222:15-02015:20121222下午约车成功");
        
     }
 }

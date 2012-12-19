@@ -31,6 +31,7 @@ import com.sohu.wap.bo.DayCarInfo;
 import com.sohu.wap.bo.DayKaoShiInfo;
 import com.sohu.wap.bo.Result;
 import com.sohu.wap.bo.VerifyCode;
+import com.sohu.wap.core.Constants;
 import com.sohu.wap.http.HttpUtil4;
 import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.IO;
@@ -128,13 +129,19 @@ public class YueChe {
 		
 		boolean isLoginSuccess = false;
 		do {
+			int retry_count =0;
 			//模拟用户行为，一直请求验证码
 			String imageCode = null;
 			do{
+				retry_count++;
 				try {
 					imageCode = getImgCode(LOGIN_IMG_URL);
 				} catch (IOException e1) {
 					log.error("get image code error", e1);
+				}
+				if( retry_count > YueCheHelper.NET_RETRY_LIMIT){
+					log.error("login error, get image code count extend retry_limit");
+					return false;
 				}
 			}while(imageCode == null);
 			
@@ -255,7 +262,7 @@ public class YueChe {
 				carsJson = httpUtil4.postJson(GET_CARS_URL, json);
 				if (carsJson == null) {
 					log.error("get car info error");
-					ThreadUtil.sleep(1);
+//					ThreadUtil.sleep(1);
 				}else{
 					break;
 				}
@@ -376,7 +383,7 @@ public class YueChe {
 
 					if (jbResult.getJSONObject(0).getBoolean("Result")) {
 						System.out.println("预约成功!...");
-						String info = "Info:"+selectedCar.getString("YYRQ") + ":"
+						String info = ""+selectedCar.getString("YYRQ") + ":"
 								+ selectedCar.getString("XNSD") + "-"
 								+ selectedCar.getString("CNBH");
 						result.setData(info);

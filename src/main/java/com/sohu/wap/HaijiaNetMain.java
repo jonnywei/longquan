@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.sohu.wap.proxy.ConfigHttpProxy;
 import com.sohu.wap.proxy.Host;
 import com.sohu.wap.util.DateUtil;
-import com.sohu.wap.util.SystemConfigurations;
+import com.sohu.wap.util.NetSystemConfigurations;
 import com.sohu.wap.util.ThreadPool;
 import com.sohu.wap.util.ThreadUtil;
 
@@ -37,9 +37,16 @@ public class HaijiaNetMain
 
         
         while(true){
-            
+           
+        	
             // 如果今天任务已经完成的话
-           if (  YueCheHelper. isTodayTaskExecuteOver()){
+           if (  YueCheHelper.isTodayTaskExecuteOver()){
+        	   System.out.println("今日任务已经完成！waitting tomorrow...");
+        	   boolean isShutdown = NetSystemConfigurations.getSystemBooleanProperty("system.client.shutdown", false);
+               
+               if(isShutdown){
+                   break;
+               }
                ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
                continue;
            }
@@ -50,17 +57,19 @@ public class HaijiaNetMain
            YueCheHelper.waitForService();
            
             ExecutorService executeService = ThreadPool.getInstance().getExecutorService();
-            
             List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
             
-            String date = SystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(7));
-          
+            //约车日期
+            String date =  DateUtil.getFetureDay(7);
+            String dateModel = NetSystemConfigurations.getSystemStringProperty("system.yueche.date.model", "auto");
             
+            if(dateModel.equals("config")){
+            	 date = NetSystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(7));
+            }
             
             System.out.println("抢车日期为:"+ date);
+//           
            
-           
-            
             if (YueCheHelper.isEnterCreakerModel()){
               //进入破解模式
               //  速度肯定是最快的了
@@ -70,9 +79,10 @@ public class HaijiaNetMain
                 CookieImgCodeHelper.getImageCodeCookie();
             }
           
+            YueCheInfo  ycInfo = new YueCheInfo();
             
-            for (String accoutId: AccountMap.getInstance().getXueYuanAccountMap().keySet()){
-                XueYuanAccount  xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);
+            for (Integer accoutId: ycInfo.getYueCheInfo().keySet()){
+                XueYuanAccount  xy = ycInfo.getYueCheInfo().get(accoutId);
                 if ( xy!=null){
                     if (YueCheHelper.isUseProxy()){
                         for ( int num = 0 ; num < YueCheHelper.getProxyNumPreUser(); num++){
@@ -103,8 +113,10 @@ public class HaijiaNetMain
           
             //设置今天任务已经完成
             YueCheHelper.setTodayTaskExecuteOver(); 
-           
-            if(12==12){
+            log.info(date+ "taskover!");
+            boolean isShutdown = NetSystemConfigurations.getSystemBooleanProperty("system.client.shutdown", false);
+            
+            if(isShutdown){
                 break;
             }
         }
