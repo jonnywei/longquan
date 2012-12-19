@@ -129,9 +129,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   String info =uinfo +"约车成功";
                   System.out.println(info);
                   log.info(info);
-                  
                   YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_SUCCESS, info);
-                  
                   xueYuan.setBookSuccess(isSuccess);
               }else if (result == YueChe.NO_CAR){  //无车
                   System.out.println(uinfo+"无车!");
@@ -149,15 +147,17 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   String info = uinfo +"科目二剩余小时不足!";
                   System.out.println(info);
                   log.info(info);
+                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_KEMU2_NO_TIME, info);
                   break;
               } else if (result == YueChe. BOOK_INVAILD_OPERATION){  //无车
                   String info = uinfo +"非法操作!";
                   System.out.println(info);
                   log.info(info);
-                  break;
+                  return;
               }else if (result == YueChe. NOT_BOOK_WEEKEND_CAR){  //所在班种不能约周六日车辆
                   String info = uinfo +"所在班种不能约周六日车辆";
                   log.info(info);
+                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_NOT_BOOK_WEEKEND_CAR, info);
                   break;
               } else {  //无车
                   System.out.println("未知错误！重试! RESULT="+result);

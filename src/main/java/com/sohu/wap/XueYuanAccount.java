@@ -22,10 +22,19 @@ public class XueYuanAccount {
 	public static int BOOK_CAR_SUCCESS = 0;
 	
 	public static int BOOK_CAR_ALREADY_BOOKED_CAR=1;
+	
+    //1开始
+    public static int BOOK_CAR_NOT_SET = 2;
+
     
-	//1开始
-	public static int BOOK_CAR_NOT_SET = 3;
-	public static int BOOK_CAR_ERROR = 3;
+	public static int BOOK_CAR_KEMU2_NO_TIME = 3;
+	
+    
+    public static int BOOK_CAR_NOT_BOOK_WEEKEND_CAR= 4;
+    
+    public static int BOOK_CAR_ERROR = 5;
+    
+   
 	
 	private int id;
     

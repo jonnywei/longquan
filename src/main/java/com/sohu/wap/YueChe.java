@@ -76,12 +76,15 @@ public class YueChe {
 	public static int BOOK_CAR_SUCCESS = 0;
 	public static int NO_CAR = 1;
 	public static int GET_CAR_ERROR = 2;
+	   public static int GET_BOOK_CODE_ERROR = 123323;
 	public static int ALREADY_BOOKED_CAR=3;
 	public static int BOOK_INVAILD_OPERATION = 5;
 	
 	public static int NOT_BOOK_WEEKEND_CAR = 800005;
 	public static int KEMU2_NO_TIME=10003;
-	public static int YUCHE_RETRY_TIME = 3;
+	
+	
+	public static int YUCHE_RETRY_TIME = 5;
 
 	
 	protected  HttpUtil4 httpUtil4 = HttpUtil4.getInstanceHaveCookie(); //默认值
@@ -257,8 +260,15 @@ public class YueChe {
 			json.put("pageNum", 1);
 			
 			JSONObject carsJson = null;
+			
+			 int retry_count =0;
 			do{
 				// 得到某天的信息
+			    retry_count ++;
+			    if(retry_count > YueCheHelper.NET_RETRY_LIMIT){
+			        log.error("get car info  count extend count");
+			        break;
+			    }
 				carsJson = httpUtil4.postJson(GET_CARS_URL, json);
 				if (carsJson == null) {
 					log.error("get car info error");
@@ -268,6 +278,12 @@ public class YueChe {
 				}
 			}while(true);
 			
+			
+			//没有得到车辆信息的话
+			if(carsJson == null){
+			    result.setRet(GET_CAR_ERROR);
+		        return result;
+			}
 
 			// System.out.println(carsJson.toString());
 
@@ -319,15 +335,27 @@ public class YueChe {
 					log.info("选择的车是：" + selectedCar.toString());
 					System.out.println("选择的车是：" + selectedCar.toString());
 					String imageCode = "";
-					try {
-						do{
-							imageCode = getImgCode(BOOKING_IMG_URL);
-						}while(imageCode == null);
+					retry_count =0;
+					// get image code				 
+					do{
+					      retry_count ++;
+						    try {
+						       imageCode = getImgCode(BOOKING_IMG_URL);
+						    } catch (IOException e1) {
+		                        log.error("get book image code error", e1);
+		                   }
+						   if(retry_count > YueCheHelper.NET_RETRY_LIMIT){
+						       imageCode = null;
+						       break;
+						   }
+					}while(imageCode == null);
 						
-					} catch (IOException e1) {
-						log.error("get book image code error", e1);
-						continue;
-					}
+				   
+					//没有的话
+		            if(imageCode == null){
+		                result.setRet(GET_BOOK_CODE_ERROR);
+		                return result;
+		            }
 
 					String md5Code = MD5.crypt(imageCode.toUpperCase());
 
