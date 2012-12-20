@@ -133,9 +133,10 @@ public class YueChe {
 	 * 1 失败
 	 * 2 代理服务器失效
 	 * 3 帐号密码错误
+	 * @throws InterruptedException 
 	 *  
 	 */
-	public  int  login(String userName, String passwd) {
+	public  int  login(String userName, String passwd) throws InterruptedException {
 		
 		long currentTime = System.currentTimeMillis();
 		
@@ -313,7 +314,7 @@ public class YueChe {
 			JSONObject selectedCar = null;
 
 			String data = carsJson.getString("d");
-			log.info("carInfo:"+data);
+			System.out.println("carInfo:"+data);
 			
 			//LoginOut:您尚未登录!
 			if(data.equals("LoginOut:您的IP地址被禁止!")){
@@ -341,7 +342,7 @@ public class YueChe {
 
 			JSONArray carsArray = new JSONArray(carInfo);
 			System.out.println("可选的车有：" + carsArray.toString());
-			log.info("availableCar：" + carsArray.toString());
+			log.info("availableCar:" + carsArray.toString());
 			if (carsArray.length() == 0) {
 				resultN = NO_CAR;
 				result.setRet(resultN);

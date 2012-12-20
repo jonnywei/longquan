@@ -57,7 +57,7 @@ public class ScanYueCheTask extends YueCheTask {
 		return NO_CAR;
 	}
 	
-	private  void  doLogin () {
+	private  void  doLogin () throws InterruptedException {
 		
 		long currentTime = System.currentTimeMillis();
 		
@@ -73,9 +73,11 @@ public class ScanYueCheTask extends YueCheTask {
 	             }else{
 	                 first = false;
 	             }
-	             
-	             isLoginSuccess =  login(xueYuan.getUserName() , xueYuan.getPassword());
-	            
+	          int result =    login(xueYuan.getUserName() , xueYuan.getPassword());
+	          if (result == YueChe.LONGIN_SUCCESS){
+	              isLoginSuccess =  true;
+	          }
+	           
 	       }while (!isLoginSuccess);
 	        
 	        isLogon = true;

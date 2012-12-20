@@ -39,17 +39,24 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	}
 	
 	@Override
-	public Integer call() throws Exception {
-	    
-		 YueCheHelper.waiting(xueYuan.getCarType());
-		 if (doLogin() ==0){ 
-			 doYuche();
-		 }
-		 
-         if (xueYuan.isBookSuccess()){
-        	 return Integer.valueOf(0);
-         }
-         return Integer.valueOf(1);
+	public Integer call()  throws Exception {
+	    log.info(this.xueYuan.getUserName()+"  yueche thread start!");
+		 try {
+            YueCheHelper.waiting(xueYuan.getCarType());
+            
+            if (doLogin() ==0){ 
+                doYuche();
+            }
+            if (xueYuan.isBookSuccess()){
+                return Integer.valueOf(0);
+             }
+            
+        } catch (InterruptedException e) {
+              log.error("cancel task! ");
+              return Integer.valueOf(2);
+        }  
+        return Integer.valueOf(1);
+        
 	}
 	
 	/**

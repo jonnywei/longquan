@@ -97,9 +97,10 @@ public class YueChe2 {
 	 * 
 	 * 处理用户登录
 	 * @throws InterruptedException 
+	 * @throws InterruptedException 
 	 * 
 	 */
-	public  boolean login(String userName, String passwd) {
+	public  boolean login(String userName, String passwd) throws InterruptedException {
 		long currentTime = System.currentTimeMillis();
 		
 		//为了加快访问速度，只加载一次login页面

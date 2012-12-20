@@ -15,17 +15,13 @@ public class ThreadUtil {
     /**
      * 
      *睡眠指定的秒数
+     * @throws InterruptedException 
      * 
      */
-    public static  void sleep(int seconds)
+    public static  void sleep(int seconds) throws InterruptedException
     {
-        try
-        {
+       
             Thread.sleep(seconds * 1000);
-        } catch (InterruptedException e)
-        {
         
-            e.printStackTrace();
-        }
     }
 }

@@ -9,8 +9,9 @@ public class ConfigProxyTest {
 
 	/**
 	 * @param args
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		// TODO Auto-generated method stub
 		ConcurrentHashMap  <String, Host>  hostMap = ConfigHttpProxy.getInstance().getProxy();
 		System.out.println(ConfigHttpProxy.getInstance().getRandomHost());

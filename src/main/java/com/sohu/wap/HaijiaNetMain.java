@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +37,14 @@ public class HaijiaNetMain
    
     public static void main( String[] args ) throws InterruptedException, IOException
     {
-
+        
         
         while(true){
            
-        	
             // 如果今天任务已经完成的话
            if (  YueCheHelper.isTodayTaskExecuteOver()){
         	   System.out.println("今日任务已经完成！waitting tomorrow...");
+        	 
         	   boolean isShutdown = NetSystemConfigurations.getSystemBooleanProperty("system.client.shutdown", false);
                
                if(isShutdown){
@@ -56,7 +59,7 @@ public class HaijiaNetMain
            //等待任务开始
            YueCheHelper.waitForService();
            
-            ExecutorService executeService = ThreadPool.getInstance().getExecutorService();
+       
             List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
             
             //约车日期
@@ -81,6 +84,9 @@ public class HaijiaNetMain
           
             YueCheInfo  ycInfo = new YueCheInfo();
             
+            //初始化线程池的数目
+            ExecutorService executeService = Executors.newFixedThreadPool(ycInfo.getYueCheInfo().size() * YueCheHelper.getProxyNumPreUser());
+            
             for (Integer accoutId: ycInfo.getYueCheInfo().keySet()){
                 XueYuanAccount  xy = ycInfo.getYueCheInfo().get(accoutId);
                 if ( xy!=null){
@@ -98,31 +104,39 @@ public class HaijiaNetMain
             
             executeService.shutdown(); 
             
+            //等待两个小时
+            executeService.awaitTermination(60*60,TimeUnit.SECONDS);
+         
+            System.out.println("shutdown Now!");
+            
+            executeService.shutdownNow();
+            
             for (Future<Integer> fs : resultList) {  
                 try {  
-                    System.out.println(fs.get());   // 打印各个线程（任务）执行的结果  
+                    System.out.println(fs.get(2,TimeUnit.SECONDS));   // 打印各个线程（任务）执行的结果  
                 } catch (InterruptedException e) {  
                     e.printStackTrace();  
                 } catch (ExecutionException e) {  
-                    executeService.shutdownNow();  
                     e.printStackTrace();  
-                    return;  
+               } catch (TimeoutException e) {
+                     e.printStackTrace();
                 }  
             }  
             
-          
+            
             //设置今天任务已经完成
             YueCheHelper.setTodayTaskExecuteOver(); 
             log.info(date+ "taskover!");
             boolean isShutdown = NetSystemConfigurations.getSystemBooleanProperty("system.client.shutdown", false);
-            
+          
             if(isShutdown){
                 break;
             }
         }
     	
         System.out.println("程序结束!请按任意键退出程序!");
-        System.in.read();
+        log.info("System.exit!");
+        System.exit(0);
       
     }
     

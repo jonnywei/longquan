@@ -198,7 +198,7 @@ public class YueCheHelper
     
     
     
-    public static  void waitForService(){
+    public static  void waitForService() throws InterruptedException{
     	  
         do {
             //在服务时间内
@@ -213,7 +213,7 @@ public class YueCheHelper
     
     
     
-    public static void waiting(String carType){
+    public static void waiting(String carType) throws InterruptedException{
     	Date beginDate = DateUtil.getTodayTime(SERVICE_BEGIN_TIME);
     	
     	if ( Constants.CAR_TYPE_FK.equalsIgnoreCase(carType)  || Constants.CAR_TYPE_STN.equalsIgnoreCase(carType)){

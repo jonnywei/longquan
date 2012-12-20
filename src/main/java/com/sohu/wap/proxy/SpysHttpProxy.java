@@ -256,8 +256,9 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
     /**
      * @param args
      * @throws ScriptException 
+     * @throws InterruptedException 
      */
-    public static void main(String[] args) throws ScriptException {
+    public static void main(String[] args) throws ScriptException, InterruptedException {
 
         Map<String, Host>  hostMap =SpysHttpProxy.getInstance().getProxy();
 		ThreadUtil.sleep(120);
