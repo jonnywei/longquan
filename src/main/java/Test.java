@@ -37,6 +37,7 @@ public class Test {
         // }
         //        
       
+    	System.out.print("\\a");
         String proxyIp = "115.236.98.101";
         int port = 80;
         String[] ipArray = new String[] { "61.55.141.10", "125.39.66.150", "221.176.14.72", "125.39.66.147",

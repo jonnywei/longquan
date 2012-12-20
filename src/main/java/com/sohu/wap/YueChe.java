@@ -76,12 +76,31 @@ public class YueChe {
 	public static int BOOK_CAR_SUCCESS = 0;
 	public static int NO_CAR = 1;
 	public static int GET_CAR_ERROR = 2;
-	   public static int GET_BOOK_CODE_ERROR = 123323;
+	public static int GET_BOOK_CODE_ERROR = 123323;
 	public static int ALREADY_BOOKED_CAR=3;
 	public static int BOOK_INVAILD_OPERATION = 5;
 	
 	public static int NOT_BOOK_WEEKEND_CAR = 800005;
 	public static int KEMU2_NO_TIME=10003;
+	
+	/**
+	 * 
+	 *
+	 * 处理用户登录
+	 * @return
+	 * 0 成功
+	 * 1 失败
+	 * 2 代理服务器失效
+	 * 3 帐号密码错误
+	 *  
+	 */
+	public static int LONGIN_SUCCESS =0;
+	public static int LONGIN_ERROR =1;
+	public static int LONGIN_PROXY_ERROR =2;
+	public static int LONGIN_ACCOUNT_ERROR =3;
+	public static int LONGIN_IP_FORBIDDEN =4;
+//	public static int LONGIN_ERROR =1;
+	
 	
 	
 	public static int YUCHE_RETRY_TIME = 5;
@@ -107,20 +126,29 @@ public class YueChe {
 	
 	/**
 	 * 
+	 *
 	 * 处理用户登录
-	 * @throws InterruptedException 
-	 * 
+	 * @return
+	 * 0 成功
+	 * 1 失败
+	 * 2 代理服务器失效
+	 * 3 帐号密码错误
+	 *  
 	 */
-	public  boolean login(String userName, String passwd) {
+	public  int  login(String userName, String passwd) {
+		
 		long currentTime = System.currentTimeMillis();
 		
 		//为了加快访问速度，只加载一次login页面
 		//如果没有访问过登录页面，或者上次访问登录页面超过了超时时间
 		if (  !isVisitedLoginUrl || (currentTime - visitLoginUrlTime > YueCheHelper.LOGIN_SESSION_TIMEOUT_MILLISECOND) ){
 			String firstPage = httpUtil4.getContent(LOGIN_URL);
-			if (firstPage == null || firstPage.length()< 100) { //失败，一切不操作
-				return false;
+			if (firstPage == null) {        //失败， 也可能是因代理服务器失效，暂时无法判断
+				return LONGIN_ERROR;
+			}else if ( firstPage.length()< 100 ||  firstPage.indexOf("海淀驾校学员网络预约系统") ==-1 ){
+				return LONGIN_PROXY_ERROR;
 			}
+			
 			Document document = Jsoup.parse(firstPage);
 			viewState = document.getElementById(__VIEWSTATE);
 			eventValid = document.getElementById(__EVENTVALIDATION);
@@ -128,8 +156,8 @@ public class YueChe {
 			visitLoginUrlTime = System.currentTimeMillis();
 		}
 		
-		
-		
+		//后面可以不考虑代理失败的情况
+	
 		boolean isLoginSuccess = false;
 		do {
 			int retry_count =0;
@@ -144,7 +172,7 @@ public class YueChe {
 				}
 				if( retry_count > YueCheHelper.NET_RETRY_LIMIT){
 					log.error("login error, get image code count extend retry_limit");
-					return false;
+					return LONGIN_ERROR;
 				}
 			}while(imageCode == null);
 			
@@ -197,26 +225,21 @@ public class YueChe {
 					isLoginSuccess =true;
 				} else if(result.indexOf("验证码错误")!= -1 ||result.indexOf("请输入验证码")!= -1 ){  //失败的话 ，继续登录
 					System.out.println("验证码识别错误！登录失败.");
-				}else if(result.indexOf("账号或密码错误")!= -1  ){  //失败的话 ，继续登录
-					System.out.println("账号或密码错误！登录失败.");
-					log.error("账号或密码错误"); //打印错误，直接退出
-					log.error("accountError:"+userName+","+passwd); //打印错误，直接退出
-					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
 				}else if (result.indexOf("系统服务时间每天从07:35-20:00")!= -1  ){
 					System.out.println("系统服务时间每天从07:35-20:00;"+"enter sleep");
 					ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
-//					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
 				}else if (result.indexOf("桑塔纳、富康车型学员登陆时间为每天 07:40 以后!")!= -1  ){
 					System.out.println("桑塔纳、富康车型学员登陆时间为每天 07:40 以后!;"+"enter sleep");
 					ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
-//					ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
 				}else if(result.indexOf("您的IP地址被限制登录!")!= -1  ){  //失败的话 ，继续登录
 					System.out.println("您的IP地址被限制登录!");
 					log.error("您的IP地址被限制登录!"); //打印错误，直接退出
-//					System.exit(1);
+					return LONGIN_IP_FORBIDDEN;
+				}else if(result.indexOf("账号或密码错误")!= -1  ){  //失败的话 ，继续登录
+					System.out.println("账号或密码错误！登录失败.");
+					log.error("账号或密码错误"); //打印错误，直接退出
+					return LONGIN_ACCOUNT_ERROR;
 				}
-				
-				
 				else{
 					log.debug(result);
 					System.out.println(result);
@@ -226,7 +249,7 @@ public class YueChe {
 			}
 		}while(!isLoginSuccess);
 	
-		return true;
+		return LONGIN_SUCCESS;
 	}
 
 	/**
@@ -291,6 +314,8 @@ public class YueChe {
 
 			String data = carsJson.getString("d");
 			log.info("carInfo:"+data);
+			
+			//LoginOut:您尚未登录!
 			if(data.equals("LoginOut:您的IP地址被禁止!")){
 				log.error("LoginOut:您的IP地址被禁止!");
 				ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);

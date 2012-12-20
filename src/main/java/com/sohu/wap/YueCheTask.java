@@ -42,20 +42,32 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	public Integer call() throws Exception {
 	    
 		 YueCheHelper.waiting(xueYuan.getCarType());
-		 doLogin();
-         doYuche();
+		 if (doLogin() ==0){ 
+			 doYuche();
+		 }
+		 
          if (xueYuan.isBookSuccess()){
         	 return Integer.valueOf(0);
          }
          return Integer.valueOf(1);
 	}
 	
+	/**
+	 *
+	 *0 登录成功
+	 *1 登录失败
+	 *2 已经约车成功
+	 *3 无法进行下一步了
+	 * */
 	
-	private  void  doLogin () throws InterruptedException{
-        boolean  isLogin = false;
+	private  int   doLogin () throws InterruptedException{
+        
+		boolean  isLogin = false;
         boolean first = true;
         int count =0;
-      do {
+        
+        
+        do {
              if (!first){
                  log.error("login error. retry!");
                  ThreadUtil.sleep( RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
@@ -63,21 +75,36 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                  first = false;
              }
              
-             isLogin = login(xueYuan.getUserName() , xueYuan.getPassword());
+             int loginResult = login(xueYuan.getUserName() , xueYuan.getPassword());
+             
+             if(loginResult == YueChe.LONGIN_PROXY_ERROR || loginResult == YueChe.LONGIN_IP_FORBIDDEN ){
+            	 log.error("proxy error or ip forbidden !");
+            	 return 3;
+             } else if( loginResult == YueChe.LONGIN_ACCOUNT_ERROR ){
+            	 String info ="accountError:"+xueYuan.getUserName()+","+xueYuan.getPassword();
+            	 log.error(info); 
+            	 YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_ACCOUNT_ERROR, info);
+            	 return 3;
+             }else if( loginResult == YueChe.LONGIN_SUCCESS ){
+            	 isLogin = true;
+             }else{
+            	 log.error("login error!"); 
+             }
+             
             
              count ++;
-             
              if(count % 10 == 0){
             	int ycResult =  YueCheHelper.getYueCheBookInfo(xueYuan.getId());
             	if(ycResult == XueYuanAccount.BOOK_CAR_SUCCESS || 
             			ycResult == XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR ){
-            		break;
+            		log.info(xueYuan.getUserName()+"已经约车成功");
+            		return 2;
             	}
              }
              
        }while (!isLogin);
         log.info("login success!");
-       return ;
+       return 0;
     }
     
     /**
@@ -91,7 +118,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
         	timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
         }
         int count =0;
-        for (String amPm1 : timeArray){  //按情况约车
+        for (String amPm1 : timeArray){    //按情况约车
             String amPm  =  YueCheHelper.AMPM.get(amPm1);
             boolean  isSuccess = false;
             boolean first = true;
@@ -108,11 +135,13 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                  }
             	
                  if (!first){
-                     log.error("yuche  error. retry!");
+                     log.error("yuche  error. retry !");
                      ThreadUtil.sleep( RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
                  }else{
                      first = false;
                  }
+                 //判断科目信息
+                 
                  Result<String> ret =  null;
                  if(Constants.KM3.equals(xueYuan.getKm())){
                 	 ret =  yuche(date, amPm,true);
@@ -120,27 +149,25 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                 	 ret =  yuche(date, amPm,false);
                  }
                
-               String uinfo = xueYuan.getUserName() +":"+date+ YueCheHelper.AMPM.get(amPm);
-               
+              String uinfo = xueYuan.getUserName() +":"+date+ YueCheHelper.AMPM.get(amPm);
+             
               int  result  = ret.getRet();
+              
               if (result == YueChe.BOOK_CAR_SUCCESS){
                   isSuccess = true;
                   uinfo = xueYuan.getUserName() +":"+ret.getData()+":"+date+ YueCheHelper.AMPM.get(amPm);
-                  String info =uinfo +"约车成功";
+                  String info =uinfo +"约车成功！";
                   System.out.println(info);
                   log.info(info);
                   YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_SUCCESS, info);
                   xueYuan.setBookSuccess(isSuccess);
-              }else if (result == YueChe.NO_CAR){  //无车
-                  System.out.println(uinfo+"无车!");
                   break;
-              }else if (result == YueChe.GET_CAR_ERROR){  //无车
-                  System.out.println("得到车辆信息错误！重试！");
-              }else if (result == YueChe.ALREADY_BOOKED_CAR){  //无车
-            	  String info = uinfo+ "该日已经预约车辆。不能在约车了！";
+              }else if (result == YueChe.ALREADY_BOOKED_CAR){  //该日已经预约车辆
+            	  String info = uinfo+ "该日已经预约车辆了！";
             	  log.info(info);
                   System.out.println(info);
                   isSuccess = true;
+                  xueYuan.setBookSuccess(isSuccess);
                   YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR, info);
                   break;
               }else if (result == YueChe. KEMU2_NO_TIME){  //无车
@@ -148,8 +175,11 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   System.out.println(info);
                   log.info(info);
                   YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_KEMU2_NO_TIME, info);
+                  return ;
+              } else if (result == YueChe.NO_CAR){  //无车的话，赶紧约下班车
+                  System.out.println(uinfo+"无车!");
                   break;
-              } else if (result == YueChe. BOOK_INVAILD_OPERATION){  //无车
+              }else if (result == YueChe. BOOK_INVAILD_OPERATION){  //非法操作，服务器已经被锁定，直接退出约车
                   String info = uinfo +"非法操作!";
                   System.out.println(info);
                   log.info(info);
@@ -158,20 +188,24 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   String info = uinfo +"所在班种不能约周六日车辆";
                   log.info(info);
                   YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_NOT_BOOK_WEEKEND_CAR, info);
-                  break;
-              } else {  //无车
+                  return;
+              }else if (result == YueChe.GET_CAR_ERROR){   //得到车辆信息错误的话
+            	  log.info("get car info error ! retry");
+                  System.out.println("得到车辆信息错误！重试！");
+              }
+              else {  //无车
                   System.out.println("未知错误！重试! RESULT="+result);
               }
               
-             }while (!isSuccess);
+             } while (true);
             
-            if (isSuccess){ //如果约车成功的话，退出
+            if (isSuccess){  //如果约车成功的话，退出
             	break;
             }
             
         }    
         
-       log.info("yuche finish !");
+        log.info("yuche finish!");
         return ;
     }
     

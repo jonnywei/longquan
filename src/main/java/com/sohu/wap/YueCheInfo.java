@@ -65,7 +65,7 @@ public class YueCheInfo {
     		 	ycArray  = new JSONArray(ycInfo);
 			
     	 }else{
-    		 log.error("get yucheinfo from server error");
+    		 log.error("get yuche info from server error");
     		 return;
     	 }
     	 for (int index =0; index < ycArray.length(); index ++){

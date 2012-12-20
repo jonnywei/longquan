@@ -18,23 +18,31 @@ import com.sohu.wap.core.Constants;
 public class XueYuanAccount {
 	
 	
+	 //1开始
+    public static int BOOK_CAR_NOT_SET = -1;
 	
 	public static int BOOK_CAR_SUCCESS = 0;
 	
+	
 	public static int BOOK_CAR_ALREADY_BOOKED_CAR=1;
 	
-    //1开始
-    public static int BOOK_CAR_NOT_SET = 2;
-
     
-	public static int BOOK_CAR_KEMU2_NO_TIME = 3;
+	public static int BOOK_CAR_KEMU2_NO_TIME = 2;
 	
     
-    public static int BOOK_CAR_NOT_BOOK_WEEKEND_CAR= 4;
-    
-    public static int BOOK_CAR_ERROR = 5;
+    public static int BOOK_CAR_NOT_BOOK_WEEKEND_CAR= 3;
     
    
+    public static int BOOK_CAR_NO_CAR =4;
+    
+    
+    public static int BOOK_CAR_NO_FAIL =5;
+    
+   
+    public static int BOOK_CAR_ERROR = 6;
+    
+    public static int BOOK_CAR_ACCOUNT_ERROR = 7;
+    
 	
 	private int id;
     
