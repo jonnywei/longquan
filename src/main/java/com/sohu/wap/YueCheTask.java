@@ -104,7 +104,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
             	int ycResult =  YueCheHelper.getYueCheBookInfo(xueYuan.getId());
             	if(ycResult == XueYuanAccount.BOOK_CAR_SUCCESS || 
             			ycResult == XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR ){
-            		log.info(xueYuan.getUserName()+"已经约车成功");
+            		log.info(xueYuan.getUserName()+"已经约车成功.");
             		return 2;
             	}
              }

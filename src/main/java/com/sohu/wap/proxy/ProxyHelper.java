@@ -22,7 +22,7 @@ public class ProxyHelper {
     private static Logger log = LoggerFactory.getLogger(ProxyHelper.class);
 
     
-    private static String TEST_PROXY_URL = "http://dev.w.sohu.com/t2/reqinfo.do";
+    private static String TEST_PROXY_URL = "http://w.sohu.com/t2/reqinfo.do";
     
     
     
@@ -76,7 +76,6 @@ public class ProxyHelper {
                 log.info(proxyIp + " check ok!");
                 isCanUse= true;
             } else {
-                
                 log.error(proxyIp + "cookie  test error");
             }
 

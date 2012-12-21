@@ -422,7 +422,7 @@ public class YueChe {
 						if (bookResult == null) {
 							System.out.println("book car timeout or error");
 							log.error("book car timeout or error");
-							ThreadUtil.sleep(1);
+							ThreadUtil.sleep(0.1F);
 						}
 					}while(bookResult == null);
 					
@@ -466,10 +466,12 @@ public class YueChe {
 						      resultN = KEMU2_NO_TIME;
 	                            break;
 	                    }
-						
+						if("非预约开放时间".equals(outMsg)){
+							yucheTry--; //非预约开放时间，不计入retry次数
+						}
 						if("验证码错误！".equals(outMsg)){
 							System.out.println(outMsg+"不计入retry次数");
-							//yucheTry--; //验证码错误，不计入retry次数
+							 yucheTry--; //验证码错误，不计入retry次数
 						}
 						if(outMsg.indexOf("该车时段已经被约") != -1){
 							yucheTry++; //该页面可能都被约了

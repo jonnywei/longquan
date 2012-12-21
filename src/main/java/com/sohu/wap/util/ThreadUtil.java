@@ -24,4 +24,27 @@ public class ThreadUtil {
             Thread.sleep(seconds * 1000);
         
     }
+    
+    /**
+     * 
+     *睡眠指定的秒数
+     * @throws InterruptedException 
+     * 
+     */
+    public static  void sleep(float seconds) throws InterruptedException
+    {
+    	     float millsSeconds = seconds* 1000;
+    	     long s =  (long )millsSeconds;
+    	    
+            Thread.sleep( s );
+        
+    }
+    
+    public static void main(String[] args){
+    	 float seconds =0.0003f;
+    	 float millsSeconds = seconds* 1000;
+	     long s =  (long )millsSeconds;
+	     System.out.println(s);
+    }
+     
 }
