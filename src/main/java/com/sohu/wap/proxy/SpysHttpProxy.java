@@ -50,7 +50,7 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
 
     static String prefix = "document.write(\"<font class=spy2>:<\\/font>\"+";
 
-    static String TEST_URL = "http://dev.w.sohu.com/t2/reqinfo.do";
+    static String TEST_URL = "http://w.sohu.com/t2/reqinfo.do";
     
     
     static long min_proxy_size  = 30;
@@ -263,7 +263,7 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
         Map<String, Host>  hostMap =SpysHttpProxy.getInstance().getProxy();
 		ThreadUtil.sleep(120);
 		Iterator<String> iter = hostMap.keySet().iterator();
-		int index =1000;
+		int index =1000075;
 		while(iter.hasNext()){
 			index ++;
 			String key = iter.next();

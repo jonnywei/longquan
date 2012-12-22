@@ -186,7 +186,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
               } else if (result == YueChe.NO_CAR){  //无车的话，赶紧约下班车
                   System.out.println(uinfo+"无车!");
                   break;
-              }else if (result == YueChe. BOOK_INVAILD_OPERATION){  //非法操作，服务器已经被锁定，直接退出约车
+              }else if (result == YueChe. BOOK_INVAILD_OPERATION || result ==YueChe.IP_FORBIDDEN ){  //非法操作，服务器已经被锁定，直接退出约车
                   String info = uinfo +"非法操作!";
                   System.out.println(info);
                   log.info(info);
@@ -198,6 +198,9 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   return;
               }else if (result == YueChe.GET_CAR_ERROR){   //得到车辆信息错误的话
             	  log.info("get car info error ! retry");
+                  System.out.println("得到车辆信息错误！重试！");
+              }else if (result == YueChe.GET_BOOK_CODE_ERROR){   //得到book code错误的话
+            	  log.info("GET_BOOK_CODE_ERROR");
                   System.out.println("得到车辆信息错误！重试！");
               }
               else {  //无车

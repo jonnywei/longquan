@@ -100,12 +100,12 @@ public class XueYuanAccount {
     	
     	yc.setId(json.optInt("pk"));
     	JSONObject field = json.optJSONObject("fields");
-    	yc.setUserName(field.optString("id_num").toUpperCase());
-    	yc.setPassword(field.optString("passwd"));
+    	yc.setUserName(field.optString("id_num").trim().toUpperCase());
+    	yc.setPassword(field.optString("passwd").trim());
     	yc.setKm(field.optString("yc_km",Constants.KM2));
     	yc.setAmPm(field.optString("yc_time"));
     	yc.setCarType(field.optString("car_type"));
-    	yc.setWhiteCar(field.optString("white_car"));
+    	yc.setWhiteCar(field.optString("white_car"));  
     	yc.setBlackCar(field.optString("black_car"));
     	if(field.isNull("yc_result")){
     		yc.setYcResult(BOOK_CAR_NOT_SET);

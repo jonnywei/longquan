@@ -80,7 +80,7 @@ public class YueCheInfo {
     	} catch (JSONException e) {
 			log.error("init yueche account from net error", e);
 		}
-    	 log.info("initXuYuanAccounts over!" );
+    	 log.info("initYueCheInfos over! size=" +  yueCheInfoMap.size() );
     }
     
     

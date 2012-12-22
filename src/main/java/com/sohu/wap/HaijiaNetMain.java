@@ -82,6 +82,8 @@ public class HaijiaNetMain
                 CookieImgCodeHelper.getImageCodeCookie();
             }
           
+            long startTime = System.currentTimeMillis();
+            
             YueCheInfo  ycInfo = new YueCheInfo();
             
             //初始化线程池的数目
@@ -122,7 +124,7 @@ public class HaijiaNetMain
                      e.printStackTrace();
                 }  
             }  
-            
+            log.info("Today task execute time ="+(System.currentTimeMillis()- startTime));
             
             //设置今天任务已经完成
             YueCheHelper.setTodayTaskExecuteOver(); 

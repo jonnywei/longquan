@@ -82,7 +82,7 @@ public class YueChe {
 	
 	public static int NOT_BOOK_WEEKEND_CAR = 800005;
 	public static int KEMU2_NO_TIME=10003;
-	
+	public static int IP_FORBIDDEN = 1000333;
 	/**
 	 * 
 	 *
@@ -319,9 +319,13 @@ public class YueChe {
 			//LoginOut:您尚未登录!
 			if(data.equals("LoginOut:您的IP地址被禁止!")){
 				log.error("LoginOut:您的IP地址被禁止!");
-				ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
+				result.setRet(IP_FORBIDDEN);
+				return result;
+//				ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
 //				System.exit(1);
 				
+			}else if (data.equals("LoginOut:您尚未登录!")){
+				log.error("LoginOut:您尚未登录!");
 			}
 			int splitPosition = data.indexOf("_");
 			String carInfo = data.substring(0, splitPosition);
@@ -467,6 +471,7 @@ public class YueChe {
 	                            break;
 	                    }
 						if("非预约开放时间".equals(outMsg)){
+							ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
 							yucheTry--; //非预约开放时间，不计入retry次数
 						}
 						if("验证码错误！".equals(outMsg)){
@@ -678,9 +683,17 @@ public class YueChe {
 			}
 		} catch (Exception ex){
 			log.error("tessecret return null", ex);
+		}finally{
+			try{
+				IO.deleteFile(storeAddress);
+				IO.deleteFile(destAddress);
+				IO.deleteFile(textImg);
+			}catch (Exception ex){
+				log.error("deleteFile error", ex);
+			}
 		}
-//		IO.deleteFile(storeAddress);
-
+		
+		
 		return imageCode;
 	}
 	

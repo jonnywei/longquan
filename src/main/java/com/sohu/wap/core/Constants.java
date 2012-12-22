@@ -32,9 +32,9 @@ public class Constants {
 	
 	
 
-    public static String   SERVER_URL ="http://localhost:8000/";
+//    public static String   SERVER_URL ="http://localhost:8000/";
 	
-//	 public static String   SERVER_URL ="http://42.121.106.4/";
+	 public static String   SERVER_URL ="http://42.121.106.4/";
 	    
     public static String   CONFIG_URL = SERVER_URL + "a/config/";
     

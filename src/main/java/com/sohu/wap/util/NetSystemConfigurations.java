@@ -76,7 +76,7 @@ public final class NetSystemConfigurations {
 	static {
 	  
 	    reload();
-		
+		log.info("config load over!");
 	}
 	
 	
