@@ -8,6 +8,11 @@ package com.sohu.wap.proxy;
 
 import java.util.Date;
 
+import org.json.JSONObject;
+
+import com.sohu.wap.XueYuanAccount;
+import com.sohu.wap.core.Constants;
+
 /**
  * @author jianjunwei
  *
@@ -26,6 +31,37 @@ public class Host {
     private long speed;
     
     
+  public static  Host jsonToHost(JSONObject json){
+        
+        Host yc= new Host();
+        
+//        yc.setId(json.optInt("pk"));
+        JSONObject field = json.optJSONObject("fields");
+        yc.setIp(field.optString("ip").trim().toUpperCase());
+        yc.setPort(field.optInt("port"));
+//        yc.setKm(field.optString("yc_km",Constants.KM2));
+//        yc.setAmPm(field.optString("yc_time"));
+//        yc.setCarType(field.optString("car_type"));
+//        yc.setWhiteCar(field.optString("white_car"));  
+//        yc.setBlackCar(field.optString("black_car"));
+//        if(field.isNull("yc_result")){
+//            yc.setYcResult(BOOK_CAR_NOT_SET);
+//        }else{
+//            yc.setYcResult(field.optInt("yc_result"));
+//        }
+//        yc.setYcResultInfo(field.optString("yc_info"));
+        
+        return yc;
+    }
+    
+  /**
+   * @param ip
+   * @param port
+   */
+  public Host() {
+      super();
+     
+  }
     /**
      * @param ip
      * @param port

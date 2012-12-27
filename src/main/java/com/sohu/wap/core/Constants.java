@@ -46,6 +46,10 @@ public class Constants {
     
     public static String   COOKIE_ADD_URL = SERVER_URL + "a/cookie/add/";
     
+    public static String    PROXY_ADD_URL = SERVER_URL + "a/proxy/add/";
+    
+    public static String    PROXY_URL = SERVER_URL + "a/proxy/all/";
+    
     public static String   YUECHE_UPDATE_URL = SERVER_URL + "a/yueche/%d/update/";
     
     

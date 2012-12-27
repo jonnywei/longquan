@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sohu.wap.proxy.ConfigHttpProxy;
 import com.sohu.wap.proxy.Host;
+import com.sohu.wap.proxy.SpysHttpProxy;
 import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.NetSystemConfigurations;
 import com.sohu.wap.util.ThreadPool;
@@ -41,9 +42,14 @@ public class HaijiaNetMain
         
         while(true){
            
+            //初始化spy
+            
+            SpysHttpProxy.getInstance();
+            
             // 如果今天任务已经完成的话
            if (  YueCheHelper.isTodayTaskExecuteOver()){
-        	   System.out.println("今日任务已经完成！waitting tomorrow...");
+        	  
+               System.out.println("今日任务已经完成！waitting tomorrow...");
         	 
         	   boolean isShutdown = NetSystemConfigurations.getSystemBooleanProperty("system.client.shutdown", false);
                
@@ -53,6 +59,7 @@ public class HaijiaNetMain
                ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
                continue;
            }
+         
          
            Host host = ConfigHttpProxy.getInstance().getRandomHost();
           

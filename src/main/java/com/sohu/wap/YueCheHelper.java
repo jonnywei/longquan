@@ -304,6 +304,33 @@ public class YueCheHelper
     }
     
     
+    
+    public static void addPrxoyHost(String proxyIp, String proxyPort){
+        try {
+            
+             JSONObject  param = new JSONObject();
+             
+             param.put("ip", proxyIp);
+             param.put("port", proxyPort);
+             
+             
+             String  ycInfo  = HttpUtil4Exposer.getInstance().getContent(Constants.PROXY_ADD_URL,param);
+          
+             System.out.println(ycInfo);
+             
+            } catch (JSONException e) {
+                log.error("error", e);
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+    }
+    
+    
     public static void main (String[] args){
 //    	waiting("fk");
     	System.out.println(getYueCheBookInfo(2));

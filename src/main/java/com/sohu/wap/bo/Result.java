@@ -13,6 +13,9 @@ import org.json.JSONObject;
  *
  */
 public class Result<T extends Object> {
+    
+    public static int SUCCSS =0 ;
+    public   static int FAILURE =1 ;
     private T data;
     private int ret;
     private Object extend;

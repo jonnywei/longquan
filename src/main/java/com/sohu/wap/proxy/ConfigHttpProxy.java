@@ -10,9 +10,15 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.XueYuanAccount;
+import com.sohu.wap.core.Constants;
+import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.PropConfigurations;
 
 /**
@@ -60,6 +66,7 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
       protected  void init (){
         proxy = new PropConfigurations("proxy.properties");
         initProxy();
+        getProxyFromNet();
     }
     
     private void initProxy(){
@@ -85,6 +92,38 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
          
         log.info("initConfigProxy over! size="+ HOST_MAP.size() );
     }
+    
+    
+    
+    
+     private void getProxyFromNet(){
+         try {
+             JSONArray ycArray = new JSONArray();;
+             String  ycInfo  = HttpUtil4Exposer.getInstance().getContent(Constants.PROXY_URL);
+             if(ycInfo != null){
+                    ycArray  = new JSONArray(ycInfo);
+                
+             }else{
+                 log.error("get yuche info from server error");
+                 return;
+             }
+             for (int index =0; index < ycArray.length(); index ++){
+                
+                JSONObject yc =  ycArray.getJSONObject(index);
+                
+                Host host = Host.jsonToHost(yc);
+                
+             
+                HOST_MAP.putIfAbsent(host.getIp(), host);
+                
+//                yueCheInfoMap.put(xyAccount.getId(), xyAccount);
+                
+             }
+            } catch (JSONException e) {
+                log.error("getProxyFromNet from net error", e);
+            }
+             log.info("getProxyFromNet over! size=" +  HOST_MAP.size() );
+     }
     
     public static void main (String [] args){
         ConfigHttpProxy.getInstance().getProxy();

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.bo.Result;
 import com.sohu.wap.http.HttpUtil4Exposer;
 
 /**
@@ -23,6 +24,29 @@ public class ProxyHelper {
 
     
     private static String TEST_PROXY_URL = "http://w.sohu.com/t2/reqinfo.do";
+    
+    
+    /**
+     * 
+     *测试代理是否可用 
+     *返回正确的cookie和内容
+     * 
+     */
+    public static Result<Long> testProxy2(Host host) {
+        
+       Result<Long> result = new Result<Long>(Result.FAILURE);
+       long start = System.currentTimeMillis();
+       boolean checkResult  =     testProxy(host.getIp(), host.getPort());
+       
+       if(checkResult){
+           result.setRet(Result.SUCCSS);
+       }
+       long time = System.currentTimeMillis() - start;
+//       log.debug(host.getIp() + " time=" + time);
+       result.setData(time);
+       return result;
+    }
+    
     
     
     

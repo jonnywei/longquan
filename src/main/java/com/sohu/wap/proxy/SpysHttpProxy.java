@@ -8,18 +8,12 @@ package com.sohu.wap.proxy;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,10 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sohu.wap.YueCheHelper;
 import com.sohu.wap.http.HttpUtil4Exposer;
-import com.sohu.wap.proxy.AbstractHttpProxy.ProxyChecker;
-import com.sohu.wap.util.CheckProxyThreadPool;
 import com.sohu.wap.util.DateUtil;
-import com.sohu.wap.util.ScheduledThreadPool;
+import com.sohu.wap.util.NetSystemConfigurations;
 import com.sohu.wap.util.ThreadUtil;
 
 /**
@@ -57,8 +49,6 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
     
   //单例对象
     private static  SpysHttpProxy  _instance;
-    
-    
     
     private static volatile boolean isInit = false;
    
@@ -92,16 +82,15 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
         
         GetHostFromSpysTask loadTask = new GetHostFromSpysTask();
         
-        scheduledService.scheduleWithFixedDelay(proxyChecker, 60*60, 60*60, TimeUnit.SECONDS);
+        scheduledService.scheduleWithFixedDelay(loadTask, 60*60, 60*60, TimeUnit.SECONDS);
         
-        
-    
     }
     
     protected class GetHostFromSpysTask implements Runnable {
         @Override
         public void run() {
             try {
+                log.info("GetHostFromSpysTask execute");
                 loadHostProxyMap();
             } catch (Exception ex) {
                 log.error("throw exception", ex);
@@ -109,84 +98,15 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
             System.out.println("check after proxyhost size =" + HOST_MAP.size());
         }
     }; 
-    
-    
- 
-//    public   Map<String, Host> getHttpProxy() {
-//
-//        if (!isInit) {
-//            synchronized (SpysHttpProxy.class) {
-//
-//                try {
-//                    // 初始化hash map
-//                    loadHostProxyMap();
-//                } catch (ScriptException e) {
-//                    log.error("script execute error", e);
-//                }
-//                TimerTask task = new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            Iterator iterator = SpysHttpProxy.getHttpProxy().keySet().iterator();
-//                            while (iterator.hasNext()) {
-//                                String key = (String) iterator.next();
-//                                Host host = SpysHttpProxy.getHttpProxy().get(key);
-//                                long begin = System.currentTimeMillis();
-//                                boolean canUse = ProxyHelper.testProxy(host.getIp(), host.getPort());
-//                                long time = (System.currentTimeMillis() - begin);
-//                                System.out.println("request time=" + time);
-//                                if (time > long_request_time){
-//                                    if ( SpysHttpProxy.getHttpProxy().size() < min_proxy_size &&  time < max_request_time){
-//                                        log.error("proxy list size too small. not remove .size =" +SpysHttpProxy.getHttpProxy().size());
-//                                    }else{
-//                                        log.error(key +" time="+time +" extend " + long_request_time);
-//                                        System.out.println(key +" time="+time +" extend " + long_request_time);
-//                                        iterator.remove();
-//                                        continue;
-//                                    }
-//                                }
-//                                if (! canUse) {
-//                                    log.error(host + "can not Use,remove");
-//                                    iterator.remove();
-//                                } else {
-//                                      log.info(host + " check ok!");
-//                                }
-//                                // 海驾的测试可用取消，速度太慢了
-//                                // long hjbegin = System.currentTimeMillis();
-//                                // String hjtest =
-//                                // httpUtil4.getContent(YueChe.LOGIN_URL);
-//                                // time = (System.currentTimeMillis() -
-//                                // hjbegin);
-//                                //                              
-//                                // System.out.println("request haijia time" +
-//                                // time);
-//                                //                              
-//                            }
-//
-//                        } catch (Exception ex) {
-//                            log.error("throw exception", ex);
-//                        }
-//                        System.out.println("check after proxyhost size =" + SpysHttpProxy.getHttpProxy().size());
-//                    }
-//                };
-//                
-//               
-//                timer.scheduleAtFixedRate(task, 0, 30 * 60 * 1000);
-//                timer.scheduleAtFixedRate(loadTask, 60 * 60 * 1000, 60 * 60 * 1000);
-//                isInit = true;
-//            }
-//        }
-//
-//        return HOST_MAP;
-//
-//    }
-
+  
     private  void loadHostProxyMap(String url) throws ScriptException {
 
         ScriptEngineManager sem = new ScriptEngineManager();
         ScriptEngine se = sem.getEngineByName("javascript");
+        String pip = NetSystemConfigurations.getSystemStringProperty("system.spy.proxy.ip", "127.0.0.1");
+        int pport = NetSystemConfigurations.getSystemIntProperty("system.spy.proxy.port", 8087);
         
-        HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient();
+        HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient(pip,pport);
 
         String result = httpUtil4.getContent(url);
         if (result == null) {
@@ -229,7 +149,9 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
             host.setName(td4.text());
             Element td5 = tds.get(5);
             host.setCheckDate(DateUtil.getDate(td5.text(), "dd-MMM-yyyy HH:mm"));
-
+            //向服务器推送信息
+            YueCheHelper.addPrxoyHost(ip, port);
+            
             System.out.println(host);
 
             HOST_MAP.put(ip, host);
@@ -272,7 +194,6 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
 		}
 		System.exit(0);
     }
-
 
 
     /* (non-Javadoc)

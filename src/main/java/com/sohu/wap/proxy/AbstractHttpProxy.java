@@ -40,6 +40,7 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 	    
 	 static long max_request_time = 6;
 	 
+	 static  int  proxy_min_size =  100;
 	 
 	 protected abstract  void  init();
 
@@ -81,7 +82,7 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 			}
 			log.info("schedule check over! size=" + HOST_MAP.size());
 			//如果代理数目小于30，重新加载
-			if (HOST_MAP.size() < 30){
+			if (HOST_MAP.size() < proxy_min_size){
 				log.info("size less than 30.reload! " + HOST_MAP.size());
 			    init();
 			}
