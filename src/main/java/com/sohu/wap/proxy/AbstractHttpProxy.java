@@ -33,14 +33,14 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 
 	protected static long initialDelay = 0;
 
-	protected static long delay = 10 * 60;
+	protected static long delay = 20 * 60;
 	
 	//seconds
-	 static long long_request_time = 3;
+	 static long long_request_time = 5;
 	    
-	 static long max_request_time = 6;
+	 static long max_request_time = 10;
 	 
-	 static  int  proxy_min_size =  100;
+	 static  int  proxy_min_size = 68;
 	 
 	 protected abstract  void  init();
 
@@ -83,7 +83,7 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 			log.info("schedule check over! size=" + HOST_MAP.size());
 			//如果代理数目小于30，重新加载
 			if (HOST_MAP.size() < proxy_min_size){
-				log.info("size less than 30.reload! " + HOST_MAP.size());
+				log.info("size less than "+proxy_min_size+".reload! " + HOST_MAP.size());
 			    init();
 			}
 

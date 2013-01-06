@@ -94,7 +94,7 @@ public class HaijiaNetMain
             YueCheInfo  ycInfo = new YueCheInfo();
             
             //初始化线程池的数目
-            ExecutorService executeService = Executors.newFixedThreadPool(ycInfo.getYueCheInfo().size() * YueCheHelper.getProxyNumPreUser());
+            ExecutorService executeService = Executors.newFixedThreadPool(2 + ycInfo.getYueCheInfo().size() * YueCheHelper.getProxyNumPreUser());
             
             for (Integer accoutId: ycInfo.getYueCheInfo().keySet()){
                 XueYuanAccount  xy = ycInfo.getYueCheInfo().get(accoutId);
