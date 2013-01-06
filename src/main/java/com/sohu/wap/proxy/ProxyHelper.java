@@ -97,7 +97,7 @@ public class ProxyHelper {
                     && httpUtil4.getCookieValue("cookie_test") != null
                     && httpUtil4.getCookieValue("cookie_test").equals("true")) {
                 
-                log.info(proxyIp + " check ok!");
+//                log.info(proxyIp + " check ok!");
                 isCanUse= true;
             } else {
                 log.error(proxyIp + "cookie  test error");

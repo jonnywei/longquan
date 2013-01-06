@@ -59,7 +59,7 @@ public class ThreadExecuteTest
             
             System.out.println("data:"+ date);
 //           
-            ExecutorService executeService = Executors.newFixedThreadPool(10);
+            ExecutorService executeService = Executors.newFixedThreadPool(0);
             List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
             
           

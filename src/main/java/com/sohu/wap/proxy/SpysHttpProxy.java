@@ -76,9 +76,9 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
 			log.error("load error");
 		}
     	
-        ProxyChecker proxyChecker =  new ProxyChecker();
+//      ProxyChecker proxyChecker =  new ProxyChecker();
 //      proxyChecker.run();
-        scheduledService.scheduleWithFixedDelay(proxyChecker,initialDelay, delay, TimeUnit.SECONDS);
+//      scheduledService.scheduleWithFixedDelay(proxyChecker,initialDelay, delay, TimeUnit.SECONDS);
         
         GetHostFromSpysTask loadTask = new GetHostFromSpysTask();
         
