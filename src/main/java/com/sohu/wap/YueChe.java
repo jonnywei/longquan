@@ -765,19 +765,22 @@ public class YueChe {
 		                if (timeArray.length  <  0) {
 		                    timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
 		                }
+		                //如果今天已经约车了
+		                if ( ycCarInfo.getCarInfo().get("am").equals("已约") ||  ycCarInfo.getCarInfo().get("pm").equals("已约") ||  ycCarInfo.getCarInfo().get("ni").equals("已约")){
+		                    continue;
+		                }
 		                boolean havaCar = false;
 		                for (String amPmStr : timeArray){  //按情况约车
-		                     String info = ycCarInfo.getCarInfo().get(amPmStr);
+		                      String info = ycCarInfo.getCarInfo().get(amPmStr);
 		                     if (info.equals("无")){
 		                         
 		                    }else if (info.equals("已约")){
 		                        ret.setRet(3);
-		                        return ret;
+//		                        return ret;
 		                    }else{
 		                        ret.setData(yueCheDate); //设置约车日期
 		                        if (Constants.AM_STR.equals(amPmStr)){
 		                            ret.setRet(0);
-		                           
 		                            return ret;
 		                        
 		                        }else if (Constants.PM_STR.equals(amPmStr)){

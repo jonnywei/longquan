@@ -60,6 +60,15 @@ public class YueCheHelper
     //遗留的，删除
     public static boolean IS_USE_PROXY= false;
     
+    
+    public static boolean isScanUseProxy(){
+        
+        boolean   IS_SCAN_USE_PROXY = NetSystemConfigurations.getSystemBooleanProperty("system.scan.use.proxy",false) ;; 
+        
+        return IS_SCAN_USE_PROXY;
+    }
+    
+    
     public static boolean isUseProxy(){
         
         boolean   IS_USE_PROXY = NetSystemConfigurations.getSystemBooleanProperty("system.use.proxy",false) ;; 

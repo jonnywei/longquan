@@ -4,6 +4,9 @@ import java.io.IOException;
 
 import com.sohu.wap.bo.Result;
 import com.sohu.wap.core.Constants;
+import com.sohu.wap.http.HttpUtil4Exposer;
+import com.sohu.wap.proxy.ConfigHttpProxy;
+import com.sohu.wap.proxy.Host;
 import com.sohu.wap.util.RandomUtil;
 import com.sohu.wap.util.ThreadUtil;
 
@@ -18,9 +21,21 @@ public class ScanYueCheTask extends YueCheTask {
 	
 	
 	public ScanYueCheTask(XueYuanAccount xueYuan) {
-		super(xueYuan, xueYuan.getYueCheDate());
-		 
-		// TODO Auto-generated constructor stub
+	    
+	    super();
+	    
+        if (YueCheHelper.isScanUseProxy()){
+                 Host host = ConfigHttpProxy.getInstance().getRandomHost();
+                
+                 httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp(),host.getPort());
+        }else{
+                 httpUtil4 = HttpUtil4Exposer.createHttpClient();
+        }
+    
+        this.xueYuan = xueYuan;
+        this.date = xueYuan.getYueCheDate(); 
+        log.info(this.xueYuan.getUserName()+" init thread");
+ 
 	}
 	/**
 	 * @throws InterruptedException 

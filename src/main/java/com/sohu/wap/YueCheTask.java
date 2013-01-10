@@ -21,6 +21,10 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	XueYuanAccount xueYuan;
 	
 	String date;
+	YueCheTask(){
+	    
+	}
+	
 	
 	public YueCheTask(XueYuanAccount xueYuan, String date){
 	  
