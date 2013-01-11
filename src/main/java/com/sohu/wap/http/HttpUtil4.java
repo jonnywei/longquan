@@ -592,7 +592,12 @@ public class HttpUtil4
 		{
 			log.error("error! " +e.getMessage());
 			e.printStackTrace();
-		}
+		}finally{
+		    if(!httpGet.isAborted()){
+		        httpGet.abort();
+		    } 
+		  
+        }
 		
 		return content;
 	}
@@ -975,7 +980,7 @@ public class HttpUtil4
 			} 
             
             HttpEntity httpEntity =  httpResponse.getEntity();
-            
+             
             String content = EntityUtils.toString(httpEntity);
             System.out.println(content);
             rj = new JSONObject(content);
@@ -999,6 +1004,11 @@ public class HttpUtil4
         catch (JSONException e) {
             log.error("error! " +e.getMessage());
             e.printStackTrace();
+        }finally{
+            if(!httpPost.isAborted()){
+                httpPost.abort();
+            }
+          
         }
         
         return rj;
