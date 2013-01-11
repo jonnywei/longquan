@@ -146,7 +146,10 @@ public class YueChe {
 			String firstPage = httpUtil4.getContent(LOGIN_URL);
 			if (firstPage == null) {        //失败， 也可能是因代理服务器失效，暂时无法判断
 				return LONGIN_ERROR;
-			}else if ( firstPage.length()< 100 ||  firstPage.indexOf("海淀驾校学员网络预约系统") ==-1 ){
+			}else if (firstPage.indexOf("Internal Server Error")!=-1){
+			    return LONGIN_ERROR;
+			}
+			else if ( firstPage.length()< 100 ||  firstPage.indexOf("海淀驾校学员网络预约系统") ==-1 ){
 				return LONGIN_PROXY_ERROR;
 			}
 			
