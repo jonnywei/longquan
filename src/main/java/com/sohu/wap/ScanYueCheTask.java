@@ -111,6 +111,7 @@ public class ScanYueCheTask extends YueCheTask {
 		int yueCheInfo = result.getRet();
 		if (yueCheInfo == 0){
 			yueKao(result.getData(),xueYuan.getKm());
+			xueYuan.setBookSuccess(true);
 		} else if (yueCheInfo == 1){
 			
 		}else if (yueCheInfo == 2){

@@ -472,8 +472,8 @@ public class YueChe {
 							resultN = NOT_BOOK_WEEKEND_CAR;
 							break;
 						}
-						
-						if(outMsg.indexOf("科目二剩余小时不足") != -1){
+						 
+						if(outMsg.indexOf("科目二剩余小时不足") != -1 || outMsg.indexOf("科目二训练小时将会超出小时!") != -1){
 						      resultN = KEMU2_NO_TIME;
 	                            break;
 	                    }
@@ -884,7 +884,7 @@ public class YueChe {
     /**
 	 * 0 可以
 	 * 1 不可以
-	 * 2 已经约车
+	 * 2 已经约考
 	 * 3 其他错误
 	 * @param  yueCheDateArray 日期列表
 	 * @param  amPm  上下信息
@@ -908,7 +908,7 @@ public class YueChe {
 	               for (String amPmStr : timeArray){
 	            	   DayKaoShiInfo ykKaoShiInfo  =  kaoShiInfoMap.get(yueCheDate+":"+amPmStr);
 	            	    //如果今天已经约车了
-	 	                if ( ykKaoShiInfo.getStatus().equals("已经预约") ){
+	 	                if ( ykKaoShiInfo.getStatus().equals("取消预约") ){
 	 	                	ret.setRet(2);
                             return ret;
 	 	                }
@@ -994,6 +994,9 @@ public class YueChe {
 //			System.out.println(result);
 //			log.debug(result);
 			//登录成功
+			 if (result.indexOf("预约成功！")!= -1 ){
+					System.out.println("预约成功！");
+			}else
 			if(result.indexOf("桩考可预约人数不足")!= -1  ){  //失败的话 ，继续登录
 				System.out.println("桩考可预约人数不足");
 			}else if (result.indexOf("系统服务时间每天从07:35-20:00")!= -1  ){
@@ -1002,8 +1005,6 @@ public class YueChe {
 			}else if (result.indexOf("您需要先通过科目二的所有考试，才能预约科目三考试！")!= -1  ){
 				System.out.println("您需要先通过科目二的所有考试，才能预约科目三考试！");
 			}
-			
-			
 			else{
 				log.debug(result);
 				System.out.println(result);
