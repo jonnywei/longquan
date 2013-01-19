@@ -21,6 +21,8 @@ public class DayKaoShiInfo {
     private String amPm;
     private String remindNum;
     private String kaoShi;
+    
+    private String status;
  
     
     /**
@@ -71,6 +73,12 @@ public class DayKaoShiInfo {
     public void setKaoShi(String kaoShi) {
         this.kaoShi = kaoShi;
     }
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
    
    
     

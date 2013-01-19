@@ -19,7 +19,6 @@ public class ScanYueCheTask extends YueCheTask {
 	boolean isLogon = false;
 	long  lastLoginTime = 0;
 	
-	
 	public ScanYueCheTask(XueYuanAccount xueYuan) {
 	    
 	    super();
@@ -37,12 +36,35 @@ public class ScanYueCheTask extends YueCheTask {
         log.info(this.xueYuan.getUserName()+" init thread");
  
 	}
+
+	/**
+	 * 
+	 * 扫描程序，进行扫描操作
+	 * @throws InterruptedException 
+	 * 
+	 * 
+	 */
+	public int scan () throws InterruptedException{
+		if (isYueKao())
+			return scanYueKao();
+		else{
+			return	scanYueChe();
+		}
+        		
+	}
+
+	private boolean isYueKao(){
+		if ( xueYuan.getKm() != null &&  xueYuan.getKm().startsWith("ks"))
+			return true;
+		return false;
+	}
+	
 	/**
 	 * @throws InterruptedException 
 	 * 
 	 * 
 	 */
-	public int scan() throws InterruptedException{
+	public int scanYueChe() throws InterruptedException{
 		
 		doLogin () ;
 		System.out.println(xueYuan.getUserName());
@@ -71,6 +93,41 @@ public class ScanYueCheTask extends YueCheTask {
 		}
 		return NO_CAR;
 	}
+	
+	
+	/**
+	 * 科目考试
+	 * @throws InterruptedException 
+	 * 
+	 * 
+	 */
+	public int scanYueKao() throws InterruptedException{
+		
+		doLogin () ;
+		System.out.println(xueYuan.getUserName());
+		
+		Result<String> result = canYueKao(xueYuan.getYueCheDate(),xueYuan.getYueCheAmPm(),xueYuan.getKm());
+		
+		int yueCheInfo = result.getRet();
+		if (yueCheInfo == 0){
+			yueKao(result.getData(),xueYuan.getKm());
+		} else if (yueCheInfo == 1){
+			
+		}else if (yueCheInfo == 2){
+			return ALREADY_YUECHE;
+		}else if (yueCheInfo == 3){
+			return ALREADY_YUECHE;
+			
+		}else if (yueCheInfo == 4){
+		
+		}
+		
+		if (xueYuan.isBookSuccess()){
+			return SCAN_YUECHE_SUCCESS;
+		}
+		return NO_CAR;
+	}
+	
 	
 	private  void  doLogin () throws InterruptedException {
 		
@@ -109,8 +166,7 @@ public class ScanYueCheTask extends YueCheTask {
      */
     private  void  doYueche ( String date, String amPm ) throws InterruptedException {
     
-
-    	  //按情况约车
+    	//按情况约车
         amPm = YueCheHelper.AMPM.get(amPm);
         boolean  isSuccess = false;
         boolean first = true;
@@ -150,4 +206,6 @@ public class ScanYueCheTask extends YueCheTask {
        log.info("yuche finish !");
         return ;
     }
+    
+     
 }

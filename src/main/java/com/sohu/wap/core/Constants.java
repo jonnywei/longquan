@@ -21,6 +21,12 @@ public class Constants {
 	public static String AM_STR = "am";
 	public static String PM_STR = "pm";
 	public static String NI_STR = "ni";
+	
+	
+	public static String KS2 = "ks2";
+	public static String KS21 = "ks21";
+	public static String KS3 = "ks3";
+	public static String KS4 = "ks4";
 
 	public static String CAR_TYPE_ALS = "als";
 	public static String CAR_TYPE_BYD = "byd";
