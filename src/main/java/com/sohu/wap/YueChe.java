@@ -852,6 +852,72 @@ public class YueChe {
         return "getedYueKaoInfo";
     }
 	
+    
+    /**
+     * 0 上午可以
+     * 1 下午可以
+     * 2 晚上可以
+     * 
+     * 3 该日已经约车
+     * 4 无车
+     * 5 登录超时
+     */
+    public Result<String>  canYueKao (String yueCheDateArray,  String amPm){
+        
+        Result<String> ret = new Result<String>(4);
+        
+        String result = getAvailableCarInfo();
+        
+        if (result.equals("noLogin")){
+            ret.setRet(5);
+            return ret;
+        }else{
+            String[] array =  yueCheDateArray.split("[,]");
+            for(String yueCheDate : array){
+                  DayCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
+                    if (ycCarInfo != null){
+                        String[] timeArray = amPm.split("[,;]");
+                        if (timeArray.length  <  0) {
+                            timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
+                        }
+                        //如果今天已经约车了
+                        if ( ycCarInfo.getCarInfo().get("am").equals("已约") ||  ycCarInfo.getCarInfo().get("pm").equals("已约") ||  ycCarInfo.getCarInfo().get("ni").equals("已约")){
+                            continue;
+                        }
+                        boolean havaCar = false;
+                        for (String amPmStr : timeArray){  //按情况约车
+                              String info = ycCarInfo.getCarInfo().get(amPmStr);
+                             if (info.equals("无")){
+                                 
+                            }else if (info.equals("已约")){
+                                ret.setRet(3);
+//                              return ret;
+                            }else{
+                                ret.setData(yueCheDate); //设置约车日期
+                                if (Constants.AM_STR.equals(amPmStr)){
+                                    ret.setRet(0);
+                                    return ret;
+                                
+                                }else if (Constants.PM_STR.equals(amPmStr)){
+                                   ret.setRet(1);
+                                   return ret;
+                                }else{
+                                   ret.setRet(2);
+                                   return ret;
+                                }
+                            }
+                        }
+                    }
+            }
+            
+
+           
+        }
+         ret.setRet(4);
+         return ret;
+    }
+    
+    
 	
 	Result<String > yueKao (String date){
 	    return null;
