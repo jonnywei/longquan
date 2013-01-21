@@ -12,9 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -84,6 +82,16 @@ public class YueChe {
 	public static int ALREADY_BOOKED_CAR=3;
 	public static int BOOK_INVAILD_OPERATION = 5;
 	
+	public static int YUE_KAO_SUCCESS = 0;
+	
+	public static int YUE_KAO_ERROR = 1;
+
+	public static int YUE_KAO_CANCEL = 2;
+	
+	public static int ALREADY_YUE_KAO = 3;
+	
+	public static int YUE_KAO_NO_POSITION = 4;
+	
 	public static int NOT_BOOK_WEEKEND_CAR = 800005;
 	public static int KEMU2_NO_TIME=10003;
 	public static int IP_FORBIDDEN = 1000333;
@@ -121,8 +129,10 @@ public class YueChe {
 	
 	private Element eventTarget;
     private Element eventArgument;
+    
     private String eventTargetString;
-	
+    
+	private String yueKaoInfoDetail;
 	
 	private Map<String, DayCarInfo> yueCheCarInfoMap = new HashMap<String, DayCarInfo>();
 	
@@ -473,7 +483,8 @@ public class YueChe {
 							break;
 						}
 						 
-						if(outMsg.indexOf("科目二剩余小时不足") != -1 || outMsg.indexOf("科目二训练小时将会超出小时!") != -1){
+						if(outMsg.indexOf("科目二剩余小时不足") != -1 || outMsg.indexOf("科目二训练小时将会超出小时!") != -1
+							|| outMsg.indexOf("您已经完成了科目二的所有训练！") != -1){
 						      resultN = KEMU2_NO_TIME;
 	                            break;
 	                    }
@@ -907,6 +918,9 @@ public class YueChe {
 	               }
 	               for (String amPmStr : timeArray){
 	            	   DayKaoShiInfo ykKaoShiInfo  =  kaoShiInfoMap.get(yueCheDate+":"+amPmStr);
+	            	   if (ykKaoShiInfo == null){ //没有信息的话
+	            		   continue;
+	            	   }
 	            	    //如果今天已经约车了
 	 	                if ( ykKaoShiInfo.getStatus().equals("取消预约") ){
 	 	                	ret.setRet(2);
@@ -921,7 +935,8 @@ public class YueChe {
 	                    	return ret;
 	                    }else{
 	                    	eventTargetString =ykKaoShiInfo.getKaoShi();
-	                    	ret.setData(ykKaoShiInfo.getKaoShi());
+	                    	yueKaoInfoDetail = yueCheDate+":"+amPmStr;
+	                    	ret.setData(eventTargetString);
 	                    	ret.setRet(0);
 	                    	System.out.println(yueCheDate+":"+amPmStr+" 可以约考了！");
                             return ret;
@@ -943,26 +958,28 @@ public class YueChe {
 	 * 
 	 * 
 	 */
-	Result<String > yueKao (String kaoShiTarget ,String ks) throws InterruptedException{
+	Result<String > yueKao ( String ks ) throws InterruptedException{
 		if (Constants.KS2.equals(ks)){
-			return yueKaoCommon(YUEKAO2_URL, kaoShiTarget);
+			return yueKaoCommon(YUEKAO2_URL);
 		}else if (Constants.KS21.equals(ks)){
-			return yueKaoCommon(YUEKAO21_URL, kaoShiTarget);
+			return yueKaoCommon(YUEKAO21_URL);
 //			return getAvailableYueKaoInfoBase(YUEKAO21_URL);
 		}else if (Constants.KS3.equals(ks)){
-			return yueKaoCommon(YUEKAO3_URL, kaoShiTarget);
+			return yueKaoCommon(YUEKAO3_URL);
 //			return getAvailableYueKaoInfoBase(YUEKAO3_URL);
 		}else if (Constants.KS4.equals(ks)){
-			return yueKaoCommon(YUEKAO4_URL, kaoShiTarget);
+			return yueKaoCommon(YUEKAO4_URL);
 //			return getAvailableYueKaoInfoBase(YUEKAO4_URL);
 		}else{
-			return yueKaoCommon(YUEKAO2_URL, kaoShiTarget);
+			return yueKaoCommon(YUEKAO2_URL);
 //			return getAvailableYueKaoInfoBase(YUEKAO2_URL);
 		}
 		
 	}
 	
-	Result<String > yueKaoCommon (String url, String kaoShiTarget) throws InterruptedException{
+	Result<String > yueKaoCommon (String url) throws InterruptedException{
+		
+		Result <String> ret = new Result<String>(UNKNOWN_ERROR);
 		JSONObject json = new JSONObject();
 		try {
 			json.put(__EVENTTARGET, eventTargetString);
@@ -993,19 +1010,35 @@ public class YueChe {
 		if (result != null) {
 //			System.out.println(result);
 //			log.debug(result);
-			//登录成功
+//			public static int YUE_KAO_SUCCESS = 0;
+//			
+//			public static int YUE_KAO_ERROR = 1;
+//
+//			public static int YUE_KAO_CANCEL = 2;
+//			
+//			public static int ALREADY_YUE_KAO = 3;
+			
 			 if (result.indexOf("预约成功！")!= -1 ){
 					System.out.println("预约成功！");
+					ret.setData(yueKaoInfoDetail);
+					ret.setRet(YUE_KAO_SUCCESS);
 			}else
 			if(result.indexOf("桩考可预约人数不足")!= -1  ){  //失败的话 ，继续登录
 				System.out.println("桩考可预约人数不足");
+				ret.setRet(YUE_KAO_NO_POSITION);
+				
 			}else if (result.indexOf("系统服务时间每天从07:35-20:00")!= -1  ){
 				System.out.println("系统服务时间每天从07:35-20:00;"+"enter sleep");
 				ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
 			}else if (result.indexOf("您需要先通过科目二的所有考试，才能预约科目三考试！")!= -1  ){
 				System.out.println("您需要先通过科目二的所有考试，才能预约科目三考试！");
+				ret.setRet(YUE_KAO_ERROR);
+			} else if (result.indexOf("取消成功！")!= -1){ //忙中出错了，取消了
+				ret.setRet(YUE_KAO_CANCEL);
 			}
+			
 			else{
+				ret.setRet(YUE_KAO_ERROR);
 				log.debug(result);
 				System.out.println(result);
 			}
@@ -1013,7 +1046,7 @@ public class YueChe {
 		 
 		}
 		
-		return null;
+		return ret;
 	}
     /**
      * @return the httpUtil4

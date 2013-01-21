@@ -48,7 +48,7 @@ public class ScanYueCheTask extends YueCheTask {
 		if (isYueKao())
 			return scanYueKao();
 		else{
-			return	scanYueChe();
+			return scanYueChe();
 		}
         		
 	}
@@ -110,8 +110,8 @@ public class ScanYueCheTask extends YueCheTask {
 		
 		int yueCheInfo = result.getRet();
 		if (yueCheInfo == 0){
-			yueKao(result.getData(),xueYuan.getKm());
-			xueYuan.setBookSuccess(true);
+			doYueKao( xueYuan.getKm());
+			
 		} else if (yueCheInfo == 1){
 			
 		}else if (yueCheInfo == 2){
@@ -160,6 +160,8 @@ public class ScanYueCheTask extends YueCheTask {
         log.info("login success!");
        return ;
     }
+	
+	
     
     /**
      * @throws IOException 
@@ -205,6 +207,52 @@ public class ScanYueCheTask extends YueCheTask {
         
     
        log.info("yuche finish !");
+        return ;
+    }
+
+    
+    /**
+     * @throws IOException 
+     * 
+     */
+    private  void  doYueKao (String ks) throws InterruptedException {
+    
+    	//按情况约车
+    
+    	boolean  isSuccess = false;
+        boolean first = true;
+        do {
+             if (!first){
+                 log.error("yuche  error. retry!");
+                 Thread.sleep(1000 * RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
+             }else{
+                 first = false;
+             }
+        
+          Result<String > ret =  yueKao(ks);
+          
+          int  result  = ret.getRet();
+             
+          if (result == YueChe.YUE_KAO_SUCCESS){
+              isSuccess = true;
+              String info = xueYuan.getUserName() +":"+ret.getData() +"约考成功";
+              System.out.println(info);
+              log.info(info);
+              xueYuan.setBookSuccess(isSuccess);
+          }else if (result == YueChe.YUE_KAO_NO_POSITION){  
+              System.out.println(date + "可预约人数不足");
+              break;
+          }else if (result == YueChe.YUE_KAO_CANCEL){   
+              System.out.println("错误！取消！错误");
+          }else if (result == YueChe.YUE_KAO_ERROR){   
+              System.out.println("约考失败");
+              break;
+          }else {  //无车
+              System.out.println("未知错误！重试!RUSULT="+result);
+          }
+          
+         }while (!isSuccess);
+        log.info("yuekao finish !");
         return ;
     }
     
