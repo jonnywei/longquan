@@ -12,9 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -57,8 +55,12 @@ public class YueChe {
 	public static String LOGIN_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=ImgCode&random=";
 
 	private static String YUCHE_URL = "http://haijia.bjxueche.net/ych2.aspx";
-	private static String YUEKAO_URL = "http://haijia.bjxueche.net/yk2.aspx";
 	
+	private static String YUEKAO2_URL = "http://haijia.bjxueche.net/yk2.aspx";
+	private static String YUEKAO21_URL = "http://haijia.bjxueche.net/yk21.aspx";
+	private static String YUEKAO3_URL = "http://haijia.bjxueche.net/yk3.aspx";
+	private static String YUEKAO4_URL = "http://haijia.bjxueche.net/yk4.aspx";
+
 	private static String GET_CARS_URL = "http://haijia.bjxueche.net/Han/ServiceBooking.asmx/GetCars";
 	protected static String BOOKING_CAR_URL = "http://haijia.bjxueche.net/Han/ServiceBooking.asmx/BookingCar";
 	public  static String BOOKING_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=BookingCode&random=";
@@ -79,6 +81,16 @@ public class YueChe {
 	public static int GET_BOOK_CODE_ERROR = 123323;
 	public static int ALREADY_BOOKED_CAR=3;
 	public static int BOOK_INVAILD_OPERATION = 5;
+	
+	public static int YUE_KAO_SUCCESS = 0;
+	
+	public static int YUE_KAO_ERROR = 1;
+
+	public static int YUE_KAO_CANCEL = 2;
+	
+	public static int ALREADY_YUE_KAO = 3;
+	
+	public static int YUE_KAO_NO_POSITION = 4;
 	
 	public static int NOT_BOOK_WEEKEND_CAR = 800005;
 	public static int KEMU2_NO_TIME=10003;
@@ -118,7 +130,9 @@ public class YueChe {
 	private Element eventTarget;
     private Element eventArgument;
     
-	
+    private String eventTargetString;
+    
+	private String yueKaoInfoDetail;
 	
 	private Map<String, DayCarInfo> yueCheCarInfoMap = new HashMap<String, DayCarInfo>();
 	
@@ -222,7 +236,7 @@ public class YueChe {
 			
 		
 			if (result != null) {
-				System.out.println(result);
+//				System.out.println(result);
 				log.debug(result);
 				//登录成功
 				if (result.equals("/index.aspx")) {
@@ -270,11 +284,15 @@ public class YueChe {
 		// 页面中一个隐藏的输入，默认为2，可能更改,其实是科目信息，亲
 		String hiddenKM = "2";
 		if (isKM3) {
-//			String yuchePage = httpUtil4.getContent(YUCHE_URL);
-//			Document document = Jsoup.parse(yuchePage);
-//			Element hkm = document.getElementById(HIDDEN_KM);
-//			hiddenKM = hkm.attr("value");
-			hiddenKM="3";
+		    try{
+		        String yuchePage = httpUtil4.getContent(YUCHE_URL);
+	            Document document = Jsoup.parse(yuchePage);
+	            Element hkm = document.getElementById(HIDDEN_KM);
+	            hiddenKM = hkm.attr("value");
+	            System.out.println("hiddenKM is "+hiddenKM );
+		    }catch(Exception ex){
+		        hiddenKM="3";
+		    }
 		}
 
 		// {"yyrq":"20121126","yysd":"58","xllxID":"2","pageSize":35,"pageNum":1}
@@ -468,8 +486,9 @@ public class YueChe {
 							resultN = NOT_BOOK_WEEKEND_CAR;
 							break;
 						}
-						
-						if(outMsg.indexOf("科目二剩余小时不足") != -1){
+						 
+						if(outMsg.indexOf("科目二剩余小时不足") != -1 || outMsg.indexOf("科目二训练小时将会超出小时!") != -1
+							|| outMsg.indexOf("您已经完成了科目二的所有训练！") != -1){
 						      resultN = KEMU2_NO_TIME;
 	                            break;
 	                    }
@@ -807,12 +826,26 @@ public class YueChe {
 
 	
 	
-//扫描table ，得到约车信息
-    
-    private   String getAvailableYueKaoInfo(){
+	private String getAvailableYueKaoInfo(String ks){
+		if (Constants.KS2.equals(ks)){
+			return getAvailableYueKaoInfoBase(YUEKAO2_URL);
+		}else if (Constants.KS21.equals(ks)){
+			return getAvailableYueKaoInfoBase(YUEKAO21_URL);
+		}else if (Constants.KS3.equals(ks)){
+			return getAvailableYueKaoInfoBase(YUEKAO3_URL);
+		}else if (Constants.KS4.equals(ks)){
+			return getAvailableYueKaoInfoBase(YUEKAO4_URL);
+		}else{
+			return getAvailableYueKaoInfoBase(YUEKAO2_URL);
+		}
+		
+	}
+
+   //扫描table ，得到约车信息
+    private   String getAvailableYueKaoInfoBase(String url){
         String ykPage = null;
         do{
-             ykPage = httpUtil4.getContent(YUEKAO_URL);
+             ykPage = httpUtil4.getContent(url);
              
         }while(ykPage == null);
         if (ykPage.equals("/login.aspx")){
@@ -836,17 +869,26 @@ public class YueChe {
             Element op =  tds.get(3);
             Element a =op.getElementsByTag("a").get(0);
             String href = a.attr("href");
-            int index = href.indexOf("&#39;");
+            String status = a.text();
+            int index = href.indexOf("'");
            
-            String kaoshi =href.substring( index ,href.indexOf("&#39;", index+5));
+            String kaoshi =href.substring( index + 1,href.indexOf("'", index+5));
             DayKaoShiInfo carInfo = new DayKaoShiInfo();
-            carInfo.setDate(date.replace("-", ""));
+            date = date.replace("-", "");
+            carInfo.setDate(date);
+            if(amPm.equals("上午")){
+            	amPm="am";
+     	    }
+     	    if (amPm.equalsIgnoreCase("下午")){
+     	    	amPm="pm";
+     	    }
             carInfo.setAmPm(amPm);
             carInfo.setRemindNum(remindNum) ;
             
             carInfo.setKaoShi(kaoshi);
+            carInfo.setStatus(status);
             
-            kaoShiInfoMap.put(date,carInfo);
+            kaoShiInfoMap.put(date+":"+amPm,carInfo);
             
         }
         return "getedYueKaoInfo";
@@ -854,73 +896,161 @@ public class YueChe {
 	
     
     /**
-     * 0 上午可以
-     * 1 下午可以
-     * 2 晚上可以
-     * 
-     * 3 该日已经约车
-     * 4 无车
-     * 5 登录超时
-     */
-    public Result<String>  canYueKao (String yueCheDateArray,  String amPm){
-        
-        Result<String> ret = new Result<String>(4);
-        
-        String result = getAvailableCarInfo();
-        
-        if (result.equals("noLogin")){
-            ret.setRet(5);
-            return ret;
-        }else{
-            String[] array =  yueCheDateArray.split("[,]");
-            for(String yueCheDate : array){
-                  DayCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
-                    if (ycCarInfo != null){
-                        String[] timeArray = amPm.split("[,;]");
-                        if (timeArray.length  <  0) {
-                            timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
-                        }
-                        //如果今天已经约车了
-                        if ( ycCarInfo.getCarInfo().get("am").equals("已约") ||  ycCarInfo.getCarInfo().get("pm").equals("已约") ||  ycCarInfo.getCarInfo().get("ni").equals("已约")){
-                            continue;
-                        }
-                        boolean havaCar = false;
-                        for (String amPmStr : timeArray){  //按情况约车
-                              String info = ycCarInfo.getCarInfo().get(amPmStr);
-                             if (info.equals("无")){
-                                 
-                            }else if (info.equals("已约")){
-                                ret.setRet(3);
-//                              return ret;
-                            }else{
-                                ret.setData(yueCheDate); //设置约车日期
-                                if (Constants.AM_STR.equals(amPmStr)){
-                                    ret.setRet(0);
-                                    return ret;
-                                
-                                }else if (Constants.PM_STR.equals(amPmStr)){
-                                   ret.setRet(1);
-                                   return ret;
-                                }else{
-                                   ret.setRet(2);
-                                   return ret;
-                                }
-                            }
-                        }
-                    }
-            }
-            
-
-           
-        }
-         ret.setRet(4);
-         return ret;
-    }
-    
-    
+	 * 0 可以
+	 * 1 不可以
+	 * 2 已经约考
+	 * 3 其他错误
+	 * @param  yueCheDateArray 日期列表
+	 * @param  amPm  上下信息
+	 * @param  ks    考试信息
+	 */
+	public Result<String>  canYueKao (String yueCheDateArray,  String amPm ,String ks){
+		Result<String> ret = new Result<String>(4);
+	  
+		String result = getAvailableYueKaoInfo(ks);
 	
-	Result<String > yueKao (String date){
-	    return null;
+		if (result.equals("noLogin")){
+		    ret.setRet(5);
+			return ret;
+		}else{
+			String[] array =  yueCheDateArray.split("[,]");
+		    for(String yueCheDate : array){
+		          String[] timeArray = amPm.split("[,;]");
+	               if (timeArray.length  <  0) {
+	                    timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
+	               }
+	               for (String amPmStr : timeArray){
+	            	   DayKaoShiInfo ykKaoShiInfo  =  kaoShiInfoMap.get(yueCheDate+":"+amPmStr);
+	            	   if (ykKaoShiInfo == null){ //没有信息的话
+	            		   continue;
+	            	   }
+	            	    //如果今天已经约车了
+	 	                if ( ykKaoShiInfo.getStatus().equals("取消预约") ){
+	 	                	ret.setRet(2);
+                            return ret;
+	 	                }
+	 	             //按情况约车
+	                    String remindNumStr = ykKaoShiInfo.getRemindNum();
+	 	                int remindNum = Integer.valueOf(remindNumStr);
+	 	                
+	                    if (remindNum <= 0){
+	                    	ret.setRet(1);
+	                    	return ret;
+	                    }else{
+	                    	eventTargetString =ykKaoShiInfo.getKaoShi();
+	                    	yueKaoInfoDetail = yueCheDate+":"+amPmStr;
+	                    	ret.setData(eventTargetString);
+	                    	ret.setRet(0);
+	                    	System.out.println(yueCheDate+":"+amPmStr+" 可以约考了！");
+                            return ret;
+	                    }
+	                }
+	              
+		  }
+		 
+		}
+		ret.setRet(4);
+		return ret;
+		
+	
+	}
+	/**
+	 * 
+	 * 
+	 *约考试情况。。。。 
+	 * 
+	 * 
+	 */
+	Result<String > yueKao ( String ks ) throws InterruptedException{
+		if (Constants.KS2.equals(ks)){
+			return yueKaoCommon(YUEKAO2_URL);
+		}else if (Constants.KS21.equals(ks)){
+			return yueKaoCommon(YUEKAO21_URL);
+//			return getAvailableYueKaoInfoBase(YUEKAO21_URL);
+		}else if (Constants.KS3.equals(ks)){
+			return yueKaoCommon(YUEKAO3_URL);
+//			return getAvailableYueKaoInfoBase(YUEKAO3_URL);
+		}else if (Constants.KS4.equals(ks)){
+			return yueKaoCommon(YUEKAO4_URL);
+//			return getAvailableYueKaoInfoBase(YUEKAO4_URL);
+		}else{
+			return yueKaoCommon(YUEKAO2_URL);
+//			return getAvailableYueKaoInfoBase(YUEKAO2_URL);
+		}
+		
+	}
+ 
+	
+	Result<String > yueKaoCommon (String url) throws InterruptedException{
+		
+		Result <String> ret = new Result<String>(UNKNOWN_ERROR);
+		JSONObject json = new JSONObject();
+		try {
+			json.put(__EVENTTARGET, eventTargetString);
+			json.put(__EVENTARGUMENT, "");
+			if (viewState!= null){
+				json.put(__VIEWSTATE, viewState.attr("value"));
+			}
+			if (eventValid != null){
+				json.put(__EVENTVALIDATION, eventValid.attr("value"));;
+			}
+		} catch (JSONException e) {
+			log.error("error", e);
+			e.printStackTrace();
+		}
+		
+		//服务器失败的话，一直重试
+		String result = null;
+		do{
+			 result = httpUtil4.post(url, json);
+			 if (result == null){
+//				 ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
+			 }else{
+				 break;
+			 }
+		
+		}while(result == null);
+		
+		if (result != null) {
+//			System.out.println(result);
+//			log.debug(result);
+//			public static int YUE_KAO_SUCCESS = 0;
+//			
+//			public static int YUE_KAO_ERROR = 1;
+//
+//			public static int YUE_KAO_CANCEL = 2;
+//			
+//			public static int ALREADY_YUE_KAO = 3;
+			
+			 if (result.indexOf("预约成功！")!= -1 ){
+					System.out.println("预约成功！");
+					ret.setData(yueKaoInfoDetail);
+					ret.setRet(YUE_KAO_SUCCESS);
+			}else
+			if(result.indexOf("桩考可预约人数不足")!= -1  ){  //失败的话 ，继续登录
+				System.out.println("桩考可预约人数不足");
+				ret.setRet(YUE_KAO_NO_POSITION);
+				
+			}else if (result.indexOf("系统服务时间每天从07:35-20:00")!= -1  ){
+				System.out.println("系统服务时间每天从07:35-20:00;"+"enter sleep");
+				ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
+			}else if (result.indexOf("您需要先通过科目二的所有考试，才能预约科目三考试！")!= -1  ){
+				System.out.println("您需要先通过科目二的所有考试，才能预约科目三考试！");
+				ret.setRet(YUE_KAO_ERROR);
+			} else if (result.indexOf("取消成功！")!= -1){ //忙中出错了，取消了
+				ret.setRet(YUE_KAO_CANCEL);
+			}
+			
+			else{
+				ret.setRet(YUE_KAO_ERROR);
+				log.debug(result);
+				System.out.println(result);
+			}
+//			
+		 
+		}
+		
+		return ret;
 	}
     /**
      * @return the httpUtil4
