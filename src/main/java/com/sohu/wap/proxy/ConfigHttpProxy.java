@@ -20,6 +20,7 @@ import com.sohu.wap.XueYuanAccount;
 import com.sohu.wap.core.Constants;
 import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.PropConfigurations;
+import com.sohu.wap.util.SystemConfigurations;
 
 /**
  * 配置的代理
@@ -66,7 +67,11 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
       protected  void init (){
         proxy = new PropConfigurations("proxy.properties");
         initProxy();
-        getProxyFromNet();
+        boolean useNetAdmin =  SystemConfigurations.getSystemBooleanProperty(Constants.CFG_SYSTEM_USE_NET_ADMIN, false);
+        if(useNetAdmin){
+        	getProxyFromNet(); 
+		 }   
+        
     }
     
     private void initProxy(){

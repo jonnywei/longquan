@@ -65,13 +65,14 @@ public final class SystemConfigurations {
 	static {
 	  
 		try {
-		     
-		   String sp = HttpUtil4Exposer.getInstance().getContent(Constants.CONFIG_URL);
-		 
-		   StringReader  sr = new StringReader(sp);
-		   
-			system.load(SystemConfigurations.class.getClassLoader().getResourceAsStream("system.properties"));
-			system.load(sr);
+		   system.load(SystemConfigurations.class.getClassLoader().getResourceAsStream("system.properties"));
+		   boolean useNetAdmin =  SystemConfigurations.getSystemBooleanProperty(Constants.CFG_SYSTEM_USE_NET_ADMIN, false);
+		   if(useNetAdmin){
+			   String sp = HttpUtil4Exposer.getInstance().getContent(Constants.CONFIG_URL);
+			   StringReader  sr = new StringReader(sp); 
+			   system.load(sr);
+		   }
+			
 		} catch (Exception e) {
 			system = null;
 			System.err.println("WARNING: Could not find system.properties  file in class path.");

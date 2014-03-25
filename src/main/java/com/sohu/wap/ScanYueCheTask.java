@@ -181,7 +181,13 @@ public class ScanYueCheTask extends YueCheTask {
                  first = false;
              }
         
-             Result ret =  yuche(date, amPm,false);
+             Result<String> ret =  null;
+             if(Constants.KM3.equals(xueYuan.getKm())){
+                 ret =  yuche(date, amPm,true);
+             }else{
+                 ret =  yuche(date, amPm,false);
+             }
+             
              int  result  = ret.getRet();
              
           if (result == YueChe.BOOK_CAR_SUCCESS){

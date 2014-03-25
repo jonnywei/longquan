@@ -40,7 +40,7 @@ public class Constants {
 
 //    public static String   SERVER_URL ="http://localhost:8000/";
 	
-	 public static String   SERVER_URL ="http://42.121.106.4/";
+	public static String   SERVER_URL ="http://42.121.106.4/";
 	    
     public static String   CONFIG_URL = SERVER_URL + "a/config/";
     
@@ -57,6 +57,9 @@ public class Constants {
     public static String    PROXY_URL = SERVER_URL + "a/proxy/all/";
     
     public static String   YUECHE_UPDATE_URL = SERVER_URL + "a/yueche/%d/update/";
+    
+    // Config prop keys
+    public static  String CFG_SYSTEM_USE_NET_ADMIN="system.use.net.admin";
     
     
     

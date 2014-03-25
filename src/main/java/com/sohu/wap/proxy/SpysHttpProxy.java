@@ -6,6 +6,7 @@
  */
 package com.sohu.wap.proxy;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -103,12 +104,16 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
 
         ScriptEngineManager sem = new ScriptEngineManager();
         ScriptEngine se = sem.getEngineByName("javascript");
-        String pip = NetSystemConfigurations.getSystemStringProperty("system.spy.proxy.ip", "127.0.0.1");
-        int pport = NetSystemConfigurations.getSystemIntProperty("system.spy.proxy.port", 8087);
+//        String pip = NetSystemConfigurations.getSystemStringProperty("system.spy.proxy.ip", "127.0.0.1");
+//        int pport = NetSystemConfigurations.getSystemIntProperty("system.spy.proxy.port", 8087);
+        String pip ="127.0.0.1";
+        int pport =8087;
         
         HttpUtil4Exposer httpUtil4 = HttpUtil4Exposer.createHttpClient(pip,pport);
-
-        String result = httpUtil4.getContent(url);
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("sto", "View 200 per page");
+        
+        String result = httpUtil4.post(url, params);
         if (result == null) {
             log.error("fetch proxy info error!");
             return;
@@ -150,7 +155,7 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
             Element td5 = tds.get(5);
             host.setCheckDate(DateUtil.getDate(td5.text(), "dd-MMM-yyyy HH:mm"));
             //向服务器推送信息
-            YueCheHelper.addPrxoyHost(ip, port);
+//            YueCheHelper.addPrxoyHost(ip, port);
             
             System.out.println(host);
 
@@ -164,7 +169,7 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
     private  void loadHostProxyMap() throws ScriptException {
             
         String url =  SPYS_RU_PROXY_URL;
-        for(int i= 0; i< 4; i++){
+        for(int i= 0; i< 1; i++){
             if (i != 0){
                  url =    SPYS_RU_PROXY_URL.replace("free-proxy-list", "free-proxy-list"+i);
             }
