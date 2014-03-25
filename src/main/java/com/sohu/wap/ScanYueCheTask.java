@@ -187,7 +187,7 @@ public class ScanYueCheTask extends YueCheTask {
              }else{
                  ret =  yuche(date, amPm,false);
              }
-             
+
              int  result  = ret.getRet();
              
           if (result == YueChe.BOOK_CAR_SUCCESS){
