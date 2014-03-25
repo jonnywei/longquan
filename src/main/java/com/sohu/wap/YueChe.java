@@ -284,7 +284,6 @@ public class YueChe {
 		// 页面中一个隐藏的输入，默认为2，可能更改,其实是科目信息，亲
 		String hiddenKM = "2";
 		if (isKM3) {
-<<<<<<< HEAD
 			   try{
 				     String yuchePage = httpUtil4.getContent(YUCHE_URL);
 				     Document document = Jsoup.parse(yuchePage);
@@ -295,17 +294,6 @@ public class YueChe {
 						        hiddenKM="3";
 			 }
 
-=======
-		    try{
-		        String yuchePage = httpUtil4.getContent(YUCHE_URL);
-	            Document document = Jsoup.parse(yuchePage);
-	            Element hkm = document.getElementById(HIDDEN_KM);
-	            hiddenKM = hkm.attr("value");
-	            System.out.println("hiddenKM is "+hiddenKM );
-		    }catch(Exception ex){
-		        hiddenKM="3";
-		    }
->>>>>>> b24bd4414e88a0f2a83391dc576e6b3acf3b4ea9
 		}
 
 		// {"yyrq":"20121126","yysd":"58","xllxID":"2","pageSize":35,"pageNum":1}
