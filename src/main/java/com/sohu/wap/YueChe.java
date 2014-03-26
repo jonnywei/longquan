@@ -64,6 +64,7 @@ public class YueChe {
 	private static String GET_CARS_URL = "http://haijia.bjxueche.net/Han/ServiceBooking.asmx/GetCars";
 	protected static String BOOKING_CAR_URL = "http://haijia.bjxueche.net/Han/ServiceBooking.asmx/BookingCar";
 	public  static String BOOKING_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=BookingCode&random=";
+	public  static String BOOKING2_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode2.ashx?key=ImgCode&random=";
 
 	private static String __VIEWSTATE = "__VIEWSTATE";
 	private static String __EVENTVALIDATION = "__EVENTVALIDATION";
@@ -282,7 +283,7 @@ public class YueChe {
 		int resultN = UNKNOWN_ERROR;
 
 		// 页面中一个隐藏的输入，默认为2，可能更改,其实是科目信息，亲
-		String hiddenKM = "2";
+		String hiddenKM = "1";
 		if (isKM3) {
 			   try{
 				     String yuchePage = httpUtil4.getContent(YUCHE_URL);
@@ -392,7 +393,7 @@ public class YueChe {
 					do{
 					      retry_count ++;
 						    try {
-						       imageCode = getImgCode(BOOKING_IMG_URL);
+						       imageCode = getImgCode(BOOKING2_IMG_URL);
 						    } catch (IOException e1) {
 		                        log.error("get book image code error", e1);
 		                   }
@@ -420,7 +421,7 @@ public class YueChe {
 						bookCarJson.put("imgCode", md5Code);
 						bookCarJson.put("KMID", hiddenKM);
 
-					} catch (JSONException e) {
+					} catch (Exception e) {
 
 						e.printStackTrace();
 					}
@@ -535,7 +536,12 @@ public class YueChe {
 		url = url + RandomUtil.getJSRandomDecimals();
 
 		String imageCode = "";
-		String fileName = Util.generateUUID() + ".gif"; // 生成唯一的id
+		String fileSuffix =".gif";
+		if(url.contains("CreateCode2")){
+			 fileSuffix =".jgpg";
+
+		}
+		String fileName = Util.generateUUID() + fileSuffix; // 生成唯一的id
 		
 		String imgDir = "d:/haijia/img";
 		String comand = "ping	" ; //都有的命令

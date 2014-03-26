@@ -85,20 +85,27 @@ public final class NetSystemConfigurations {
 	
 	private  static  void reload(){
 	    try {
+	    	
+	    	
             
 	          if (strategy.reloadingRequired()){
 	                 
-	                String sp = HttpUtil4Exposer.getInstance().getContent(Constants.CONFIG_URL);
-	              
-	                if (sp == null){
-	                    log.error("load config from net eror");
-	                    sp="";
-	                }
-	                StringReader  sr = new StringReader(sp);
-	               
-	                system.load(NetSystemConfigurations.class.getClassLoader().getResourceAsStream("system.properties"));
+	        	   system.load(NetSystemConfigurations.class.getClassLoader().getResourceAsStream("system.properties"));
 	                
-	                system.load(sr);
+	        	   boolean useNetAdmin =  SystemConfigurations.getSystemBooleanProperty(Constants.CFG_SYSTEM_USE_NET_ADMIN, false);
+	    		   if(useNetAdmin){
+	    			   String sp = HttpUtil4Exposer.getInstance().getContent(Constants.CONFIG_URL);
+
+		                if (sp == null){
+		                    log.error("load config from net eror");
+		                    sp="";
+		                }
+	    			   StringReader  sr = new StringReader(sp); 
+	    			   system.load(sr);
+	    		   }else{
+	    			   log.info("log config from net disable");
+	    		   }
+	              
 	          }
 	           
 	        } catch (Exception e) {
