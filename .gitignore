@@ -1,3 +1,5 @@
 .settings/
 target/
 .myeclipse/
+.idea/
+haijia.iml

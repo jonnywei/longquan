@@ -410,7 +410,7 @@ public class YueChe {
 		                return result;
 		            }
 
-					String md5Code = MD5.crypt(imageCode.toUpperCase());
+//					String md5Code = MD5.crypt(imageCode.toUpperCase());
 
 					// {"yyrq":"20121126","xnsd":"58","cnbh":"06204","imgCode":"d32926ad20c3ef9b703472edba4d413d","KMID":"2"}
 					JSONObject bookCarJson = new JSONObject();
@@ -418,7 +418,7 @@ public class YueChe {
 						bookCarJson.put("yyrq", selectedCar.getString("YYRQ"));
 						bookCarJson.put("xnsd", selectedCar.getString("XNSD"));
 						bookCarJson.put("cnbh", selectedCar.getString("CNBH"));
-						bookCarJson.put("imgCode", md5Code);
+						bookCarJson.put("imgCode",imageCode.toUpperCase() );
 						bookCarJson.put("KMID", hiddenKM);
 
 					} catch (Exception e) {
@@ -538,7 +538,7 @@ public class YueChe {
 		String imageCode = "";
 		String fileSuffix =".gif";
 		if(url.contains("CreateCode2")){
-			 fileSuffix =".jgpg";
+			 fileSuffix =".jpg";
 
 		}
 		String fileName = Util.generateUUID() + fileSuffix; // 生成唯一的id
