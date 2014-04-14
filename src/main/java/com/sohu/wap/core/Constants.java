@@ -14,9 +14,14 @@ package com.sohu.wap.core;
 public class Constants {
 	
 	
+	public static String KM1 = "km1";
 	public static String KM2 = "km2";
-
 	public static String KM3 = "km3";
+	public static String KM_AUTO = "km0";
+	
+	public static int KM1_HiddenKM = 1;
+	public static int KM2_HiddenKM = 2;
+	public static int KM3_HiddenKM = 3;
 
 	public static String AM_STR = "am";
 	public static String PM_STR = "pm";
@@ -40,7 +45,7 @@ public class Constants {
 
 //    public static String   SERVER_URL ="http://localhost:8000/";
 	
-	public static String   SERVER_URL ="http://42.121.106.4/";
+	public static String   SERVER_URL ="http://114.215.110.185/";
 	    
     public static String   CONFIG_URL = SERVER_URL + "a/config/";
     

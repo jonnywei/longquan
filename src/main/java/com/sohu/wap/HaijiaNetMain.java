@@ -15,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sohu.wap.bo.VerifyCode;
 import com.sohu.wap.proxy.ConfigHttpProxy;
 import com.sohu.wap.proxy.Host;
 import com.sohu.wap.proxy.SpysHttpProxy;
@@ -44,7 +45,7 @@ public class HaijiaNetMain
            
             //初始化spy
             
-            SpysHttpProxy.getInstance();
+//            SpysHttpProxy.getInstance();
             
             // 如果今天任务已经完成的话
            if (  YueCheHelper.isTodayTaskExecuteOver()){
@@ -60,8 +61,7 @@ public class HaijiaNetMain
                continue;
            }
          
-         
-           Host host = ConfigHttpProxy.getInstance().getRandomHost();
+//           Host host = ConfigHttpProxy.getInstance().getRandomHost();
           
            //等待任务开始
            YueCheHelper.waitForService();
@@ -79,14 +79,13 @@ public class HaijiaNetMain
             
             System.out.println("抢车日期为:"+ date);
 //           
-           
             if (YueCheHelper.isEnterCreakerModel()){
-              //进入破解模式
+              //  进入破解模式
               //  速度肯定是最快的了
               //  利用海驾的验证码漏洞，事先输入验证码，之后约车
                 System.out.println("Open Creak Model");
                 log.info("Open Creak Model");
-                CookieImgCodeHelper.getImageCodeCookie();
+                CookieImgCodeHelper.getVerifyCodeSmart(VerifyCode.CODE_TYPE_LOGIN_IMG_CODE);
             }
           
             long startTime = System.currentTimeMillis();
@@ -99,15 +98,14 @@ public class HaijiaNetMain
             for (Integer accoutId: ycInfo.getYueCheInfo().keySet()){
                 XueYuanAccount  xy = ycInfo.getYueCheInfo().get(accoutId);
                 if ( xy!=null){
-                    if (YueCheHelper.isUseProxy()){
-                        for ( int num = 0 ; num < YueCheHelper.getProxyNumPreUser(); num++){
+                	int threadPerUserNum = 
+                		YueCheHelper.isUseProxy()? YueCheHelper.getProxyNumPreUser(): YueCheHelper.getThreadPerUser();
+                    
+                	for ( int num = 0 ; num < threadPerUserNum; num++){
                             YueCheTask yueCheTask = new YueCheTask(xy,date);
-                            resultList.add(executeService.submit(yueCheTask) );
-                        }
-                    }else{
-                        YueCheTask yueCheTask = new YueCheTask(xy,date);
-                        resultList.add(executeService.submit(yueCheTask) );
-                    }
+                            resultList.add(executeService.submit(yueCheTask) );     
+                       
+                    } 
                  }
             }
             

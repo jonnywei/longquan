@@ -155,7 +155,7 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
             Element td5 = tds.get(5);
             host.setCheckDate(DateUtil.getDate(td5.text(), "dd-MMM-yyyy HH:mm"));
             //向服务器推送信息
-//            YueCheHelper.addPrxoyHost(ip, port);
+            YueCheHelper.addPrxoyHost(ip, port);
             
             System.out.println(host);
 

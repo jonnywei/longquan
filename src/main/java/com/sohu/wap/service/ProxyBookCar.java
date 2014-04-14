@@ -42,8 +42,8 @@ public class ProxyBookCar extends YueChe {
        
        HttpUtil4Exposer httpUtil =   HttpUtil4Exposer.getProxyInstance(host.getIp(), host.getPort());
       
-       httpUtil.addCookie(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY));
-       httpUtil.addCookie(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY));
+//       httpUtil.addCookie(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY));
+//       httpUtil.addCookie(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY));
        httpUtil.addCookie(CookieImgCodeHelper.COOKIE_LOGINON_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_LOGINON_KEY));
        httpUtil.addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, cookieInfo.optString(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
       

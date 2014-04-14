@@ -51,7 +51,7 @@ public class YueChe {
 
 	public static String LOGIN_URL = "http://haijia.bjxueche.net/";
 	private static String LOGOUT_URL = "http://haijia.bjxueche.net/Login.aspx?LoginOut=true";
-
+	private static String TOP_URL =  "http://haijia.bjxueche.net/top.aspx";
 	public static String LOGIN_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=ImgCode&random=";
 
 	private static String YUCHE_URL = "http://haijia.bjxueche.net/ych2.aspx";
@@ -72,7 +72,8 @@ public class YueChe {
 	private static String __EVENTARGUMENT = "__EVENTARGUMENT";
     private static String __EVENTTARGET = "__EVENTTARGET";
 	
-	
+    private static String COOKIE_IMG_CODE_KEY="ImgCode";
+    
 	private static String HIDDEN_KM = "hiddenKM";
 
 	public static int UNKNOWN_ERROR = -1;
@@ -182,20 +183,29 @@ public class YueChe {
 			int retry_count =0;
 			//模拟用户行为，一直请求验证码
 			String imageCode = null;
-			do{
-				retry_count++;
-				try {
-					imageCode = getImgCode(LOGIN_IMG_URL);
-				} catch (IOException e1) {
-					log.error("get image code error", e1);
-				}
-				if( retry_count > YueCheHelper.NET_RETRY_LIMIT){
-					log.error("login error, get image code count extend retry_limit");
-					return LONGIN_ERROR;
-				}
-			}while(imageCode == null);
-			
-			
+
+			if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
+		        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_LOGIN_IMG_CODE);
+		        imageCode = vcode.getVcode();
+		        
+		       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
+		       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
+		    }else{
+		    	do{
+					retry_count++;
+					try {
+						
+						imageCode = getImgCode(LOGIN_IMG_URL);
+						
+					} catch (IOException e1) {
+						log.error("get image code error", e1);
+					}
+					if( retry_count > YueCheHelper.NET_RETRY_LIMIT){
+						log.error("login error, get image code count extend retry_limit");
+						return LONGIN_ERROR;
+					}
+				}while(imageCode == null);
+		    }
 			JSONObject json = new JSONObject();
 			try {
 				json.put("txtUserName", userName);
@@ -218,23 +228,18 @@ public class YueChe {
 			//服务器失败的话，一直重试
 			String result = null;
 			
-			//进入creak 模式
-			 if (YueCheHelper.isEnterCreakerModel()){
-			    
-			    ( (HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, 
-			             CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY).getCookie());
-			 }
-			
 			do{
 				 result = httpUtil4.post(LOGIN_URL, json);
 				 if (result == null){
+					 System.out.println("server not response");
 //					 ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
 				 }else{
 					 break;
 				 }
 			
 			}while(result == null);
-			
+	        System.out.println("loginseesionid="+((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
+
 		
 			if (result != null) {
 //				System.out.println(result);
@@ -271,20 +276,81 @@ public class YueChe {
 		return LONGIN_SUCCESS;
 	}
 
+	private void printXuanYuanInfo(){
+		String info = httpUtil4.getContent(TOP_URL);
+		System.out.println("printXuanYuanInfoSessionId="+((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
+
+		if(info != null){
+//			<span id="lblName">魏建军</span>
+			int nameStart = info.indexOf("<span id=\"lblName\">");
+			if(nameStart!= -1){
+				String endName = info.substring(nameStart+ 19);
+				int endNameIndex = endName.indexOf("<");
+				String name = endName.substring(0, endNameIndex);
+				System.out.println(name);
+
+			}
+		}else{
+			System.out.println("get xueyuan info error");
+
+		}
+	}
+	
+	private void testYueChe(){
+		String imageCode ="";
+		if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
+	        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_BOOKING_CODE);
+	        imageCode = vcode.getVcode();
+	       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
+	       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
+
+	    } 
+		System.out.println("printXuanYuanInfoSessionId="+((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
+
+
+//		String md5Code = MD5.crypt(imageCode.toUpperCase());
+
+		// {"yyrq":"20121126","xnsd":"58","cnbh":"06204","imgCode":"d32926ad20c3ef9b703472edba4d413d","KMID":"2"}
+		JSONObject bookCarJson = new JSONObject();
+		try {
+			bookCarJson.put("yyrq", "20140420");
+			bookCarJson.put("xnsd", "812");
+			bookCarJson.put("cnbh", "08219");
+			bookCarJson.put("imgCode",imageCode.toUpperCase() );
+			bookCarJson.put("KMID", "2");
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		 
+		//一直重试，知道返回结果
+		JSONObject bookResult = null;
+		do{
+			bookResult = httpUtil4.postJson(BOOKING_CAR_URL, bookCarJson);
+			if (bookResult == null) {
+				System.out.println("book car timeout or error");
+				log.error("book car timeout or error");
+			}
+		}while(bookResult == null);
+		
+	}
 	/**
-	 * -1 约车错误 0 约车成功 1 无车可约
+	 * -1 约车错误 0 约车成功 1 无车可约 ,修正科目信息
+	 * @parm km 0 自动选择科目  1-3科目
 	 * 
 	 */
-	public  Result<String> yuche(String date, String amOrpm, boolean isKM3 )
+	public  Result<String> yuche(String date, String amOrpm, int km )
 			throws InterruptedException {
 	    
 	    Result <String>result = new Result<String>(UNKNOWN_ERROR);
 	    
 		int resultN = UNKNOWN_ERROR;
 
+		//判断科目信息
 		// 页面中一个隐藏的输入，默认为2，可能更改,其实是科目信息，亲
-		String hiddenKM = "1";
-		if (isKM3) {
+		String hiddenKM = "2";  //自动选择科目
+		if ( km ==0 ) {
 			   try{
 				     String yuchePage = httpUtil4.getContent(YUCHE_URL);
 				     Document document = Jsoup.parse(yuchePage);
@@ -292,9 +358,10 @@ public class YueChe {
 				     hiddenKM = hkm.attr("value");
 				     System.out.println("hiddenKM is "+hiddenKM );
 				  }catch(Exception ex){
-						        hiddenKM="3";
+						        hiddenKM="2";
 			 }
-
+		}else {
+	        hiddenKM=String.valueOf(km);
 		}
 
 		// {"yyrq":"20121126","yysd":"58","xllxID":"2","pageSize":35,"pageNum":1}
@@ -317,7 +384,9 @@ public class YueChe {
 			        break;
 			    }
 				carsJson = httpUtil4.postJson(GET_CARS_URL, json);
+//				printXuanYuanInfo();
 				if (carsJson == null) {
+					System.out.println("get car info error");
 					log.error("get car info error");
 //					ThreadUtil.sleep(1);
 				}else{
@@ -325,7 +394,7 @@ public class YueChe {
 				}
 			}while(true);
 			
-			
+//			testYueChe();
 			//没有得到车辆信息的话
 			if(carsJson == null){
 			    result.setRet(GET_CAR_ERROR);
@@ -389,21 +458,30 @@ public class YueChe {
 					System.out.println("选择的车是：" + selectedCar.toString());
 					String imageCode = "";
 					retry_count =0;
-					// get image code				 
-					do{
-					      retry_count ++;
-						    try {
-						       imageCode = getImgCode(BOOKING2_IMG_URL);
-						    } catch (IOException e1) {
-		                        log.error("get book image code error", e1);
-		                   }
-						   if(retry_count > YueCheHelper.NET_RETRY_LIMIT){
-						       imageCode = null;
-						       break;
-						   }
-					}while(imageCode == null);
-						
-				   
+					
+					if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
+				        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_BOOKING_CODE);
+				        imageCode = vcode.getVcode();
+				       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
+				       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
+
+				    }else{
+				    	// get image code				 
+						do{
+						      retry_count ++;
+							    try {
+							       imageCode = getImgCode(BOOKING2_IMG_URL);
+							    } catch (IOException e1) {
+			                        log.error("get book image code error", e1);
+			                   }
+							   if(retry_count > YueCheHelper.NET_RETRY_LIMIT){
+							       imageCode = null;
+							       break;
+							   }
+						}while(imageCode == null);
+							
+				    }
+					
 					//没有的话
 		            if(imageCode == null){
 		                result.setRet(GET_BOOK_CODE_ERROR);
@@ -427,21 +505,13 @@ public class YueChe {
 					}
 					
 //					ThreadUtil.sleep(1);
-					
-					//如果是 creak 模式
-		             if (YueCheHelper.isEnterCreakerModel()){
-		               ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, 
-		                         CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY).getCookie());
-		             }
-		             
+					 
 		             JSONObject cookieJson = new JSONObject();
-		             cookieJson.put(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY));
-		             cookieJson.put(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY));
+//		             cookieJson.put(COOKIE_IMG_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY));
+//		             cookieJson.put(COOKIE_IMG_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY));
 		             cookieJson.put(CookieImgCodeHelper.COOKIE_LOGINON_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_LOGINON_KEY));
 		             cookieJson.put(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
                     
-		             
-		             
 					//一直重试，知道返回结果
 					JSONObject bookResult = null;
 					do{
@@ -607,23 +677,13 @@ public class YueChe {
 	
 	
 	private String getImgCode(String url)throws IOException{
-	    if (YueCheHelper.isEnterCreakerModel()){
-	        if (url.equals(LOGIN_IMG_URL)){
-	            VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY);
-	            return vcode.getVcode();
-	        }else{
-	            VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie().get(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY);
-                return vcode.getVcode();
-	        }
-	       
-	    }else{
-	        if (YueCheHelper.isImageCodeInputMethodAuto()){
-	            return getImgCodeAuto(url);
-	        }else{
-	            return  getImgCodeManual(url);
-	        }
-	    }
-		
+
+        if (YueCheHelper.isImageCodeInputMethodAuto()){
+            return getImgCodeAuto(url);
+        }else{
+            return  getImgCodeManual(url);
+        }  
+	  
 	}
 	
 	private  String getImgCodeAuto(String url) throws IOException {
@@ -736,6 +796,8 @@ public class YueChe {
 		}while(yuchePage == null);
 		if (yuchePage.equals("/login.aspx")){
 			return "notLogin";
+		} else if (yuchePage.equals("Internal Server Error")){
+			return "InternalServerError";
 		}
 	 
 		Document document = Jsoup.parse(yuchePage);
@@ -775,12 +837,17 @@ public class YueChe {
 	 * 3 该日已经约车
 	 * 4 无车
 	 * 5 登录超时
+	 * 6 服务器error InternalServerError
 	 */
 	public Result<String>  canYueChe (String yueCheDateArray,  String amPm){
 		
 	    Result<String> ret = new Result<String>(4);
 	    
 		String result = getAvailableCarInfo();
+		if(result.equals("InternalServerError")){
+			ret.setRet(6);
+			return ret;
+		}
 		
 		if (result.equals("noLogin")){
 		    ret.setRet(5);

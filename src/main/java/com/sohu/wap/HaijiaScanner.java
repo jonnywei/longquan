@@ -25,10 +25,7 @@ public class HaijiaScanner
     
     
     private static Logger log = LoggerFactory.getLogger(HaijiaScanner.class);
- 
-    private  static int   IN_SERVICE_SCANNER_BASE = 20;
-    
-    private  static int   IN_SERVICE_SCANNER_INTERVAL = 60;
+
     
     public static void main( String[] args ) throws InterruptedException, IOException
     {
@@ -42,6 +39,8 @@ public class HaijiaScanner
     
     public  static void scan () throws InterruptedException{
         
+    	//初始化约车信息
+    	
     	List <ScanYueCheTask> list = new ArrayList<ScanYueCheTask>();
     	for (String accoutId: AccountMap.getInstance().getScanXueYuanAccountMap().keySet()){
             XueYuanAccount  xy =AccountMap.getInstance().getScanXueYuanAccountMap().get(accoutId);
@@ -64,13 +63,14 @@ public class HaijiaScanner
                     }catch(Exception ex){
                     	log.error("exception",ex);
                     }
-                     ThreadUtil.sleep(  RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
+                     ThreadUtil.sleep( RandomUtil.getRandomInt(YueCheHelper.SCAN_MAX_SLEEP_TIME));
                 }
-            	
-                ThreadUtil.sleep(IN_SERVICE_SCANNER_BASE + RandomUtil.getRandomInt(IN_SERVICE_SCANNER_INTERVAL)); 
-                
+            	//max >休息时间 >min
+                ThreadUtil.sleep(YueCheHelper.SCAN_MIN_INTEVAL + 
+                		RandomUtil.getRandomInt(YueCheHelper.SCAN_MAX_INTEVAL - YueCheHelper.SCAN_MIN_INTEVAL)); 
                 
             }else{
+            	log.info("waiting");
                 ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
             }
         }while (true);

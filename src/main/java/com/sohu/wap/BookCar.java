@@ -38,33 +38,33 @@ public class BookCar {
         List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
         
         ExecutorService executeService = BookThreadPool.getInstance().getExecutorService();
-        for (int i =0; i< MAX_BOOK_REQUEST; i ++){
-            BookCarTask bookCarTask = new BookCarTask( carsArrayInfo, cookieInfo );
-            Future<Integer> future = executeService.submit(bookCarTask);
-            resultList.add(future);
-        }
-        
-        for (Future<Integer> future : resultList) {
-            Integer result = BookCarUtil.UNDEFINE;
-            try {  
-                result = future.get(BOOK_TIME_OUT, TimeUnit.MILLISECONDS);  // 打印各个线程（任务）执行的结果  
-                
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            }  catch (InterruptedException e) {  
-                e.printStackTrace();  
-            } catch (ExecutionException e) {  
-                e.printStackTrace();  
-            } 
-            
-            
-            if (XueYuanAccount.BOOK_CAR_SUCCESS == result || BookCarUtil.TODAY_ALREADY_BOOKED_CAR  == result) {
-				return  XueYuanAccount.BOOK_CAR_SUCCESS;
-			
-			} else {
-		 }
-
-        }  
+//        for (int i =0; i< MAX_BOOK_REQUEST; i ++){
+//            BookCarTask bookCarTask = new BookCarTask( carsArrayInfo, cookieInfo );
+//            Future<Integer> future = executeService.submit(bookCarTask);
+//            resultList.add(future);
+//        }
+//        
+//        for (Future<Integer> future : resultList) {
+//            Integer result = BookCarUtil.UNDEFINE;
+//            try {  
+//                result = future.get(BOOK_TIME_OUT, TimeUnit.MILLISECONDS);  // 打印各个线程（任务）执行的结果  
+//                
+//            } catch (TimeoutException e) {
+//                e.printStackTrace();
+//            }  catch (InterruptedException e) {  
+//                e.printStackTrace();  
+//            } catch (ExecutionException e) {  
+//                e.printStackTrace();  
+//            } 
+//            
+//            
+//            if (XueYuanAccount.BOOK_CAR_SUCCESS == result || BookCarUtil.TODAY_ALREADY_BOOKED_CAR  == result) {
+//				return  XueYuanAccount.BOOK_CAR_SUCCESS;
+//			
+//			} else {
+//		 }
+//
+//        }  
         
        return XueYuanAccount.BOOK_CAR_ERROR; 
         

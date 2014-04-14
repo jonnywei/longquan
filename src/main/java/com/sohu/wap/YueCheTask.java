@@ -46,7 +46,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	public Integer call()  throws Exception {
 	    log.info(this.xueYuan.getUserName()+"  yueche thread start!");
 		 try {
-            YueCheHelper.waiting(xueYuan.getCarType());
+//            YueCheHelper.waiting(xueYuan.getCarType());
             
             if (doLogin() ==0){ 
                 doYuche();
@@ -102,7 +102,6 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
             	 log.error("login error!"); 
              }
              
-            
              count ++;
              if(count % 10 == 0){
             	int ycResult =  YueCheHelper.getYueCheBookInfo(xueYuan.getId());
@@ -151,13 +150,17 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                  }else{
                      first = false;
                  }
-                 //判断科目信息
                  
                  Result<String> ret =  null;
+                 //判断科目信息
                  if(Constants.KM3.equals(xueYuan.getKm())){
-                	 ret =  yuche(date, amPm,true);
+                	 ret =  yuche(date, amPm,Constants.KM3_HiddenKM);
+                 }else if (Constants.KM1.equals(xueYuan.getKm())){
+                	 ret =  yuche(date, amPm,Constants.KM1_HiddenKM);
+                 }else if (Constants.KM_AUTO.equals(xueYuan.getKm())) {
+                	 ret =  yuche(date, amPm,0);
                  }else{
-                	 ret =  yuche(date, amPm,false);
+                	 ret =  yuche(date, amPm,Constants.KM2_HiddenKM);
                  }
                
               String uinfo = xueYuan.getUserName() +":"+date+ YueCheHelper.AMPM.get(amPm);
@@ -201,7 +204,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_NOT_BOOK_WEEKEND_CAR, info);
                   return;
               }else if (result == YueChe.GET_CAR_ERROR){   //得到车辆信息错误的话
-            	  log.info("get car info error ! retry");
+            	  log.info("get car info error ! retry!");
                   System.out.println("得到车辆信息错误！重试！");
               }else if (result == YueChe.GET_BOOK_CODE_ERROR){   //得到book code错误的话
             	  log.info("GET_BOOK_CODE_ERROR");

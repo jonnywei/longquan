@@ -274,7 +274,7 @@ public class MyImgFilter {
     
     
     public static void main(String[] args) throws IOException {  
-    	MyImgFilter.transformImg("d:/i/do1.jpg", "d:/do1.jpg");
+    	MyImgFilter.transformImg("/home/wjj/tmp/a.gif", "/home/wjj/tmp/b.jpg");
 //        FileInputStream fin=new FileInputStream(args[0]);  
 //        BufferedImage bi=ImageIO.read(fin);  
 //        MyImgFilter flt=new MyImgFilter(bi);  

@@ -19,49 +19,49 @@ import com.sohu.wap.util.RandomUtil;
 /**
  * @author jianjunwei
  *
- */
-public class BookCarTask extends YueChe2  implements Callable<Integer> {
-
-	private static Logger log = LoggerFactory.getLogger(BookCarTask.class);
-	
-    private JSONArray carArrayInfo;
-    
-    private JSONObject cookieInfo;
-    
-
-    /**
-     * @param carInfo
-     * @param cookieInfo
-     */
-    public BookCarTask(JSONArray carArrayInfo, JSONObject cookieInfo) {
-        super();
-        this.carArrayInfo = carArrayInfo;
-        this.cookieInfo = cookieInfo;
-    }
-    
-    
-    /* (non-Javadoc)
-     * @see java.util.concurrent.Callable#call()
-     */
-    @Override
-    public Integer call() throws Exception {
-    	if (carArrayInfo.length() == 0) {
-    		return  BookCarUtil.NO_CAR;
-		}
-    	JSONObject selectedCar = carArrayInfo.getJSONObject(RandomUtil.getRandomInt(carArrayInfo.length()));
-
-		if (selectedCar == null) {
-			return  BookCarUtil.SELECT_CAR_ERROR;
-		}
-		log.info("选择的车是：" + selectedCar.toString());
-		
-		JSONObject bookCarJson = getBookCarJson(selectedCar, getImgCode() ,getHiddenKM(false));
-	
-		JSONObject result =  ProxyBookCar.book(bookCarJson, cookieInfo);
-		
-    	return BookCarUtil.bookResult(result);
-    }
-
-    
-
-}
+// */
+//public class BookCarTask extends YueChe2  implements Callable<Integer> {
+//
+//	private static Logger log = LoggerFactory.getLogger(BookCarTask.class);
+//	
+//    private JSONArray carArrayInfo;
+//    
+//    private JSONObject cookieInfo;
+//    
+//
+//    /**
+//     * @param carInfo
+//     * @param cookieInfo
+//     */
+//    public BookCarTask(JSONArray carArrayInfo, JSONObject cookieInfo) {
+//        super();
+//        this.carArrayInfo = carArrayInfo;
+//        this.cookieInfo = cookieInfo;
+//    }
+//    
+//    
+//    /* (non-Javadoc)
+//     * @see java.util.concurrent.Callable#call()
+//     */
+//    @Override
+//    public Integer call() throws Exception {
+//    	if (carArrayInfo.length() == 0) {
+//    		return  BookCarUtil.NO_CAR;
+//		}
+//    	JSONObject selectedCar = carArrayInfo.getJSONObject(RandomUtil.getRandomInt(carArrayInfo.length()));
+//
+//		if (selectedCar == null) {
+//			return  BookCarUtil.SELECT_CAR_ERROR;
+//		}
+//		log.info("选择的车是：" + selectedCar.toString());
+//		
+//		JSONObject bookCarJson = getBookCarJson(selectedCar, getImgCode() ,getHiddenKM(false));
+//	
+//		JSONObject result =  ProxyBookCar.book(bookCarJson, cookieInfo);
+//		
+//    	return BookCarUtil.bookResult(result);
+//    }
+//
+//    
+//
+//}

@@ -86,6 +86,8 @@ public class ScanYueCheTask extends YueCheTask {
 		
 		}else if (yueCheInfo == 5){
 			isLogon =false;
+		}else if (yueCheInfo == 6){
+			log.info("canYueChe InternalServerError");
 		}
 		
 		if (xueYuan.isBookSuccess()){
@@ -155,10 +157,12 @@ public class ScanYueCheTask extends YueCheTask {
 	        
 	        isLogon = true;
 	        lastLoginTime = System.currentTimeMillis();
+	        log.info(xueYuan.getUserName()+" login success!");
+		}else{
+	        log.info(xueYuan.getUserName()+" retain login status!");
+
 		}
         
-        log.info("login success!");
-       return ;
     }
 	
 	
@@ -183,9 +187,13 @@ public class ScanYueCheTask extends YueCheTask {
         
              Result<String> ret =  null;
              if(Constants.KM3.equals(xueYuan.getKm())){
-                 ret =  yuche(date, amPm,true);
+            	 ret =  yuche(date, amPm,Constants.KM3_HiddenKM);
+             }else if (Constants.KM1.equals(xueYuan.getKm())){
+            	 ret =  yuche(date, amPm,Constants.KM1_HiddenKM);
+             }else if (Constants.KM_AUTO.equals(xueYuan.getKm())) {
+            	 ret =  yuche(date, amPm,0);
              }else{
-                 ret =  yuche(date, amPm,false);
+            	 ret =  yuche(date, amPm,Constants.KM2_HiddenKM);
              }
 
              int  result  = ret.getRet();

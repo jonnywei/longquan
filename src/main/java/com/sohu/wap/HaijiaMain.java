@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.sohu.wap.proxy.ConfigHttpProxy;
 import com.sohu.wap.proxy.Host;
 import com.sohu.wap.util.DateUtil;
+import com.sohu.wap.util.NetSystemConfigurations;
 import com.sohu.wap.util.SystemConfigurations;
 import com.sohu.wap.util.ThreadPool;
 
@@ -22,7 +23,7 @@ import com.sohu.wap.util.ThreadPool;
 
 /**
  * 约车主程序
- *
+ *停
  */
 public class HaijiaMain 
 {
@@ -35,16 +36,23 @@ public class HaijiaMain
     	
         List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
         
-        String date = SystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(7));
+        //约车日期
+        String date =  DateUtil.getFetureDay(7);
+        String dateModel = NetSystemConfigurations.getSystemStringProperty("system.yueche.date.model", "auto");
+        
+        if(dateModel.equals("config")){
+       	 	date = NetSystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(7));
+       }
       
-        Host host = ConfigHttpProxy.getInstance().getRandomHost();
+      //初始化代理信息
+//        Host host = ConfigHttpProxy.getInstance().getRandomHost();
         
         System.out.println("抢车日期为:"+ date);
        
         YueCheHelper.waitForService();
         
         if (YueCheHelper.isEnterCreakerModel()){
-          //进入破解模式
+          //  进入破解模式
           //  速度肯定是最快的了
           //  利用海驾的验证码漏洞，事先输入验证码，之后约车
             System.out.println("Open Creak Model");

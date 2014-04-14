@@ -3,7 +3,6 @@ package com.sohu.wap;
 
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import com.sohu.wap.core.Constants;
 import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.NetSystemConfigurations;
-import com.sohu.wap.util.RandomUtil;
 import com.sohu.wap.util.ThreadUtil;
 
 
@@ -84,8 +82,11 @@ public class YueCheHelper
         return PROXY_NUM_PER_USER;
     }
     
-    
-    
+    public static int getThreadPerUser(){
+    	
+    	return NetSystemConfigurations.getSystemIntProperty("system.noproxy.num.per.user", 2);
+        
+    }
     
     
    
@@ -111,27 +112,32 @@ public class YueCheHelper
     	
     }
     
+    public static  int   SCAN_MIN_INTEVAL = NetSystemConfigurations.getSystemIntProperty("system.scan.min.interval", 60);
+    
+    public static  int   SCAN_MAX_INTEVAL = NetSystemConfigurations.getSystemIntProperty("system.scan.max.interval", 180);
+    
+    public static  int   SCAN_MAX_SLEEP_TIME = NetSystemConfigurations.getSystemIntProperty("system.scan.maxsleeptime", 30);
+
+    
     public static  int   MIN_SCAN_INTEVAL = NetSystemConfigurations.getSystemIntProperty("system.scan.min.interval", 60);
     
     public static  int   MAX_SCAN_INTEVAL = NetSystemConfigurations.getSystemIntProperty("system.scan.max.interval", 180);
     
-    public static  int   MAX_SLEEP_TIME = NetSystemConfigurations.getSystemIntProperty("system.maxsleeptime", 3);
     
     public static String YUCHE_TIME = NetSystemConfigurations.getSystemStringProperty("system.yueche.time","am,pm") ;
     
-     
-    
-    private static String    FK_YUECHE_BEGIN_TIME = "07:40";
-//    private static String    FK_YUECHE_BEGIN_TIME = "00:50";
-    
-    private static String    CREAK_START_TIME ="07:34";
-    
-//    private static String    SERVICE_BEGIN_TIME ="01:52";
+    public static  int   MAX_SLEEP_TIME = NetSystemConfigurations.getSystemIntProperty("system.maxsleeptime", 30);
+ 
+   
     private static String    SERVICE_BEGIN_TIME ="07:34";
-    
     private static String   SERVICE_END_TIME ="20:00";
+//
+//    private static String    SERVICE_BEGIN_TIME ="00:01";
+//
+//    private static String   SERVICE_END_TIME ="23:59";
+//    
     
-    public  static int     WAITTING_SCAN_INTERVAL= 5;
+    public  static int  WAITTING_SCAN_INTERVAL = 5;
     
     public static  int LOGIN_SESSION_TIMEOUT_MILLISECOND  =  30 * 60 *1000;
     
@@ -144,38 +150,18 @@ public class YueCheHelper
     
     public static  int   PROXY_PORT = NetSystemConfigurations.getSystemIntProperty("system.proxy.port", 8087);
     
-  
-   
-//   public static  String   GAE_PROXY_IP = NetSystemConfigurations.getSystemStringProperty("system.gae.proxy.ip", "127.0.0.1");
-//   
-//   public static  int   GAE_PROXY_PORT = NetSystemConfigurations.getSystemIntProperty("system.gae.proxy.port", 8087);
-//    
-    
    public static boolean   IS_USE_PROXY_BOOK_CAR = NetSystemConfigurations.getSystemBooleanProperty("system.use.proxy.bookcar",false) ;; 
    
    
-  public static   boolean isInServiceTime(){
+   /**
+    * 是否再约车的服务时间内
+    * @return
+    */
+   public static   boolean isInServiceTime(){
     
-      if (YueCheHelper.isEnterCreakerModel()){
-          return  DateUtil.isCurrTimeInTimeInterval(CREAK_START_TIME,SERVICE_END_TIME);
-      }
-	  return   isInServiceTime(null);
-    	 
-        
-    }
-    
-    public static   boolean isInServiceTime(String carType){
-    	
-    	if (carType == null || ( !Constants.CAR_TYPE_FK.equalsIgnoreCase(carType) && !Constants.CAR_TYPE_STN.equalsIgnoreCase(carType)) ){
-    		
-    		return   DateUtil.isCurrTimeInTimeInterval(SERVICE_BEGIN_TIME,SERVICE_END_TIME);
-    		
-    	}else{
-    		return   DateUtil.isCurrTimeInTimeInterval(FK_YUECHE_BEGIN_TIME,SERVICE_END_TIME);
-    	}
-        
-    }
-    
+	   return  DateUtil.isCurrTimeInTimeInterval(SERVICE_BEGIN_TIME,SERVICE_END_TIME);
+      
+    } 
     
     /**
      *设置今天任务已经完成 
@@ -184,8 +170,6 @@ public class YueCheHelper
     public static void setTodayTaskExecuteOver(){
         IS_EXECUTE_TASK.put(DateUtil.getNowDay(), "over");
     }
-    
-    
     
     
     
@@ -222,28 +206,28 @@ public class YueCheHelper
     
     
     
-    public static void waiting(String carType) throws InterruptedException{
-    	Date beginDate = DateUtil.getTodayTime(SERVICE_BEGIN_TIME);
-    	
-    	if ( Constants.CAR_TYPE_FK.equalsIgnoreCase(carType)  || Constants.CAR_TYPE_STN.equalsIgnoreCase(carType)){
-    		beginDate = DateUtil.getTodayTime(FK_YUECHE_BEGIN_TIME);
-    	}
-    	long beginTime = beginDate.getTime();
-    	
-    	do {
-    		long distance = beginTime - System.currentTimeMillis();
-            //在服务时间内
-    		System.out.println("等待...");
-            if ( distance  >  YueCheHelper.MAX_SCAN_INTEVAL*1000 ){
-            	ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
-            	
-            }else if ( distance > 10000 ){
-            	ThreadUtil.sleep(MAX_SLEEP_TIME);
-            }else{
-            	break;
-            }
-        }while (true);
-    }
+//    public static void waiting(String carType) throws InterruptedException{
+//    	Date beginDate = DateUtil.getTodayTime(SERVICE_BEGIN_TIME);
+////    	
+////    	if ( Constants.CAR_TYPE_FK.equalsIgnoreCase(carType)  || Constants.CAR_TYPE_STN.equalsIgnoreCase(carType)){
+////    		beginDate = DateUtil.getTodayTime(FK_YUECHE_BEGIN_TIME);
+////    	}
+//    	long beginTime = beginDate.getTime();
+//    	
+//    	do {
+//    		long distance = beginTime - System.currentTimeMillis();
+//            //在服务时间内
+//    		System.out.println("等待...");
+//            if ( distance  >  YueCheHelper.MAX_SCAN_INTEVAL*1000 ){
+//            	ThreadUtil.sleep (YueCheHelper.MIN_SCAN_INTEVAL +RandomUtil.getRandomInt(YueCheHelper.MAX_SCAN_INTEVAL-YueCheHelper.MIN_SCAN_INTEVAL));
+//            	
+//            }else if ( distance > 10000 ){
+//            	ThreadUtil.sleep(MAX_SLEEP_TIME);
+//            }else{
+//            	break;
+//            }
+//        }while (true);
+//    }
     
     /**
      * 

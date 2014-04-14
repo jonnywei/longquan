@@ -16,11 +16,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sohu.wap.XueYuanAccount;
 import com.sohu.wap.core.Constants;
 import com.sohu.wap.http.HttpUtil4Exposer;
 import com.sohu.wap.util.PropConfigurations;
 import com.sohu.wap.util.SystemConfigurations;
+import com.sohu.wap.util.ThreadUtil;
 
 /**
  * 配置的代理
@@ -34,10 +34,7 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
    
     //单例对象
     private static  ConfigHttpProxy  _instance;
-    
-    private PropConfigurations  proxy;
-  
-    
+   
     private  ConfigHttpProxy (){
         init();
         ProxyChecker proxyChecker =  new ProxyChecker();
@@ -65,16 +62,16 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
      *
      */
       protected  void init (){
-        proxy = new PropConfigurations("proxy.properties");
-        initProxy();
+    	loadProxyFromLocal();
         boolean useNetAdmin =  SystemConfigurations.getSystemBooleanProperty(Constants.CFG_SYSTEM_USE_NET_ADMIN, false);
         if(useNetAdmin){
-        	getProxyFromNet(); 
+        	loadProxyFromNet(); 
 		 }   
         
     }
     
-    private void initProxy(){
+    private void loadProxyFromLocal(){
+    	PropConfigurations proxy = new PropConfigurations("proxy.properties");
         Properties mapdb =  proxy.getProperties();
         Iterator itor =mapdb.keySet().iterator();
         while(itor.hasNext())
@@ -95,13 +92,11 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
            HOST_MAP.putIfAbsent(ip, host);
          }
          
-        log.info("initConfigProxy over! size="+ HOST_MAP.size() );
+        log.info("loadProxyFromLocal over! size="+ HOST_MAP.size() );
     }
     
     
-    
-    
-     private void getProxyFromNet(){
+     private void loadProxyFromNet(){
          try {
              JSONArray ycArray = new JSONArray();;
              String  ycInfo  = HttpUtil4Exposer.getInstance().getContent(Constants.PROXY_URL);
@@ -109,7 +104,7 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
                     ycArray  = new JSONArray(ycInfo);
                 
              }else{
-                 log.error("get yuche info from server error");
+                 log.error("get Proxy info from server error");
                  return;
              }
              for (int index =0; index < ycArray.length(); index ++){
@@ -118,22 +113,28 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
                 
                 Host host = Host.jsonToHost(yc);
                 
-             
                 HOST_MAP.putIfAbsent(host.getIp(), host);
-                
-//                yueCheInfoMap.put(xyAccount.getId(), xyAccount);
                 
              }
             } catch (JSONException e) {
-                log.error("getProxyFromNet from net error", e);
+                log.error("loadProxyFromNet from net error", e);
             }
-             log.info("getProxyFromNet over! size=" +  HOST_MAP.size() );
+             log.info("loadProxyFromNet over! size=" +  HOST_MAP.size() );
      }
     
-    public static void main (String [] args){
+    public static void main (String [] args) throws InterruptedException{
         ConfigHttpProxy.getInstance().getProxy();
         
-       
+        ThreadUtil.sleep(120);
+		Iterator<String> iter = ConfigHttpProxy.getInstance().HOST_MAP.keySet().iterator();
+		int index =1000075;
+		while(iter.hasNext()){
+			index ++;
+			String key = iter.next();
+			Host host =ConfigHttpProxy.getInstance().HOST_MAP.get(key);
+			System.out.println(index+"="+host.getIp()+":"+host.getPort());
+		}
+		System.exit(0);
        
 //        log.info("initConfigProxy over! size="+ HOST_MAP.size() );
     }

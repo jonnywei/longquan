@@ -1,5 +1,6 @@
 package com.sohu.wap.proxy;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -40,7 +41,7 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 	    
 	 static long max_request_time = 10;
 	 
-	 static  int  proxy_min_size = 68;
+	 static  int  proxy_min_size = 15;
 	 
 	 protected abstract  void  init();
 
@@ -48,9 +49,8 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 		@Override
 		public void run() {
 			List<Future<Boolean>> resultList = new ArrayList<Future<Boolean>>();
-			System.out.println("check proxy task");
+			System.out.println("check proxy task start");
 			Object[] proxyArray = HOST_MAP.keySet().toArray();
-			System.out.println("check");
 			int index = 0;
 			for (index = 0; index < proxyArray.length; index++) {
 				final String key = (String) proxyArray[index];
@@ -67,16 +67,24 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 				Future<Boolean> fs = resultList.get(index);
 				try {
 					Boolean checkOk = fs.get(long_request_time, TimeUnit.SECONDS);
+					
 					if (!checkOk) {
 						HOST_MAP.remove(key);
 					}
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					log.error(key + " InterruptedException! remove",e);
+					HOST_MAP.remove(key);
 				} catch (ExecutionException e) {
-
+					// 超时删除
+					log.error(key + " ExecutionException ! remove");
+					HOST_MAP.remove(key);
 				} catch (TimeoutException e) {
 					// 超时删除
 					log.error(key + " timeout! remove");
+					HOST_MAP.remove(key);
+				} catch (Exception e){
+					// 超时删除
+					log.error(key + " exception! remove",e);
 					HOST_MAP.remove(key);
 				}
 			}
