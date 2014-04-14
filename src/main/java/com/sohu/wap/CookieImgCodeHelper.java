@@ -54,8 +54,8 @@ public class CookieImgCodeHelper {
     		log.error("get net cookie img code is error,enter manul model");
     		
     		if (type.equals(VerifyCode.CODE_TYPE_BOOKING_CODE)){
-    			VerifyCode vc = new  VerifyCode("8nfs", "C53EXOfOhA8=");
-        		vc.setAspSessionId("c355lwdkyyo54h4y1mbtjbx3");
+    			VerifyCode vc = new  VerifyCode("fws3", "9PG/u8TJ/4g=");
+        		vc.setAspSessionId("x1ub05dwasx1kbxtjnopmoiu");
         		 		
                 vc.setCodeType(VerifyCode.CODE_TYPE_BOOKING_CODE);
                 return vc;
@@ -65,8 +65,8 @@ public class CookieImgCodeHelper {
 //    		VerifyCode vc = new  VerifyCode("mcbn", "4819A8chX0o=");
 //    		vc.setAspSessionId("kkwswuuhsg420ivma3vktogu");
 //    		cg7n 	SjdheqvPtCw=	c355lwdkyyo54h4y1mbtjbx3 	 8nfs 	C53EXOfOhA8=
-    		VerifyCode vc = new  VerifyCode("8nfs", "C53EXOfOhA8=");
-    		vc.setAspSessionId("c355lwdkyyo54h4y1mbtjbx3");
+    		VerifyCode vc = new  VerifyCode("fws3", "9PG/u8TJ/4g=");
+    		vc.setAspSessionId("x1ub05dwasx1kbxtjnopmoiu");
     	
             vc.setCodeType(VerifyCode.CODE_TYPE_LOGIN_IMG_CODE);
             

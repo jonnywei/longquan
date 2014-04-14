@@ -115,7 +115,7 @@ public class YueChe {
 	public static int LONGIN_IP_FORBIDDEN =4;
 //	public static int LONGIN_ERROR =1;
 	
-	
+	private String keepImgCode=null;
 	
 	public static int YUCHE_RETRY_TIME = 5;
 
@@ -246,6 +246,7 @@ public class YueChe {
 				log.debug(result);
 				//登录成功
 				if (result.equals("/index.aspx")) {
+                    keepImgCode = imageCode;
 					isLoginSuccess =true;
 				} else if(result.indexOf("验证码错误")!= -1 ||result.indexOf("请输入验证码")!= -1 ){  //失败的话 ，继续登录
 					System.out.println("验证码识别错误！登录失败.");
@@ -298,13 +299,14 @@ public class YueChe {
 	
 	private void testYueChe(){
 		String imageCode ="";
-		if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
-	        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_BOOKING_CODE);
-	        imageCode = vcode.getVcode();
-	       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
-	       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
-
-	    } 
+//		if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
+//	        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_BOOKING_CODE);
+//	        imageCode = vcode.getVcode();
+//	       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
+//	       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
+//
+//	    }
+        imageCode= keepImgCode;
 		System.out.println("printXuanYuanInfoSessionId="+((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
 
 
@@ -394,7 +396,7 @@ public class YueChe {
 				}
 			}while(true);
 			
-//			testYueChe();
+			testYueChe();
 			//没有得到车辆信息的话
 			if(carsJson == null){
 			    result.setRet(GET_CAR_ERROR);
@@ -467,18 +469,19 @@ public class YueChe {
 
 				    }else{
 				    	// get image code				 
-						do{
-						      retry_count ++;
-							    try {
-							       imageCode = getImgCode(BOOKING2_IMG_URL);
-							    } catch (IOException e1) {
-			                        log.error("get book image code error", e1);
-			                   }
-							   if(retry_count > YueCheHelper.NET_RETRY_LIMIT){
-							       imageCode = null;
-							       break;
-							   }
-						}while(imageCode == null);
+//						do{
+//						      retry_count ++;
+//							    try {
+//							       imageCode = getImgCode(BOOKING2_IMG_URL);
+//							    } catch (IOException e1) {
+//			                        log.error("get book image code error", e1);
+//			                   }
+//							   if(retry_count > YueCheHelper.NET_RETRY_LIMIT){
+//							       imageCode = null;
+//							       break;
+//							   }
+//						}while(imageCode == null);
+                        imageCode = keepImgCode; //使用登陆的验证码来破解
 							
 				    }
 					
