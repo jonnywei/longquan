@@ -61,7 +61,7 @@ public class HaijiaNetMain
                continue;
            }
          
-//           Host host = ConfigHttpProxy.getInstance().getRandomHost();
+           Host host = ConfigHttpProxy.getInstance().getRandomHost();
           
            //等待任务开始
            YueCheHelper.waitForService();

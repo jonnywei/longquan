@@ -396,7 +396,7 @@ public class YueChe {
 				}
 			}while(true);
 			
-			testYueChe();
+//			testYueChe();
 			//没有得到车辆信息的话
 			if(carsJson == null){
 			    result.setRet(GET_CAR_ERROR);
@@ -549,7 +549,7 @@ public class YueChe {
 						
 						String outMsg = jbResult.getJSONObject(0).getString("OutMSG");
 						log.info("book car return msg:"+outMsg);
-						if ("该日已预约过小时".equals(outMsg) ){
+						if ("该日已预约过小时".equals(outMsg) || outMsg.indexOf("该日已预约过时段")!=-1 ){
 							resultN = ALREADY_BOOKED_CAR;
 							break;
 						}
@@ -727,7 +727,7 @@ public class YueChe {
 			MyImgFilter.transformImg(storeAddress, destAddress);
 		}
 		catch(Exception e){
-			throw new IOException("download image error!");
+			throw new IOException("download image error!",e);
 		}
 		
 		comand +=  storeAddress; //命令行
@@ -766,6 +766,7 @@ public class YueChe {
 			imageCode = strin2.readLine().trim();
 			//常用识别错误处理
 			imageCode=imageCode.replace(")(", "X");
+			imageCode=imageCode.replaceAll(" ", "");
 			imageCode =imageCode.replaceAll("[^0-9a-zA-Z]", "");
 			
 			System.out.println("自动识别结果:" + imageCode + "; \r\n");

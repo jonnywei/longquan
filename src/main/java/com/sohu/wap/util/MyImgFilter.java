@@ -79,7 +79,8 @@ public class MyImgFilter {
         // 将数组中的象素产生一个图像  
         Image tempImg=Toolkit.getDefaultToolkit().createImage(new MemoryImageSource(iw,ih, pixels, 0, iw));  
         image = new BufferedImage(tempImg.getWidth(null),tempImg.getHeight(null), BufferedImage.TYPE_INT_BGR );  
-        image.createGraphics().drawImage(tempImg, 0, 0, null);  
+        image.createGraphics().drawImage(tempImg, 0, 0, null); 
+        
         return image;  
   
     }  
@@ -205,6 +206,19 @@ public class MyImgFilter {
         ColorConvertOp ccp=new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);  
         return image=ccp.filter(image,null);  
     }  
+    
+    public BufferedImage getBinary() {  
+    	
+    	 BufferedImage grayImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_BINARY);  
+    	    for(int i= 0 ; i < image.getWidth() ; i++){  
+    	        for(int j = 0 ; j < image.getHeight(); j++){  
+    	        int rgb = image.getRGB(i, j);  
+    	        grayImage.setRGB(i, j, rgb);  
+    	        }  
+    	    }  
+       
+        return image=grayImage;  
+    }  
   
     //Brighten using a linear formula that increases all color values  
     public BufferedImage getBrighten() {  
@@ -253,8 +267,11 @@ public class MyImgFilter {
          BufferedImage bi=ImageIO.read(fin);  
          MyImgFilter flt=new MyImgFilter(bi);  
          flt.changeGrey();  
-         flt.getGrey();  
-         flt.getBrighten();  
+         flt.getGrey();
+         flt.getBinary();
+//         flt.getBinary();
+//         flt.getMedian();
+//         flt.getBrighten(); //解决64位bug 
          bi=flt.getProcessedImg();  
          File file = new File(destImg);  
          

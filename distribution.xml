@@ -34,10 +34,13 @@
              <outputDirectory>haijia/bin/</outputDirectory>
         </fileSet>
          <fileSet>
-            <directory>data/</directory>
+             <directory>data/</directory>
              <outputDirectory>haijia/data/</outputDirectory>
         </fileSet>
-       
+       <fileSet>
+             <directory>img/</directory>
+             <outputDirectory>haijia/img/</outputDirectory>
+        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
