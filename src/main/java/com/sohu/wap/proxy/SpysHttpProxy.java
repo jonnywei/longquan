@@ -126,7 +126,7 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
 
         String selectStr = "body > table";
         Elements elems = html.select(selectStr).get(1).select("tr").get(2).select("td > table > tr");
-        int size = 34;
+        int size = 204;
         for (int i = 3; i < (size - 1); i++) {
             Element elem = elems.get(i);
             Elements tds = elem.select("td");
@@ -169,13 +169,14 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
     private  void loadHostProxyMap() throws ScriptException {
             
         String url =  SPYS_RU_PROXY_URL;
-        for(int i= 0; i< 1; i++){
-            if (i != 0){
-                 url =    SPYS_RU_PROXY_URL.replace("free-proxy-list", "free-proxy-list"+i);
-            }
-//            System.out.println(url);
-            loadHostProxyMap(url);
-        }
+//        for(int i= 1; i< 2; i++){
+//            if (i != 0){
+//                 url =   SPYS_RU_PROXY_URL+ "1/";
+//            }
+//
+//        }
+        System.out.println(url);
+        loadHostProxyMap(url);
         System.out.println("load ok! size="+HOST_MAP.size());
  
     }
