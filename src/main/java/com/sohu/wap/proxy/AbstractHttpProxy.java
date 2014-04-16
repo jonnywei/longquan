@@ -1,6 +1,5 @@
 package com.sohu.wap.proxy;
 
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -41,7 +40,7 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 	    
 	 static long max_request_time = 10;
 	 
-	 static  int  proxy_min_size = 15;
+	 static  int  proxy_min_size = 30;
 	 
 	 protected abstract  void  init();
 

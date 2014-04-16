@@ -10,8 +10,6 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
-import com.sohu.wap.XueYuanAccount;
-import com.sohu.wap.core.Constants;
 
 /**
  * @author jianjunwei
@@ -27,30 +25,31 @@ public class Host {
     private String city;
     private String name;
     private Date checkDate;
-    
+    private int aliveRate;
     private long speed;
     
     
   public static  Host jsonToHost(JSONObject json){
         
         Host yc= new Host();
-        
+        //fields": {"retry_count": 2, "city": "", "create_date": "2014-04-12T16:55:52Z", 
+//        "name": "", "check_count": 85, "ip": "60.21.136.22", "proxy_type": "HTTP",
+//        "alive_count": 83, "source": "", "check_date": "2014-04-15T12:40:31Z", 
+//        "update_date": "2014-04-15T12:40:31Z", "anonymity": "NOA", 
+//        "speed": 64171, "port": 8080}
 //        yc.setId(json.optInt("pk"));
         JSONObject field = json.optJSONObject("fields");
         yc.setIp(field.optString("ip").trim().toUpperCase());
         yc.setPort(field.optInt("port"));
-//        yc.setKm(field.optString("yc_km",Constants.KM2));
-//        yc.setAmPm(field.optString("yc_time"));
-//        yc.setCarType(field.optString("car_type"));
-//        yc.setWhiteCar(field.optString("white_car"));  
-//        yc.setBlackCar(field.optString("black_car"));
-//        if(field.isNull("yc_result")){
-//            yc.setYcResult(BOOK_CAR_NOT_SET);
-//        }else{
-//            yc.setYcResult(field.optInt("yc_result"));
-//        }
-//        yc.setYcResultInfo(field.optString("yc_info"));
-        
+        int aliveCount = field.optInt("alive_count");
+        int checkCount = field.optInt("check_count");
+        int speed = field.optInt("speed");
+        if(checkCount > 0 ){
+        	yc.setAliveRate( (aliveCount*100) / checkCount);
+        }
+        if(aliveCount > 0){
+        	yc.setSpeed(speed /aliveCount);
+        }
         return yc;
     }
     
@@ -191,12 +190,19 @@ public class Host {
     }
     
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
-    public String toString() {
-        return "Host [anonymity=" + anonymity + ", checkDate=" + checkDate + ", city=" + city + ", ip=" + ip
-                + ", name=" + name + ", port=" + port + ", speed=" + speed + ", type=" + type + "]";
-    }
+	public String toString() {
+		return "Host [aliveRate=" + aliveRate + ", anonymity=" + anonymity
+				+ ", checkDate=" + checkDate + ", city=" + city + ", ip=" + ip
+				+ ", name=" + name + ", port=" + port + ", speed=" + speed
+				+ ", type=" + type + "]";
+	}
+
+	public int getAliveRate() {
+		return aliveRate;
+	}
+
+	public void setAliveRate(int aliveRate) {
+		this.aliveRate = aliveRate;
+	}
 }

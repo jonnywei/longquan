@@ -56,6 +56,9 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
       return   _instance;
     }
     
+    public static void start(){
+    	 ConfigHttpProxy.getInstance();
+    }
     /**
      * 
      * 初始化 account 对象 
@@ -112,9 +115,9 @@ public class ConfigHttpProxy extends AbstractHttpProxy implements HttpProxy {
                 JSONObject yc =  ycArray.getJSONObject(index);
                 
                 Host host = Host.jsonToHost(yc);
-                
-                HOST_MAP.putIfAbsent(host.getIp(), host);
-                
+                if (host.getAliveRate() > 70){
+                    HOST_MAP.putIfAbsent(host.getIp(), host);
+                }
              }
             } catch (JSONException e) {
                 log.error("loadProxyFromNet from net error", e);

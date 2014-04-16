@@ -69,7 +69,6 @@ public class XueYuanAccount {
     
     private boolean isBookSuccess = false;
     
-    
 //  [
 //  {
 //      "pk": 1,
@@ -103,6 +102,7 @@ public class XueYuanAccount {
     	yc.setUserName(field.optString("id_num").trim().toUpperCase());
     	yc.setPassword(field.optString("passwd").trim());
     	yc.setKm(field.optString("yc_km",Constants.KM2));
+    	yc.setYueCheDate(field.optString("yc_date").replace("-", ""));
     	yc.setAmPm(field.optString("yc_time"));
     	yc.setCarType(field.optString("car_type"));
     	yc.setWhiteCar(field.optString("white_car"));  

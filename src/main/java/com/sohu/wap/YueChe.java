@@ -179,6 +179,7 @@ public class YueChe {
 		//后面可以不考虑代理失败的情况
 	
 		boolean isLoginSuccess = false;
+		boolean isPreemptiveImgCodeCreakSuccess =false;
 		do {
 			int retry_count =0;
 			//模拟用户行为，一直请求验证码
@@ -187,16 +188,15 @@ public class YueChe {
 			if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
 		        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_LOGIN_IMG_CODE);
 		        imageCode = vcode.getVcode();
-		        
 		       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
 		       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
+		    }else if(isPreemptiveImgCodeCreakSuccess){ //如果抢先登录成功了，验证码破解成功
+		    	imageCode=keepImgCode;
 		    }else{
 		    	do{
 					retry_count++;
 					try {
-						
 						imageCode = getImgCode(LOGIN_IMG_URL);
-						
 					} catch (IOException e1) {
 						log.error("get image code error", e1);
 					}
@@ -238,8 +238,10 @@ public class YueChe {
 				 }
 			
 			}while(result == null);
-	        System.out.println("loginseesionid="+((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
-
+//	        System.out.println("loginseesionid="+((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
+//	        String logon =((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_LOGINON_KEY) ;
+//	        System.out.println("logon="+logon);
+//	        ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_LOGINON_KEY, logon);
 		
 			if (result != null) {
 //				System.out.println(result);
@@ -251,7 +253,10 @@ public class YueChe {
 				} else if(result.indexOf("验证码错误")!= -1 ||result.indexOf("请输入验证码")!= -1 ){  //失败的话 ，继续登录
 					System.out.println("验证码识别错误！登录失败.");
 				}else if (result.indexOf("系统服务时间每天从07:35-20:00")!= -1  ){
+                    keepImgCode = imageCode;
+					isPreemptiveImgCodeCreakSuccess =true;
 					System.out.println("系统服务时间每天从07:35-20:00;"+"enter sleep");
+//					testYueChe();
 					ThreadUtil.sleep(YueCheHelper.MAX_SLEEP_TIME);
 				}else if (result.indexOf("桑塔纳、富康车型学员登陆时间为每天 07:40 以后!")!= -1  ){
 					System.out.println("桑塔纳、富康车型学员登陆时间为每天 07:40 以后!;"+"enter sleep");
@@ -308,11 +313,40 @@ public class YueChe {
 //	    }
         imageCode= keepImgCode;
 		System.out.println("printXuanYuanInfoSessionId="+((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
+		JSONObject json = new JSONObject();
+		try {
+			json.put("yyrq", "20140420");
+			json.put("yysd", "58");
+			json.put("xllxID", "2");
+			json.put("pageSize", 35);
+			json.put("pageNum", 1);
 
+		} catch (Exception e) {
 
-//		String md5Code = MD5.crypt(imageCode.toUpperCase());
+			e.printStackTrace();
+		}
+			JSONObject carsJson = null;
+//http://haijia.bjxueche.net/Han/ServiceBooking.asmx/GetCars?yyrq=20140420&yysd=58&xllxID=2&pageSize=35&pageNum=1
+			 int retry_count =0;
+			do{
+				// 得到某天的信息
+			    retry_count ++;
+			    if(retry_count > YueCheHelper.NET_RETRY_LIMIT){
+			        log.error("get car info  count extend count");
+			        break;
+			    }
+				carsJson = httpUtil4.postJson(GET_CARS_URL, json);
+//				printXuanYuanInfo();
+				if (carsJson == null) {
+					System.out.println("get car info error");
+					log.error("get car info error");
+//					ThreadUtil.sleep(1);
+				}else{
+					break;
+				}
+			}while(true);
+		System.out.println("GET_CARS_URL="+carsJson);
 
-		// {"yyrq":"20121126","xnsd":"58","cnbh":"06204","imgCode":"d32926ad20c3ef9b703472edba4d413d","KMID":"2"}
 		JSONObject bookCarJson = new JSONObject();
 		try {
 			bookCarJson.put("yyrq", "20140420");
@@ -334,6 +368,7 @@ public class YueChe {
 				System.out.println("book car timeout or error");
 				log.error("book car timeout or error");
 			}
+			System.out.println("bookResult="+bookResult);
 		}while(bookResult == null);
 		
 	}
@@ -374,9 +409,8 @@ public class YueChe {
 			json.put("xllxID", hiddenKM);
 			json.put("pageSize", 35);
 			json.put("pageNum", 1);
-			
 			JSONObject carsJson = null;
-			
+//http://haijia.bjxueche.net/Han/ServiceBooking.asmx/GetCars?yyrq=20140420&yysd=58&xllxID=2&pageSize=35&pageNum=1
 			 int retry_count =0;
 			do{
 				// 得到某天的信息
@@ -843,7 +877,7 @@ public class YueChe {
 	 * 5 登录超时
 	 * 6 服务器error InternalServerError
 	 */
-	public Result<String>  canYueChe (String yueCheDateArray,  String amPm){
+	public Result<String>  canYueChe (String yueCheDateArray ){
 		
 	    Result<String> ret = new Result<String>(4);
 	    
@@ -857,42 +891,47 @@ public class YueChe {
 		    ret.setRet(5);
 			return ret;
 		}else{
-		    String[] array =  yueCheDateArray.split("[,]");
-		    for(String yueCheDate : array){
-		          DayCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
-		            if (ycCarInfo != null){
-		                String[] timeArray = amPm.split("[,;]");
-		                if (timeArray.length  <  0) {
-		                    timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
-		                }
-		                //如果今天已经约车了
-		                if ( ycCarInfo.getCarInfo().get("am").equals("已约") ||  ycCarInfo.getCarInfo().get("pm").equals("已约") ||  ycCarInfo.getCarInfo().get("ni").equals("已约")){
-		                    continue;
-		                }
-		                boolean havaCar = false;
-		                for (String amPmStr : timeArray){  //按情况约车
-		                      String info = ycCarInfo.getCarInfo().get(amPmStr);
-		                     if (info.equals("无")){
-		                         
-		                    }else if (info.equals("已约")){
-		                        ret.setRet(3);
-//		                        return ret;
-		                    }else{
-		                        ret.setData(yueCheDate); //设置约车日期
-		                        if (Constants.AM_STR.equals(amPmStr)){
-		                            ret.setRet(0);
-		                            return ret;
-		                        
-		                        }else if (Constants.PM_STR.equals(amPmStr)){
-		                           ret.setRet(1);
-		                           return ret;
-		                        }else{
-		                           ret.setRet(2);
-		                           return ret;
-		                        }
-		                    }
-		                }
-		            }
+//    		3=330211199308031530;0803;20140418@am,pm|20140419@am,pm;pm;byd;km2
+		    String[] array =  yueCheDateArray.split("[|]");
+		    for(String oneItem : array){
+		    	String[] yueCheDateAndAmPm= oneItem.split("[@]");
+		    	String yueCheDate = yueCheDateAndAmPm[0];
+		    	String amPm =  yueCheDateAndAmPm[1];
+		    	DayCarInfo ycCarInfo =  yueCheCarInfoMap.get(yueCheDate);
+	            if (ycCarInfo != null){
+	                String[] timeArray = amPm.split("[,;]");
+	                if (timeArray.length  <  0) {
+	                    timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
+	                }
+	                //如果今天已经约车了
+	                if ( ycCarInfo.getCarInfo().get("am").equals("已约") ||  ycCarInfo.getCarInfo().get("pm").equals("已约") ||  ycCarInfo.getCarInfo().get("ni").equals("已约")){
+	                    continue;
+	                }
+	                boolean havaCar = false;
+	                for (String amPmStr : timeArray){  //按情况约车
+	                      String info = ycCarInfo.getCarInfo().get(amPmStr);
+	                     if (info.equals("无")){
+	                         
+	                    }else if (info.equals("已约")){
+	                        ret.setRet(3);
+//	                        return ret;
+	                    }else{
+	                        ret.setData(yueCheDate); //设置约车日期
+	                        if (Constants.AM_STR.equals(amPmStr)){
+	                            ret.setRet(0);
+	                            return ret;
+	                        
+	                        }else if (Constants.PM_STR.equals(amPmStr)){
+	                           ret.setRet(1);
+	                           return ret;
+	                        }else{
+	                           ret.setRet(2);
+	                           return ret;
+	                        }
+	                    }
+	                }
+	            }
+		          
 		    }
 		    
 

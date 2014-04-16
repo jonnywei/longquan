@@ -60,8 +60,8 @@ public class HaijiaNetMain
                ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
                continue;
            }
-         
-           Host host = ConfigHttpProxy.getInstance().getRandomHost();
+           //初始化confighttpproxy
+           ConfigHttpProxy.start();
           
            //等待任务开始
            YueCheHelper.waitForService();

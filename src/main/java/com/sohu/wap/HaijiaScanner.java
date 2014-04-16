@@ -37,6 +37,14 @@ public class HaijiaScanner
       
     }
     
+    
+    public static void startScanService(){
+    	
+    	
+    }
+    
+    
+    
     public  static void scan () throws InterruptedException{
         
     	//初始化约车信息

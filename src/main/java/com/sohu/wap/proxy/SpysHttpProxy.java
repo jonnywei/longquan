@@ -70,12 +70,12 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
     
     
     private  SpysHttpProxy (){
-    	
-    	try {
-			loadHostProxyMap();
-		} catch (ScriptException e) {
-			log.error("load error");
-		}
+//    	
+//    	try {
+////			loadHostProxyMap();
+//		} catch (ScriptException e) {
+//			log.error("load error");
+//		}
     	
 //      ProxyChecker proxyChecker =  new ProxyChecker();
 //      proxyChecker.run();
@@ -83,7 +83,7 @@ public class SpysHttpProxy extends AbstractHttpProxy implements HttpProxy {
 
         GetHostFromSpysTask loadTask = new GetHostFromSpysTask();
         
-        scheduledService.scheduleWithFixedDelay(loadTask, 60*60, 60*60, TimeUnit.SECONDS);
+        scheduledService.scheduleWithFixedDelay(loadTask, 0, 60*60, TimeUnit.SECONDS);
         
     }
     

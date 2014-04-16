@@ -126,14 +126,13 @@ public class YueCheHelper
     
     public static String YUCHE_TIME = NetSystemConfigurations.getSystemStringProperty("system.yueche.time","am,pm") ;
     
-    public static  int   MAX_SLEEP_TIME = NetSystemConfigurations.getSystemIntProperty("system.maxsleeptime", 30);
+    public static  int   MAX_SLEEP_TIME = NetSystemConfigurations.getSystemIntProperty("system.maxsleeptime", 2);
  
    
     private static String    SERVICE_BEGIN_TIME ="07:34";
     private static String   SERVICE_END_TIME ="20:00";
 //
 //    private static String    SERVICE_BEGIN_TIME ="00:01";
-//
 //    private static String   SERVICE_END_TIME ="23:59";
 //    
     
@@ -296,7 +295,32 @@ public class YueCheHelper
           	
     }
     
-    
+    public static void updateYueCheBookInfo(String idNum,String yueCheDate, int ycResult, String ycResultInfo){
+    	try {
+    		
+          	 JSONObject  param = new JSONObject();
+          	 param.put("id_num", idNum);
+          	 
+          	 param.put("yc_date", yueCheDate);
+          	 param.put("yc_result", ycResult);
+          	 param.put("yc_info", ycResultInfo);
+          	 
+          	
+          	 String  ycInfo  = HttpUtil4Exposer.getInstance().getContent(Constants.YUECHE_UPDATE_URL2,param);
+		  
+          	 System.out.println(ycInfo);
+          	 
+          	} catch (JSONException e) {
+      			log.error("error", e);
+      		} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+          	
+    }
     
     public static void addPrxoyHost(String proxyIp, String proxyPort){
         try {

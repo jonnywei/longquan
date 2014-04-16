@@ -36,6 +36,25 @@ public class ScanYueCheTask extends YueCheTask {
         log.info(this.xueYuan.getUserName()+" init thread");
  
 	}
+	
+	@Override
+	public Integer call()  throws Exception {
+	    log.info(this.xueYuan.getUserName()+"  yueche thread start!");
+		 try {
+//            YueCheHelper.waiting(xueYuan.getCarType());
+            
+			scan();
+            if (xueYuan.isBookSuccess()){
+                return Integer.valueOf(0);
+             }
+            
+        } catch (InterruptedException e) {
+              log.error("cancel task! ");
+              return Integer.valueOf(2);
+        }  
+        return Integer.valueOf(1);
+        
+	}
 
 	/**
 	 * 
@@ -68,7 +87,7 @@ public class ScanYueCheTask extends YueCheTask {
 		
 		doLogin () ;
 		System.out.println(xueYuan.getUserName());
-		Result<String> result = canYueChe(xueYuan.getYueCheDate(),xueYuan.getYueCheAmPm());
+		Result<String> result = canYueChe(xueYuan.getYueCheDate());
 		
 		int yueCheInfo = result.getRet();
 		
@@ -148,7 +167,7 @@ public class ScanYueCheTask extends YueCheTask {
 	             }else{
 	                 first = false;
 	             }
-	          int result =    login(xueYuan.getUserName() , xueYuan.getPassword());
+	          int result =  login(xueYuan.getUserName() , xueYuan.getPassword());
 	          if (result == YueChe.LONGIN_SUCCESS){
 	              isLoginSuccess =  true;
 	          }
@@ -203,6 +222,8 @@ public class ScanYueCheTask extends YueCheTask {
               String info = xueYuan.getUserName() +":"+ret.getData()+":"+date+ YueCheHelper.AMPM.get(amPm)+"约车成功";
               System.out.println(info);
               log.info(info);
+              YueCheHelper.updateYueCheBookInfo(xueYuan.getUserName(),date, XueYuanAccount.BOOK_CAR_SUCCESS, info);
+
               xueYuan.setBookSuccess(isSuccess);
           }else if (result == YueChe.NO_CAR){  //无车
               System.out.println(date + YueCheHelper.AMPM.get(amPm)+"无车!");

@@ -40,8 +40,6 @@ public class Constants {
 	public static String CAR_TYPE_STN = "stn";
 	public static String CAR_TYPE_OTHER = "other";
 	
-	
-	
 
 //    public static String   SERVER_URL ="http://localhost:8000/";
 	
@@ -53,16 +51,20 @@ public class Constants {
     
     public static String   YUECHE_DETAIL_URL = SERVER_URL + "a/yueche/%d/";
     
+    public static String   YUECHE_SCAN_URL = SERVER_URL + "a/yueche/scan/";
+    
     public static String   COOKIE_URL = SERVER_URL + "a/cookie/all/";
     
     public static String   COOKIE_ADD_URL = SERVER_URL + "a/cookie/add/";
     
-    public static String    PROXY_ADD_URL = SERVER_URL + "a/proxy/add/";
+    public static String   PROXY_ADD_URL = SERVER_URL + "a/proxy/add/";
     
-    public static String    PROXY_URL = SERVER_URL + "a/proxy/all/";
+    public static String   PROXY_URL = SERVER_URL + "a/proxy/all/";
     
     public static String   YUECHE_UPDATE_URL = SERVER_URL + "a/yueche/%d/update/";
     
+    public static String   YUECHE_UPDATE_URL2 = SERVER_URL + "a/yueche/update/";
+
     // Config prop keys
     public static  String CFG_SYSTEM_USE_NET_ADMIN="system.use.net.admin";
     
