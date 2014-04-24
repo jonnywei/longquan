@@ -206,13 +206,13 @@ public class ScanYueCheTask extends YueCheTask {
         
              Result<String> ret =  null;
              if(Constants.KM3.equals(xueYuan.getKm())){
-            	 ret =  yuche(date, amPm,Constants.KM3_HiddenKM);
+            	 ret =  yuche(date, amPm,Constants.KM3_HiddenKM,xueYuan.getPhoneNum());
              }else if (Constants.KM1.equals(xueYuan.getKm())){
-            	 ret =  yuche(date, amPm,Constants.KM1_HiddenKM);
+            	 ret =  yuche(date, amPm,Constants.KM1_HiddenKM,xueYuan.getPhoneNum());
              }else if (Constants.KM_AUTO.equals(xueYuan.getKm())) {
-            	 ret =  yuche(date, amPm,0);
+            	 ret =  yuche(date, amPm,0,xueYuan.getPhoneNum());
              }else{
-            	 ret =  yuche(date, amPm,Constants.KM2_HiddenKM);
+            	 ret =  yuche(date, amPm,Constants.KM2_HiddenKM,xueYuan.getPhoneNum());
              }
 
              int  result  = ret.getRet();

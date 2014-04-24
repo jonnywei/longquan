@@ -154,13 +154,13 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                  Result<String> ret =  null;
                  //判断科目信息
                  if(Constants.KM3.equals(xueYuan.getKm())){
-                	 ret =  yuche(date, amPm,Constants.KM3_HiddenKM);
+                	 ret =  yuche(date, amPm,Constants.KM3_HiddenKM, xueYuan.getPhoneNum());
                  }else if (Constants.KM1.equals(xueYuan.getKm())){
-                	 ret =  yuche(date, amPm,Constants.KM1_HiddenKM);
+                	 ret =  yuche(date, amPm,Constants.KM1_HiddenKM, xueYuan.getPhoneNum());
                  }else if (Constants.KM_AUTO.equals(xueYuan.getKm())) {
-                	 ret =  yuche(date, amPm,0);
+                	 ret =  yuche(date, amPm,0, xueYuan.getPhoneNum());
                  }else{
-                	 ret =  yuche(date, amPm,Constants.KM2_HiddenKM);
+                	 ret =  yuche(date, amPm,Constants.KM2_HiddenKM, xueYuan.getPhoneNum());
                  }
                
               String uinfo = xueYuan.getUserName() +":"+date+ YueCheHelper.AMPM.get(amPm);
@@ -190,7 +190,15 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
                   log.info(info);
                   YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_KEMU2_NO_TIME, info);
                   return ;
-              } else if (result == YueChe.NO_CAR){  //无车的话，赶紧约下班车
+              } else if (result == YueChe. PHONE_NUM_ERROR){  //对不起,您填写的报名时预留的手机或固定电话号码不正确
+                  String info = uinfo +"对不起,您填写的报名时预留的手机或固定电话号码不正确";
+                  System.out.println(info);
+                  log.info(info);
+                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_PHONE_NUM_ERROR, info);
+                  return ;
+              } 
+              
+              else if (result == YueChe.NO_CAR){  //无车的话，赶紧约下班车
                   System.out.println(uinfo+"无车!");
                   break;
               }else if (result == YueChe. BOOK_INVAILD_OPERATION || result ==YueChe.IP_FORBIDDEN ){  //非法操作，服务器已经被锁定，直接退出约车

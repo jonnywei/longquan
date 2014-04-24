@@ -23,27 +23,21 @@ public class XueYuanAccount {
 	
 	public static int BOOK_CAR_SUCCESS = 0;
 	
-	
 	public static int BOOK_CAR_ALREADY_BOOKED_CAR=1;
 	
-    
 	public static int BOOK_CAR_KEMU2_NO_TIME = 2;
 	
-    
     public static int BOOK_CAR_NOT_BOOK_WEEKEND_CAR= 3;
-    
    
     public static int BOOK_CAR_NO_CAR =4;
     
-    
     public static int BOOK_CAR_NO_FAIL =5;
-    
    
     public static int BOOK_CAR_ERROR = 6;
     
     public static int BOOK_CAR_ACCOUNT_ERROR = 7;
     
-	
+	public static int BOOK_CAR_PHONE_NUM_ERROR=8;
 	private int id;
     
     private String userName;
@@ -66,7 +60,7 @@ public class XueYuanAccount {
     
     private String ycResultInfo;
     
-    
+    private String phoneNum; //海驾预留的手机或者电话号码
     private boolean isBookSuccess = false;
     
 //  [
@@ -113,11 +107,20 @@ public class XueYuanAccount {
     		yc.setYcResult(field.optInt("yc_result"));
     	}
     	yc.setYcResultInfo(field.optString("yc_info"));
-    	
+    	yc.setPhoneNum(field.optString("phone_num", "").trim()); 
     	return yc;
     }
     
-    
+    @Override
+	public String toString() {
+		return "XueYuanAccount [amPm=" + amPm + ", blackCar=" + blackCar
+				+ ", carType=" + carType + ", id=" + id + ", isBookSuccess="
+				+ isBookSuccess + ", km=" + km + ", password=" + password
+				+ ", phoneNum=" + phoneNum + ", userName=" + userName
+				+ ", whiteCar=" + whiteCar + ", ycResult=" + ycResult
+				+ ", ycResultInfo=" + ycResultInfo + ", yueCheDate="
+				+ yueCheDate + "]";
+	}
     
     /**
      * @return the id
@@ -209,14 +212,7 @@ public class XueYuanAccount {
 	public void setKm(String km) {
 		this.km = km;
 	}
-	@Override
-	public String toString() {
-		return "XueYuanAccount [amPm=" + amPm + ", blackCar=" + blackCar
-				+ ", carType=" + carType + ", id=" + id + ", isBookSuccess="
-				+ isBookSuccess + ", km=" + km + ", password=" + password
-				+ ", userName=" + userName + ", whiteCar=" + whiteCar
-				+ ", yueCheDate=" + yueCheDate + "]";
-	}
+	
 	public String getBlackCar() {
 		return blackCar;
 	}
@@ -234,5 +230,11 @@ public class XueYuanAccount {
 	}
 	public void setYcResultInfo(String ycResultInfo) {
 		this.ycResultInfo = ycResultInfo;
+	}
+	public String getPhoneNum() {
+		return phoneNum;
+	}
+	public void setPhoneNum(String phoneNum) {
+		this.phoneNum = phoneNum;
 	}
 }

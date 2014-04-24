@@ -130,7 +130,7 @@ public class YueCheHelper
  
    
     private static String    SERVICE_BEGIN_TIME ="07:34";
-    private static String   SERVICE_END_TIME ="20:00";
+    private static String    SERVICE_END_TIME ="20:00";
 //
 //    private static String    SERVICE_BEGIN_TIME ="00:01";
 //    private static String   SERVICE_END_TIME ="23:59";

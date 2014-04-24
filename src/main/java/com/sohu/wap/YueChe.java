@@ -93,7 +93,7 @@ public class YueChe {
 	public static int ALREADY_YUE_KAO = 3;
 	
 	public static int YUE_KAO_NO_POSITION = 4;
-	
+	public static int PHONE_NUM_ERROR=800006;
 	public static int NOT_BOOK_WEEKEND_CAR = 800005;
 	public static int KEMU2_NO_TIME=10003;
 	public static int IP_FORBIDDEN = 1000333;
@@ -375,9 +375,10 @@ public class YueChe {
 	/**
 	 * -1 约车错误 0 约车成功 1 无车可约 ,修正科目信息
 	 * @parm km 0 自动选择科目  1-3科目
+	 * @param phoneNum 预留的手机号码
 	 * 
 	 */
-	public  Result<String> yuche(String date, String amOrpm, int km )
+	public  Result<String> yuche(String date, String amOrpm, int km, String phoneNum )
 			throws InterruptedException {
 	    
 	    Result <String>result = new Result<String>(UNKNOWN_ERROR);
@@ -516,7 +517,9 @@ public class YueChe {
 //							   }
 //						}while(imageCode == null);
                         imageCode = keepImgCode; //使用登陆的验证码来破解
-							
+						if(phoneNum != null){  //使用了海驾预留的手机号码来校验
+							imageCode = phoneNum;
+						}
 				    }
 					
 					//没有的话
@@ -593,6 +596,10 @@ public class YueChe {
 						}
 						if ("所在班种不能约周六日车辆".equals(outMsg)){
 							resultN = NOT_BOOK_WEEKEND_CAR;
+							break;
+						}
+						if("对不起,您填写的报名时预留的手机或固定电话号码不正确！请核对!".equals(outMsg)){
+							resultN = PHONE_NUM_ERROR;
 							break;
 						}
 						 

@@ -84,7 +84,9 @@ public class YueCheInfo {
     }
     
     
-    
+    public static void main(String[] args){
+    	YueCheInfo ycInfo = new YueCheInfo();
+    }
     
 
     
