@@ -64,15 +64,9 @@ public class HaijiaMain
         for (String accoutId: AccountMap.getInstance().getXueYuanAccountMap().keySet()){
             XueYuanAccount  xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);
             if ( xy!=null){
-                if (YueCheHelper.isUseProxy()){
-                    for ( int num = 0 ; num < YueCheHelper.getProxyNumPreUser(); num++){
-                        YueCheTask yueCheTask = new YueCheTask(xy,date);
-                        resultList.add(executeService.submit(yueCheTask) );
-                    }
-                }else{
-                    YueCheTask yueCheTask = new YueCheTask(xy,date);
-                    resultList.add(executeService.submit(yueCheTask) );
-                }
+                 YueCheTask yueCheTask = new YueCheTask(xy,date);
+                 resultList.add(executeService.submit(yueCheTask) );
+
              }
         }
         

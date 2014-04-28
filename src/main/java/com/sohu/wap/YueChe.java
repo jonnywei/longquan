@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,20 +50,20 @@ public class YueChe {
 
 	private static Logger log = LoggerFactory.getLogger(YueChe.class);
 
-	public static String LOGIN_URL = "http://haijia.bjxueche.net/";
+	public static String LOGIN_URL = "http://106.37.230.254:81/";
 	private static String LOGOUT_URL = "http://haijia.bjxueche.net/Login.aspx?LoginOut=true";
 	private static String TOP_URL =  "http://haijia.bjxueche.net/top.aspx";
 	public static String LOGIN_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=ImgCode&random=";
 
-	private static String YUCHE_URL = "http://haijia.bjxueche.net/ych2.aspx";
+	private static String YUCHE_URL = "http://106.37.230.254:81/ych2.aspx";
 	
 	private static String YUEKAO2_URL = "http://haijia.bjxueche.net/yk2.aspx";
 	private static String YUEKAO21_URL = "http://haijia.bjxueche.net/yk21.aspx";
 	private static String YUEKAO3_URL = "http://haijia.bjxueche.net/yk3.aspx";
 	private static String YUEKAO4_URL = "http://haijia.bjxueche.net/yk4.aspx";
 
-	private static String GET_CARS_URL = "http://haijia.bjxueche.net/Han/ServiceBooking.asmx/GetCars";
-	protected static String BOOKING_CAR_URL = "http://haijia.bjxueche.net/Han/ServiceBooking.asmx/BookingCar";
+	private static String GET_CARS_URL = "http://106.37.230.254:81/Tools/km2.aspx";
+	protected static String BOOKING_CAR_URL = "http://106.37.230.254:81/Tools/km2.aspx";
 	public  static String BOOKING_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode.ashx?key=BookingCode&random=";
 	public  static String BOOKING2_IMG_URL = "http://haijia.bjxueche.net/tools/CreateCode2.ashx?key=ImgCode&random=";
 
@@ -74,7 +75,7 @@ public class YueChe {
 	
     private static String COOKIE_IMG_CODE_KEY="ImgCode";
     
-	private static String HIDDEN_KM = "hiddenKM";
+	private static String HIDDEN_KM = "RdoType_1";
 
 	public static int UNKNOWN_ERROR = -1;
 	public static int BOOK_CAR_SUCCESS = 0;
@@ -165,7 +166,7 @@ public class YueChe {
 			}else if (firstPage.indexOf("Internal Server Error")!=-1){
 			    return LONGIN_ERROR;
 			}
-			else if ( firstPage.length()< 100 ||  firstPage.indexOf("海淀驾校学员网络预约系统") ==-1 ){
+			else if ( firstPage.length()< 100 ||  firstPage.indexOf("驾驶人计时培训-网络预约平台") ==-1 ){
 				return LONGIN_PROXY_ERROR;
 			}
 			
@@ -184,28 +185,29 @@ public class YueChe {
 			int retry_count =0;
 			//模拟用户行为，一直请求验证码
 			String imageCode = null;
-
-			if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
-		        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_LOGIN_IMG_CODE);
-		        imageCode = vcode.getVcode();
-		       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
-		       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
-		    }else if(isPreemptiveImgCodeCreakSuccess){ //如果抢先登录成功了，验证码破解成功
-		    	imageCode=keepImgCode;
-		    }else{
-		    	do{
-					retry_count++;
-					try {
-						imageCode = getImgCode(LOGIN_IMG_URL);
-					} catch (IOException e1) {
-						log.error("get image code error", e1);
-					}
-					if( retry_count > YueCheHelper.NET_RETRY_LIMIT){
-						log.error("login error, get image code count extend retry_limit");
-						return LONGIN_ERROR;
-					}
-				}while(imageCode == null);
-		    }
+//            不需要验证码
+//
+//			if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
+//		        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_LOGIN_IMG_CODE);
+//		        imageCode = vcode.getVcode();
+//		       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
+//		       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
+//		    }else if(isPreemptiveImgCodeCreakSuccess){ //如果抢先登录成功了，验证码破解成功
+//		    	imageCode=keepImgCode;
+//		    }else{
+//		    	do{
+//					retry_count++;
+//					try {
+//						imageCode = getImgCode(LOGIN_IMG_URL);
+//					} catch (IOException e1) {
+//						log.error("get image code error", e1);
+//					}
+//					if( retry_count > YueCheHelper.NET_RETRY_LIMIT){
+//						log.error("login error, get image code count extend retry_limit");
+//						return LONGIN_ERROR;
+//					}
+//				}while(imageCode == null);
+//		    }
 			JSONObject json = new JSONObject();
 			try {
 				json.put("txtUserName", userName);
@@ -346,7 +348,6 @@ public class YueChe {
 				}
 			}while(true);
 		System.out.println("GET_CARS_URL="+carsJson);
-
 		JSONObject bookCarJson = new JSONObject();
 		try {
 			bookCarJson.put("yyrq", "20140420");
@@ -387,7 +388,7 @@ public class YueChe {
 
 		//判断科目信息
 		// 页面中一个隐藏的输入，默认为2，可能更改,其实是科目信息，亲
-		String hiddenKM = "2";  //自动选择科目
+		String hiddenKM = "3";  //自动选择科目
 		if ( km ==0 ) {
 			   try{
 				     String yuchePage = httpUtil4.getContent(YUCHE_URL);
@@ -402,17 +403,33 @@ public class YueChe {
 	        hiddenKM=String.valueOf(km);
 		}
 
-		// {"yyrq":"20121126","yysd":"58","xllxID":"2","pageSize":35,"pageNum":1}
+//        _	1398664776012
+//        date	Mon Apr 28 2014 13:59:36 GMT 0800 (China Standard Time)
+//        filters[cnbh]
+//        filters[orderby]
+//        filters[type]	km2Car
+//        filters[xllxid]	3
+//        filters[xnsd]	-1
+//        filters[yyrq]	20140511
+//        orderBy
+//        pageno	1
+//        pagesize	10
 		JSONObject json = new JSONObject();
 		try {
-			json.put("yyrq", date);
-			json.put("yysd", amOrpm);
-			json.put("xllxID", hiddenKM);
-			json.put("pageSize", 35);
-			json.put("pageNum", 1);
-			JSONObject carsJson = null;
-//http://haijia.bjxueche.net/Han/ServiceBooking.asmx/GetCars?yyrq=20140420&yysd=58&xllxID=2&pageSize=35&pageNum=1
-			 int retry_count =0;
+            Date now = new Date();
+            json.put("_",now.getTime());
+            json.put("date",now.toString());
+            json.put("filters[cnbh]","");
+            json.put("filters[orderby]","");
+            json.put("filters[type]","km2Car");
+            json.put("filters[xllxid]", hiddenKM);
+            json.put("filters[xnsd]", amOrpm);
+            json.put("filters[yyrq]", date);
+            json.put("orderBy","");
+			json.put("pagesize", 30);
+			json.put("pageno", 1);
+            String getCarString  =null;
+            int retry_count =0;
 			do{
 				// 得到某天的信息
 			    retry_count ++;
@@ -420,9 +437,19 @@ public class YueChe {
 			        log.error("get car info  count extend count");
 			        break;
 			    }
-				carsJson = httpUtil4.postJson(GET_CARS_URL, json);
+                try {
+                     getCarString  = httpUtil4.getContent(GET_CARS_URL, json);
+                    if (getCarString.equals("null_0")) {
+                               //TODO
+                    }  else{
+
+                    }
+                } catch (IOException e) {
+                    log.error("get car info  error",e);
+                    getCarString = null;
+                }
 //				printXuanYuanInfo();
-				if (carsJson == null) {
+				if (getCarString == null) {
 					System.out.println("get car info error");
 					log.error("get car info error");
 //					ThreadUtil.sleep(1);
@@ -433,45 +460,28 @@ public class YueChe {
 			
 //			testYueChe();
 			//没有得到车辆信息的话
-			if(carsJson == null){
+			if(getCarString == null){
 			    result.setRet(GET_CAR_ERROR);
 		        return result;
 			}
 
-			// System.out.println(carsJson.toString());
+			System.out.println(getCarString);
 
 			JSONObject selectedCar = null;
 
-			String data = carsJson.getString("d");
-			System.out.println("carInfo:"+data);
-			
-			//LoginOut:您尚未登录!
-			if(data.equals("LoginOut:您的IP地址被禁止!")){
-				log.error("LoginOut:您的IP地址被禁止!");
-				result.setRet(IP_FORBIDDEN);
-				return result;
-//				ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
-//				System.exit(1);
-				
-			}else if (data.equals("LoginOut:您尚未登录!")){
-				log.error("LoginOut:您尚未登录!");
-			}
-			int splitPosition = data.indexOf("_");
-			String carInfo = data.substring(0, splitPosition);
-			String nu = data.substring(splitPosition + 1);
+
+			int splitPosition = getCarString.indexOf("_");
+			String carInfo = getCarString.substring(0, splitPosition);
+			String nu = getCarString.substring(splitPosition + 1);
 			
 			int totalNum = Integer.valueOf(nu);
 			
 			log.info("totalPage:"+totalNum);
-			// {
-			//
-			// "YYRQ": "20121126",
-			//
-			// "XNSD": "58",
-			//
-			// "CNBH": "06143"
-			//
-			// },
+            if(totalNum ==0 ){
+                resultN = NO_CAR;
+                result.setRet(resultN);
+                return result;
+            }
 
 			JSONArray carsArray = new JSONArray(carInfo);
 			System.out.println("可选的车有：" + carsArray.toString());
@@ -487,144 +497,133 @@ public class YueChe {
 			// 下一步，约车
 			int yucheTry = 0;
 
+            //     车辆信息
+            //       {
+//                "JLCBH": "611290",
+//                    "CNBH": "15131",
+//                    "YT": null,
+//                    "LXBH": null,
+//                    "JLYXM": "",
+//                    "XNSD": "08:00-12:00.812.0,13:00-17:00.15.4,17:00-20:00.58.0,"
+//            },
 			do {
 				selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
 
-				if (selectedCar != null) {
-					log.info("选择的车是：" + selectedCar.toString());
-					System.out.println("选择的车是：" + selectedCar.toString());
-					String imageCode = "";
-					retry_count =0;
-					
-					if (YueCheHelper.isEnterCreakerModel()){      //进入creak模式,使用已经有的验证码
-				        VerifyCode  vcode=  CookieImgCodeHelper.getImageCodeCookie(VerifyCode.CODE_TYPE_BOOKING_CODE);
-				        imageCode = vcode.getVcode();
-				       ((HttpUtil4Exposer)httpUtil4).addCookie(COOKIE_IMG_CODE_KEY, vcode.getCookie());
-				       ((HttpUtil4Exposer)httpUtil4).addCookie(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, vcode.getAspSessionId());
+                log.info("选择的车是：" + selectedCar.toString());
+                System.out.println("选择的车是：" + selectedCar.toString());
 
-				    }else{
-				    	// get image code				 
-//						do{
-//						      retry_count ++;
-//							    try {
-//							       imageCode = getImgCode(BOOKING2_IMG_URL);
-//							    } catch (IOException e1) {
-//			                        log.error("get book image code error", e1);
-//			                   }
-//							   if(retry_count > YueCheHelper.NET_RETRY_LIMIT){
-//							       imageCode = null;
-//							       break;
-//							   }
-//						}while(imageCode == null);
-                        imageCode = keepImgCode; //使用登陆的验证码来破解
-						if(phoneNum != null){  //使用了海驾预留的手机号码来校验
-							imageCode = phoneNum;
-						}
-				    }
-					
-					//没有的话
-		            if(imageCode == null){
-		                result.setRet(GET_BOOK_CODE_ERROR);
-		                return result;
-		            }
+                String[]  xnsds =   selectedCar.getString("XNSD").split(",");
+                for(int i =0; i< xnsds.length; i++){
+                    String xnsd1 = xnsds[i];
+                    String[] info = xnsd1.split("[.]");
+                    String sdname = info[0];
+                    String sdid = info[1];
+                    String sl = info[2];
+                    if (Integer.parseInt(sl) > 0 &&   ( sdid.equals(amOrpm) || sdid.equals(amOrpm) )){
 
-//					String md5Code = MD5.crypt(imageCode.toUpperCase());
+                    }
+                }
 
-					// {"yyrq":"20121126","xnsd":"58","cnbh":"06204","imgCode":"d32926ad20c3ef9b703472edba4d413d","KMID":"2"}
-					JSONObject bookCarJson = new JSONObject();
-					try {
-						bookCarJson.put("yyrq", selectedCar.getString("YYRQ"));
-						bookCarJson.put("xnsd", selectedCar.getString("XNSD"));
-						bookCarJson.put("cnbh", selectedCar.getString("CNBH"));
-						bookCarJson.put("imgCode",imageCode.toUpperCase() );
-						bookCarJson.put("KMID", hiddenKM);
+//                    http://106.37.230.254:81/Tools/km2.aspx
+//                    ?jlcbh=611333&yyrqbegin=20140511&xnsd=812&trainType=3&type=km2Car2&_=1398664811123
 
-					} catch (Exception e) {
+                JSONObject bookCarJson = new JSONObject();
+                try {
+                    Date nowBookcar = new Date();
+                    bookCarJson.put("_",nowBookcar.getTime());
+                    bookCarJson.put("yyrqbegin", selectedCar.getString("YYRQ"));
+                    bookCarJson.put("xnsd", selectedCar.getString("XNSD"));
+                    bookCarJson.put("jlcbh", selectedCar.getString("CNBH"));
+                    bookCarJson.put("trainType","3" );
+                    bookCarJson.put("type", "km2Car2");
 
-						e.printStackTrace();
-					}
-					
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+                }
+
 //					ThreadUtil.sleep(1);
-					 
-		             JSONObject cookieJson = new JSONObject();
-//		             cookieJson.put(COOKIE_IMG_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_IMG_CODE_KEY));
-//		             cookieJson.put(COOKIE_IMG_CODE_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_BOOKING_CODE_KEY));
-		             cookieJson.put(CookieImgCodeHelper.COOKIE_LOGINON_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_LOGINON_KEY));
-		             cookieJson.put(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY, ((HttpUtil4Exposer)httpUtil4).getCookieValue(CookieImgCodeHelper.COOKIE_ASP_NET_SESSION_ID_KEY));
-                    
-					//一直重试，知道返回结果
-					JSONObject bookResult = null;
-					do{
-						bookResult = httpUtil4.postJson(BOOKING_CAR_URL, bookCarJson);
-						if (bookResult == null) {
-							System.out.println("book car timeout or error");
-							log.error("book car timeout or error");
-							ThreadUtil.sleep(0.1F);
-						}
-					}while(bookResult == null);
-					
-					yucheTry++;
-					
 
-					System.out.println(bookResult.toString());
 
-					JSONArray jbResult = new JSONArray(bookResult.getString("d"));
+                //一直重试，知道返回结果
+                String bookResult = null;
+                do{
+                    try{
+                        bookResult = httpUtil4.getContent(BOOKING_CAR_URL, bookCarJson);
 
-					// {"d":"[\r\n  {\r\n    \"Result\": true,\r\n    \"OutMSG\": \"\"\r\n  }\r\n]"}
+                    }catch(IOException ex){
 
-					if (jbResult.getJSONObject(0).getBoolean("Result")) {
-						System.out.println("预约成功!...");
-						String info = ""+selectedCar.getString("YYRQ") + ":"
-								+ selectedCar.getString("XNSD") + "-"
-								+ selectedCar.getString("CNBH");
-						result.setData(info);
-						System.out.println(info);
-						log.info(info);
-						resultN = BOOK_CAR_SUCCESS;
-					
-					} else {
-						
-						String outMsg = jbResult.getJSONObject(0).getString("OutMSG");
-						log.info("book car return msg:"+outMsg);
-						if ("该日已预约过小时".equals(outMsg) || outMsg.indexOf("该日已预约过时段")!=-1 ){
-							resultN = ALREADY_BOOKED_CAR;
-							break;
-						}
-						if ("非法操作".equals(outMsg)){
-							resultN = BOOK_INVAILD_OPERATION;
-							break;
-						}
-						if ("所在班种不能约周六日车辆".equals(outMsg)){
-							resultN = NOT_BOOK_WEEKEND_CAR;
-							break;
-						}
-						if("对不起,您填写的报名时预留的手机或固定电话号码不正确！请核对!".equals(outMsg)){
-							resultN = PHONE_NUM_ERROR;
-							break;
-						}
-						 
-						if(outMsg.indexOf("科目二剩余小时不足") != -1 || outMsg.indexOf("科目二训练小时将会超出小时!") != -1
-							|| outMsg.indexOf("您已经完成了科目二的所有训练！") != -1){
-						      resultN = KEMU2_NO_TIME;
-	                            break;
-	                    }
-						if("非预约开放时间".equals(outMsg)){
-							ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
-							yucheTry--; //非预约开放时间，不计入retry次数
-						}
-						if("验证码错误！".equals(outMsg)){
-							System.out.println(outMsg+"不计入retry次数");
-							 yucheTry--; //验证码错误，不计入retry次数
-						}
-						if(outMsg.indexOf("该车时段已经被约") != -1){
-							yucheTry++; //该页面可能都被约了
-						}
-						//{"d":"[\r\n  {\r\n    \"Result\": false,\r\n    \"OutMSG\": \"科目二剩余小时不足 !\"\r\n  }\r\n]"}
-						log.error("book car return error:"+outMsg);
-					}
+                        bookResult = null;
+                    }
 
-				}
-			} while (resultN != BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
+                    if (bookResult == null) {
+                        System.out.println("book car timeout or error");
+                        log.error("book car timeout or error");
+                        ThreadUtil.sleep(0.1F);
+                    }
+                }while(bookResult == null);
+
+                yucheTry++;
+
+                System.out.println(bookResult.toString());
+
+//					JSONArray jbResult = new JSONArray(bookResult.getString("d"));
+//
+//					// {"d":"[\r\n  {\r\n    \"Result\": true,\r\n    \"OutMSG\": \"\"\r\n  }\r\n]"}
+//
+//					if (jbResult.getJSONObject(0).getBoolean("Result")) {
+//						System.out.println("预约成功!...");
+//						String info = ""+selectedCar.getString("YYRQ") + ":"
+//								+ selectedCar.getString("XNSD") + "-"
+//								+ selectedCar.getString("CNBH");
+//						result.setData(info);
+//						System.out.println(info);
+//						log.info(info);
+//						resultN = BOOK_CAR_SUCCESS;
+//
+//					} else {
+//
+//						String outMsg = jbResult.getJSONObject(0).getString("OutMSG");
+//						log.info("book car return msg:"+outMsg);
+//						if ("该日已预约过小时".equals(outMsg) || outMsg.indexOf("该日已预约过时段")!=-1 ){
+//							resultN = ALREADY_BOOKED_CAR;
+//							break;
+//						}
+//						if ("非法操作".equals(outMsg)){
+//							resultN = BOOK_INVAILD_OPERATION;
+//							break;
+//						}
+//						if ("所在班种不能约周六日车辆".equals(outMsg)){
+//							resultN = NOT_BOOK_WEEKEND_CAR;
+//							break;
+//						}
+//						if("对不起,您填写的报名时预留的手机或固定电话号码不正确！请核对!".equals(outMsg)){
+//							resultN = PHONE_NUM_ERROR;
+//							break;
+//						}
+//
+//						if(outMsg.indexOf("科目二剩余小时不足") != -1 || outMsg.indexOf("科目二训练小时将会超出小时!") != -1
+//							|| outMsg.indexOf("您已经完成了科目二的所有训练！") != -1){
+//						      resultN = KEMU2_NO_TIME;
+//	                            break;
+//	                    }
+//						if("非预约开放时间".equals(outMsg)){
+//							ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
+//							yucheTry--; //非预约开放时间，不计入retry次数
+//						}
+//						if("验证码错误！".equals(outMsg)){
+//							System.out.println(outMsg+"不计入retry次数");
+//							 yucheTry--; //验证码错误，不计入retry次数
+//						}
+//						if(outMsg.indexOf("该车时段已经被约") != -1){
+//							yucheTry++; //该页面可能都被约了
+//						}
+//						//{"d":"[\r\n  {\r\n    \"Result\": false,\r\n    \"OutMSG\": \"科目二剩余小时不足 !\"\r\n  }\r\n]"}
+//						log.error("book car return error:"+outMsg);
+//					}
+
+
+            } while (resultN != BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
 		} catch (JSONException e) {
 			log.error("error,", e);
 			e.printStackTrace();

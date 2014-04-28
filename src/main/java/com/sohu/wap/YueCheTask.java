@@ -27,15 +27,15 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
 	
 	
 	public YueCheTask(XueYuanAccount xueYuan, String date){
-	  
 
-	    if (YueCheHelper.isUseProxy()){
-	             Host host = ConfigHttpProxy.getInstance().getRandomHost();
-	            
-	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp(),host.getPort());
-	    }else{
-	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient();
-	    }
+        httpUtil4 = HttpUtil4Exposer.createHttpClient();
+//	    if (YueCheHelper.isUseProxy()){
+//	             Host host = ConfigHttpProxy.getInstance().getRandomHost();
+//
+//	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp(),host.getPort());
+//	    }else{
+//	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient();
+//	    }
 	
 		this.xueYuan = xueYuan;
 		this.date = date; 
