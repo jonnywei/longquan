@@ -17,11 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sohu.wap.bo.VerifyCode;
 import com.sohu.wap.proxy.ConfigHttpProxy;
-import com.sohu.wap.proxy.Host;
-import com.sohu.wap.proxy.SpysHttpProxy;
 import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.NetSystemConfigurations;
-import com.sohu.wap.util.ThreadPool;
 import com.sohu.wap.util.ThreadUtil;
 
 
@@ -30,43 +27,66 @@ import com.sohu.wap.util.ThreadUtil;
  * 约车主程序
  *
  */
-public class HaijiaNetMain 
+public class LongQuanNetMain
 {
     
-    private static Logger log = LoggerFactory.getLogger(HaijiaNetMain.class);
+    private static Logger log = LoggerFactory.getLogger(LongQuanNetMain.class);
     
     
    
     public static void main( String[] args ) throws InterruptedException, IOException
     {
-        
+
+        int status = YueCheHelper.STATUS_DISPATCH;
         
         while(true){
-           
-            //初始化spy
-            
-//            SpysHttpProxy.getInstance();
-            
-            // 如果今天任务已经完成的话
-           if (  YueCheHelper.isTodayTaskExecuteOver()){
-        	  
-               System.out.println("今日任务已经完成！waitting tomorrow...");
-        	 
-        	   boolean isShutdown = NetSystemConfigurations.getSystemBooleanProperty("system.client.shutdown", false);
-               
-               if(isShutdown){
-                   break;
-               }
-               ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
-               continue;
-           }
+
+             if (status == YueCheHelper.STATUS_DISPATCH) {   //启动进入的状态
+                 boolean isShutdown = NetSystemConfigurations.getSystemBooleanProperty("system.client.shutdown", false);
+                 if (isShutdown){
+                     System.out.println("程序结束!请按任意键退出程序!");
+                     log.info("System.exit!");
+                     System.exit(0);
+                 }
+
+                if(YueCheHelper.isInWaitTime()){
+
+                    status = YueCheHelper.STATUS_WAIT;
+
+                }else if (YueCheHelper.isInQiang14ServiceTime()){
+
+                    status =  YueCheHelper.STATUS_QIANG_14;
+
+                }else if (YueCheHelper.isInQiang15ServiceTime()){
+
+                    status =  YueCheHelper.STATUS_QIANG_15;
+                }
+
+             } else if (status == YueCheHelper.STATUS_WAIT){
+                 System.out.println("waitting task begin!");
+                 ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
+                 status = YueCheHelper.STATUS_DISPATCH;  //休眠完毕，重新调度
+
+             } else if (status == YueCheHelper.STATUS_QIANG_14){
+                 doYueChe14();
+                 status = YueCheHelper.STATUS_DISPATCH;  //休眠完毕，重新调度
+
+             }else if (status == YueCheHelper.STATUS_QIANG_15){
+                 doYueChe15();
+                 System.out.println("今日任务已经完成！waitting tomorrow...");
+                 status = YueCheHelper.STATUS_DISPATCH;  //休眠完毕，重新调度
+             }
+
+        }
+
+    }
+
+    public  static void doYueChe(String time) throws InterruptedException {
+
+
            //初始化confighttpproxy
-           ConfigHttpProxy.start();
-          
-           //等待任务开始
-           YueCheHelper.waitForService();
-           
-       
+            ConfigHttpProxy.start();
+
             List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
             
             //约车日期
@@ -112,7 +132,7 @@ public class HaijiaNetMain
             executeService.shutdown(); 
             
             //等待两个小时
-            executeService.awaitTermination(60*60,TimeUnit.SECONDS);
+            executeService.awaitTermination(30*60,TimeUnit.SECONDS);
          
             System.out.println("shutdown Now!");
             
@@ -129,24 +149,23 @@ public class HaijiaNetMain
                      e.printStackTrace();
                 }  
             }  
-            log.info("Today task execute time ="+(System.currentTimeMillis()- startTime));
-            
-            //设置今天任务已经完成
-            YueCheHelper.setTodayTaskExecuteOver(); 
-            log.info(date+ "taskover!");
-            boolean isShutdown = NetSystemConfigurations.getSystemBooleanProperty("system.client.shutdown", false);
-          
-            if(isShutdown){
-                break;
-            }
+            log.info(date+" "+time+"task execute time ="+(System.currentTimeMillis()- startTime));
+
+            log.info(date+ time + "taskover!");
+
         }
     	
-        System.out.println("程序结束!请按任意键退出程序!");
-        log.info("System.exit!");
-        System.exit(0);
-      
+
+
+    private static  void doYueChe14(){
+
     }
-    
+
+
+
+    private static void doYueChe15(){
+
+    }
    
     
     

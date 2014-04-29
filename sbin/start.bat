@@ -16,4 +16,4 @@ set CLASSPATH=%TWITTER_HOME%\config;%CLASSPATH%
  
 echo classpath=%CLASSPATH%
 
-java -classpath %CLASSPATH% com.sohu.wap.HaijiaNetMain
+java -classpath %CLASSPATH% com.sohu.wap.LongQuanNetMain

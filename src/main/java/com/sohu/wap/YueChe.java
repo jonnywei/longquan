@@ -84,7 +84,7 @@ public class YueChe {
 	public static int GET_BOOK_CODE_ERROR = 123323;
 	public static int ALREADY_BOOKED_CAR=3;
 	public static int BOOK_INVAILD_OPERATION = 5;
-	
+	public static int CAR_TYPE_ERROR = 6;
 	public static int YUE_KAO_SUCCESS = 0;
 	
 	public static int YUE_KAO_ERROR = 1;
@@ -467,8 +467,25 @@ public class YueChe {
 
 			System.out.println(getCarString);
 
-			JSONObject selectedCar = null;
-
+//            getCarString ="[\n" +
+//                    "  {\n" +
+//                    "    \"JLCBH\": \"611262\",\n" +
+//                    "    \"CNBH\": \"15103\",\n" +
+//                    "    \"YT\": null,\n" +
+//                    "    \"LXBH\": null,\n" +
+//                    "    \"JLYXM\": \"郑宝成\",\n" +
+//                    "    \"XNSD\": \"08:00-12:00.812.4,13:00-17:00.15.0,17:00-20:00.58.0,\"\n" +
+//                    "  },\n" +
+//                    "  {\n" +
+//                    "    \"JLCBH\": \"611290\",\n" +
+//                    "    \"CNBH\": \"15131\",\n" +
+//                    "    \"YT\": null,\n" +
+//                    "    \"LXBH\": null,\n" +
+//                    "    \"JLYXM\": \"\",\n" +
+//                    "    \"XNSD\": \"08:00-12:00.812.0,13:00-17:00.15.4,17:00-20:00.58.0,\"\n" +
+//                    "  }\n" +
+//                    "]_2";
+//
 
 			int splitPosition = getCarString.indexOf("_");
 			String carInfo = getCarString.substring(0, splitPosition);
@@ -507,43 +524,50 @@ public class YueChe {
 //                    "XNSD": "08:00-12:00.812.0,13:00-17:00.15.4,17:00-20:00.58.0,"
 //            },
 			do {
-				selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
+                //选择车辆
+
+                JSONObject selectedCar = null;
+                boolean selectedCarSuccess = false;
+                String xnsd=null;
+                do{
+                    selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
+
+                    String[]  xnsds =  selectedCar.getString("XNSD").split("[,]");
+                    for(int i =0; i< xnsds.length; i++){
+                        String xnsd1 = xnsds[i];
+                        String[] info = xnsd1.split("[.]");
+                        String sdname = info[0];
+                        String sdid = info[1];
+                        String sl = info[2];
+                        if (Integer.parseInt(sl) > 0 &&  ( amOrpm.indexOf(sdid) != -1 )){  //有时段并且符合条件
+                            selectedCarSuccess = true;
+                            xnsd = sdid;
+                            break;
+                        }
+                    }
+                } while (!selectedCarSuccess);
 
                 log.info("选择的车是：" + selectedCar.toString());
                 System.out.println("选择的车是：" + selectedCar.toString());
 
-                String[]  xnsds =   selectedCar.getString("XNSD").split(",");
-                for(int i =0; i< xnsds.length; i++){
-                    String xnsd1 = xnsds[i];
-                    String[] info = xnsd1.split("[.]");
-                    String sdname = info[0];
-                    String sdid = info[1];
-                    String sl = info[2];
-                    if (Integer.parseInt(sl) > 0 &&   ( sdid.equals(amOrpm) || sdid.equals(amOrpm) )){
 
-                    }
-                }
-
-//                    http://106.37.230.254:81/Tools/km2.aspx
-//                    ?jlcbh=611333&yyrqbegin=20140511&xnsd=812&trainType=3&type=km2Car2&_=1398664811123
+//              http://106.37.230.254:81/Tools/km2.aspx
+//              ?jlcbh=611333&yyrqbegin=20140511&xnsd=812&trainType=3&type=km2Car2&_=1398664811123
 
                 JSONObject bookCarJson = new JSONObject();
                 try {
                     Date nowBookcar = new Date();
                     bookCarJson.put("_",nowBookcar.getTime());
-                    bookCarJson.put("yyrqbegin", selectedCar.getString("YYRQ"));
-                    bookCarJson.put("xnsd", selectedCar.getString("XNSD"));
-                    bookCarJson.put("jlcbh", selectedCar.getString("CNBH"));
-                    bookCarJson.put("trainType","3" );
+                    bookCarJson.put("yyrqbegin", date);
+                    bookCarJson.put("xnsd", xnsd);
+                    bookCarJson.put("jlcbh", selectedCar.getString("JLCBH"));
+                    bookCarJson.put("trainType",hiddenKM );
                     bookCarJson.put("type", "km2Car2");
 
                 } catch (Exception e) {
-
-                    e.printStackTrace();
+                      e.printStackTrace();
                 }
-
-//					ThreadUtil.sleep(1);
-
+//                ThreadUtil.sleep(1);
 
                 //一直重试，知道返回结果
                 String bookResult = null;
@@ -565,7 +589,32 @@ public class YueChe {
 
                 yucheTry++;
 
-                System.out.println(bookResult.toString());
+                System.out.println(bookResult);
+
+                //错误
+                if(bookResult.indexOf("该时段已被别人预约,请刷新页面后重试!") != -1){
+							yucheTry++; //该页面可能都被约了
+				}
+                if ("所在班种不能约周六日车辆".equals(bookResult)){
+							resultN = NOT_BOOK_WEEKEND_CAR;
+							break;
+				}
+
+                if ("您不能预约该时间的车辆!".equals(bookResult)){
+                    ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
+					yucheTry--; //非预约开放时间，不计入retry次数
+                }
+				if ("该日已预约过小时".equals(bookResult) || bookResult.indexOf("该日已预约过时段")!=-1 ){
+						resultN = ALREADY_BOOKED_CAR;
+						break;
+				}
+                if ("您不能预约该车型的车!".equals(bookResult)){
+                    resultN = CAR_TYPE_ERROR;
+                    break;
+                }
+
+                log.info(bookResult);
+
 
 //					JSONArray jbResult = new JSONArray(bookResult.getString("d"));
 //
@@ -585,18 +634,12 @@ public class YueChe {
 //
 //						String outMsg = jbResult.getJSONObject(0).getString("OutMSG");
 //						log.info("book car return msg:"+outMsg);
-//						if ("该日已预约过小时".equals(outMsg) || outMsg.indexOf("该日已预约过时段")!=-1 ){
-//							resultN = ALREADY_BOOKED_CAR;
-//							break;
-//						}
+
 //						if ("非法操作".equals(outMsg)){
 //							resultN = BOOK_INVAILD_OPERATION;
 //							break;
 //						}
-//						if ("所在班种不能约周六日车辆".equals(outMsg)){
-//							resultN = NOT_BOOK_WEEKEND_CAR;
-//							break;
-//						}
+
 //						if("对不起,您填写的报名时预留的手机或固定电话号码不正确！请核对!".equals(outMsg)){
 //							resultN = PHONE_NUM_ERROR;
 //							break;

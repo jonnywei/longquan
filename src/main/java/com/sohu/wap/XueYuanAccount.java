@@ -38,6 +38,8 @@ public class XueYuanAccount {
     public static int BOOK_CAR_ACCOUNT_ERROR = 7;
     
 	public static int BOOK_CAR_PHONE_NUM_ERROR=8;
+
+    public static int BOOK_CAR_CAR_TYPE_ERROR=9;
 	private int id;
     
     private String userName;

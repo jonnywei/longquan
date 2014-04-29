@@ -122,114 +122,120 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
      * 
      */
     private  void  doYuche () throws InterruptedException {
-    
-    	String[] timeArray = xueYuan.getYueCheAmPm().split("[,;]");
-        if (timeArray.length  <  0) {
-        	timeArray = YueCheHelper.YUCHE_TIME.split("[,;]");
-        }
+        //am,pm,ni  to 812,15,58
+        String shiDuan = YueCheHelper.transformYueCheShiDuanToNum(xueYuan.getYueCheAmPm());
+
         int count =0;
-        for (String amPm1 : timeArray){    //按情况约车
-            String amPm  =  YueCheHelper.AMPM.get(amPm1);
-            boolean  isSuccess = false;
-            boolean first = true;
-            
-            do {
-            	 count ++; //十次就测试
-                 if(count % 10 == 0){
-                	int ycResult =  YueCheHelper.getYueCheBookInfo(xueYuan.getId());
-                	if(ycResult == XueYuanAccount.BOOK_CAR_SUCCESS || 
-               			ycResult == XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR ){
-                		isSuccess =true;
-                		break;
-               		}
-                 }
-            	
-                 if (!first){
-                     log.error("yuche  error. retry !");
-                     ThreadUtil.sleep( RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
-                 }else{
-                     first = false;
-                 }
-                 
-                 Result<String> ret =  null;
-                 //判断科目信息
-                 if(Constants.KM3.equals(xueYuan.getKm())){
-                	 ret =  yuche(date, amPm,Constants.KM3_HiddenKM, xueYuan.getPhoneNum());
-                 }else if (Constants.KM1.equals(xueYuan.getKm())){
-                	 ret =  yuche(date, amPm,Constants.KM1_HiddenKM, xueYuan.getPhoneNum());
-                 }else if (Constants.KM_AUTO.equals(xueYuan.getKm())) {
-                	 ret =  yuche(date, amPm,0, xueYuan.getPhoneNum());
-                 }else{
-                	 ret =  yuche(date, amPm,Constants.KM2_HiddenKM, xueYuan.getPhoneNum());
-                 }
-               
-              String uinfo = xueYuan.getUserName() +":"+date+ YueCheHelper.AMPM.get(amPm);
-             
-              int  result  = ret.getRet();
-              
-              if (result == YueChe.BOOK_CAR_SUCCESS){
-                  isSuccess = true;
-                  uinfo = xueYuan.getUserName() +":"+ret.getData()+":"+date+ YueCheHelper.AMPM.get(amPm);
-                  String info =uinfo +"约车成功！";
-                  System.out.println(info);
-                  log.info(info);
-                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_SUCCESS, info);
-                  xueYuan.setBookSuccess(isSuccess);
-                  break;
-              }else if (result == YueChe.ALREADY_BOOKED_CAR){  //该日已经预约车辆
-            	  String info = uinfo+ "该日已经预约车辆了！";
-            	  log.info(info);
-                  System.out.println(info);
-                  isSuccess = true;
-                  xueYuan.setBookSuccess(isSuccess);
-                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR, info);
-                  break;
-              }else if (result == YueChe. KEMU2_NO_TIME){  //无车
-                  String info = uinfo +"科目二剩余小时不足!";
-                  System.out.println(info);
-                  log.info(info);
-                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_KEMU2_NO_TIME, info);
-                  return ;
-              } else if (result == YueChe. PHONE_NUM_ERROR){  //对不起,您填写的报名时预留的手机或固定电话号码不正确
-                  String info = uinfo +"对不起,您填写的报名时预留的手机或固定电话号码不正确";
-                  System.out.println(info);
-                  log.info(info);
-                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_PHONE_NUM_ERROR, info);
-                  return ;
-              } 
-              
-              else if (result == YueChe.NO_CAR){  //无车的话，赶紧约下班车
-                  System.out.println(uinfo+"无车!");
-                  break;
-              }else if (result == YueChe. BOOK_INVAILD_OPERATION || result ==YueChe.IP_FORBIDDEN ){  //非法操作，服务器已经被锁定，直接退出约车
-                  String info = uinfo +"非法操作!";
-                  System.out.println(info);
-                  log.info(info);
-                  return;
-              }else if (result == YueChe. NOT_BOOK_WEEKEND_CAR){  //所在班种不能约周六日车辆
-                  String info = uinfo +"所在班种不能约周六日车辆";
-                  log.info(info);
-                  YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_NOT_BOOK_WEEKEND_CAR, info);
-                  return;
-              }else if (result == YueChe.GET_CAR_ERROR){   //得到车辆信息错误的话
-            	  log.info("get car info error ! retry!");
-                  System.out.println("得到车辆信息错误！重试！");
-              }else if (result == YueChe.GET_BOOK_CODE_ERROR){   //得到book code错误的话
-            	  log.info("GET_BOOK_CODE_ERROR");
-                  System.out.println("得到车辆信息错误！重试！");
-              }
-              else {  //无车
-                  System.out.println("未知错误！重试! RESULT="+result);
-              }
-              
-             } while (true);
-            
-            if (isSuccess){  //如果约车成功的话，退出
-            	break;
+
+        boolean  isSuccess = false;        //按情况约车
+        boolean first = true;
+
+        do {
+            count ++; //十次就测试
+            if(count % 10 == 0){
+                int ycResult =  YueCheHelper.getYueCheBookInfo(xueYuan.getId());
+                if(ycResult == XueYuanAccount.BOOK_CAR_SUCCESS ||
+                        ycResult == XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR ){
+                    isSuccess =true;
+                    break;
+                }
             }
-            
-        }    
-        
+
+            if (!first){
+                log.error("yuche  error. retry !");
+                ThreadUtil.sleep( RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
+            }else{
+                first = false;
+            }
+
+            Result<String> ret =  null;
+            //判断科目信息
+            if(Constants.KM3.equals(xueYuan.getKm())){
+                ret =  yuche(date, shiDuan,Constants.KM3_HiddenKM, xueYuan.getPhoneNum());
+            }else if (Constants.KM1.equals(xueYuan.getKm())){
+                ret =  yuche(date, shiDuan,Constants.KM1_HiddenKM, xueYuan.getPhoneNum());
+            }else if (Constants.KM_AUTO.equals(xueYuan.getKm())) {
+                ret =  yuche(date, shiDuan,0, xueYuan.getPhoneNum());
+            }else{
+                ret =  yuche(date, shiDuan,Constants.KM2_HiddenKM, xueYuan.getPhoneNum());
+            }
+
+            String uinfo = xueYuan.getUserName() +":"+date+ YueCheHelper.AMPM.get(shiDuan);
+
+            int  result  = ret.getRet();
+
+            if (result == YueChe.BOOK_CAR_SUCCESS){
+                isSuccess = true;
+                uinfo = xueYuan.getUserName() +":"+ret.getData()+":"+date+ YueCheHelper.AMPM.get(shiDuan);
+                String info =uinfo +"约车成功！";
+                System.out.println(info);
+                log.info(info);
+                YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_SUCCESS, info);
+                xueYuan.setBookSuccess(isSuccess);
+                break;
+            }else if (result == YueChe.ALREADY_BOOKED_CAR){  //该日已经预约车辆
+                String info = uinfo+ "该日已经预约车辆了！";
+                log.info(info);
+                System.out.println(info);
+                isSuccess = true;
+                xueYuan.setBookSuccess(isSuccess);
+                YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_ALREADY_BOOKED_CAR, info);
+                break;
+            }else if (result == YueChe. KEMU2_NO_TIME){  //无车
+                String info = uinfo +"科目二剩余小时不足!";
+                System.out.println(info);
+                log.info(info);
+                YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_KEMU2_NO_TIME, info);
+                return ;
+            } else if (result == YueChe. PHONE_NUM_ERROR){  //对不起,您填写的报名时预留的手机或固定电话号码不正确
+                String info = uinfo +"对不起,您填写的报名时预留的手机或固定电话号码不正确";
+                System.out.println(info);
+                log.info(info);
+                YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_PHONE_NUM_ERROR, info);
+                return ;
+            }
+
+            else if (result == YueChe.NO_CAR){  //无车的话，赶紧约下班车
+                if (YueCheHelper.isInQiang15ServiceTime()){
+                    System.out.println(uinfo+"无车!continue qiang che");
+                    log.info("nocar but in servicetime ,continue qiang");
+                } else{
+                    break;
+                }
+
+            }else if (result == YueChe. BOOK_INVAILD_OPERATION || result ==YueChe.IP_FORBIDDEN ){  //非法操作，服务器已经被锁定，直接退出约车
+                String info = uinfo +"非法操作!";
+                System.out.println(info);
+                log.info(info);
+                return;
+            }else if (result == YueChe. NOT_BOOK_WEEKEND_CAR){  //所在班种不能约周六日车辆
+                String info = uinfo +"所在班种不能约周六日车辆";
+                log.info(info);
+                YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_NOT_BOOK_WEEKEND_CAR, info);
+                return;
+            } else if (result == YueChe.CAR_TYPE_ERROR){  //您不能预约该车型的车
+                String info = uinfo +"您不能预约该车型的车!";
+                log.info(info);
+                YueCheHelper.updateYueCheBookInfo(xueYuan.getId(), XueYuanAccount.BOOK_CAR_CAR_TYPE_ERROR, info);
+                return;
+            }  else if (result == YueChe.GET_CAR_ERROR){   //得到车辆信息错误的话
+                log.info("get car info error ! retry!");
+                System.out.println("得到车辆信息错误！重试！");
+            }else if (result == YueChe.GET_BOOK_CODE_ERROR){   //得到book code错误的话
+                log.info("GET_BOOK_CODE_ERROR");
+                System.out.println("得到车辆信息错误！重试！");
+            }
+            else {  //无车
+                System.out.println("未知错误！重试! RESULT="+result);
+            }
+
+        } while (true);
+
+        if (isSuccess){  //如果约车成功的话，退出
+//            break;
+        }
+
+
         log.info("yuche finish!");
         return ;
     }

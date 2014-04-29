@@ -127,10 +127,8 @@ public class YueCheHelper
     public static String YUCHE_TIME = NetSystemConfigurations.getSystemStringProperty("system.yueche.time","am,pm") ;
     
     public static  int   MAX_SLEEP_TIME = NetSystemConfigurations.getSystemIntProperty("system.maxsleeptime", 2);
- 
-   
-    private static String    SERVICE_BEGIN_TIME ="07:34";
-    private static String    SERVICE_END_TIME ="20:00";
+
+
 //
 //    private static String    SERVICE_BEGIN_TIME ="00:01";
 //    private static String   SERVICE_END_TIME ="23:59";
@@ -149,25 +147,87 @@ public class YueCheHelper
     
     public static  int   PROXY_PORT = NetSystemConfigurations.getSystemIntProperty("system.proxy.port", 8087);
     
-   public static boolean   IS_USE_PROXY_BOOK_CAR = NetSystemConfigurations.getSystemBooleanProperty("system.use.proxy.bookcar",false) ;; 
+   public static boolean   IS_USE_PROXY_BOOK_CAR = NetSystemConfigurations.getSystemBooleanProperty("system.use.proxy.bookcar",false) ;
    
-   
-   /**
-    * 是否再约车的服务时间内
-    * @return
-    */
-   public static   boolean isInServiceTime(){
-    
-	   return  DateUtil.isCurrTimeInTimeInterval(SERVICE_BEGIN_TIME,SERVICE_END_TIME);
-      
-    } 
-    
+
+
+   public static String transformYueCheShiDuanToNum(String shiDuan){
+       //am,pm,ni
+        String result ="812,15";
+
+       String[] timeArray = shiDuan.split("[,;]");
+       if (timeArray.length  <  0) {
+           shiDuan = YueCheHelper.YUCHE_TIME;
+       }
+
+       result = shiDuan.replace("am","812").replace("pm","15").replace("ni","58");
+
+       return  result;
+
+
+
+
+
+   }
+
+
+    private static String    SERVICE_BEGIN_TIME ="00:00";
+
+    private static String    QIANG_14_BEGIN_TIME ="13:58";
+    private static String    QIANG_14_END_TIME ="14:05";
+    private static String    QIANG_15_BEGIN_TIME = "14:58";
+    private static String    QIANG_15_END_TIME =   "15:05";
+    private static String    SERVICE_END_TIME ="23:59";
+
+
+
+   public static int STATUS_DISPATCH =0;
+   public static int STATUS_WAIT = 1 ;
+   public static int STATUS_QIANG_14 = 2 ;
+   public static int STATUS_QIANG_15 = 3 ;
+   public static int STATUS_QIANG_OVER = 4 ;
+
+
+    public static  boolean isInWaitTime(){
+        return  DateUtil.isCurrTimeInTimeInterval(SERVICE_BEGIN_TIME,QIANG_14_BEGIN_TIME) ||  DateUtil.isCurrTimeInTimeInterval(QIANG_14_END_TIME,QIANG_15_BEGIN_TIME)
+                || DateUtil.isCurrTimeInTimeInterval(QIANG_15_END_TIME,SERVICE_END_TIME)  ;
+    }
+
+    /**
+     * 是否在抢车的时间内
+     * @return
+     */
+    public static boolean isInQiang14ServiceTime(){
+        return  DateUtil.isCurrTimeInTimeInterval(QIANG_14_BEGIN_TIME,QIANG_14_END_TIME);
+    }
+
+    /**
+     * 是否在15点抢车时间内
+     */
+    public static boolean isInQiang15ServiceTime(){
+        return  DateUtil.isCurrTimeInTimeInterval(QIANG_15_BEGIN_TIME,QIANG_15_END_TIME);
+    }
+
+
+
+    /**
+     * 是否再约车的服务时间内
+     * @return
+     */
+    public static   boolean isInServiceTime(){
+
+        return  DateUtil.isCurrTimeInTimeInterval(SERVICE_BEGIN_TIME,SERVICE_END_TIME);
+
+    }
+
+
+
     /**
      *设置今天任务已经完成 
      * 
      */
-    public static void setTodayTaskExecuteOver(){
-        IS_EXECUTE_TASK.put(DateUtil.getNowDay(), "over");
+    public static void setTodayTaskExecuteOver(String time){
+        IS_EXECUTE_TASK.put(DateUtil.getNowDay()+time, "over");
     }
     
     
@@ -177,10 +237,10 @@ public class YueCheHelper
      *得到今日任务完成状态
      * 
      */
-    public static boolean  isTodayTaskExecuteOver(){
+    public static boolean  isTodayTaskExecuteOver( ){
         
         
-        if (IS_EXECUTE_TASK.containsKey(DateUtil.getNowDay())){  //今日已经执行完毕
+        if (IS_EXECUTE_TASK.containsKey(DateUtil.getNowDay()+"14") && IS_EXECUTE_TASK.containsKey(DateUtil.getNowDay()+"15")){  //今日已经执行完毕
             return true;
         }
         
@@ -203,7 +263,9 @@ public class YueCheHelper
         }while (true);
     }
     
-    
+
+
+
     
 //    public static void waiting(String carType) throws InterruptedException{
 //    	Date beginDate = DateUtil.getTodayTime(SERVICE_BEGIN_TIME);
@@ -351,6 +413,9 @@ public class YueCheHelper
     public static void main (String[] args){
 //    	waiting("fk");
     	System.out.println(getYueCheBookInfo(2));
+        System.out.println(transformYueCheShiDuanToNum("am,ni"));
+        System.out.println(transformYueCheShiDuanToNum("ni"));
+
 //    	updateYueCheBookInfo(2,0,"371312198511084844:Info:20121222:15-02015:20121222下午约车成功");
        
     }
