@@ -31,16 +31,16 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 
 	protected ConcurrentHashMap<String, Host> HOST_MAP = new ConcurrentHashMap<String, Host>();
 
-	protected static long initialDelay = 0;
+	protected static long initialDelay =  20*60 ;
 
-	protected static long delay = 20 * 60;
+	protected static long delay = 60 * 60;
 	
 	//seconds
 	 static long long_request_time = 5;
 	    
 	 static long max_request_time = 10;
 	 
-	 static  int  proxy_min_size = 30;
+	 static  int  proxy_min_size = 50;
 	 
 	 protected abstract  void  init();
 
@@ -90,7 +90,7 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 			log.info("schedule check over! size=" + HOST_MAP.size());
 			//如果代理数目小于30，重新加载
 			if (HOST_MAP.size() < proxy_min_size){
-				log.info("size less than "+proxy_min_size+".reload! " + HOST_MAP.size());
+				log.info("size less than "+proxy_min_size+". reload! " + HOST_MAP.size());
 			    init();
 			}
 

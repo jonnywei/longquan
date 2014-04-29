@@ -173,6 +173,14 @@ public class YueCheHelper
 
     private static String    SERVICE_BEGIN_TIME ="00:00";
 
+
+//    private static String    QIANG_14_BEGIN_TIME ="23:55";
+//    private static String    QIANG_14_END_TIME ="23:58";
+//    private static String    QIANG_15_BEGIN_TIME = "23:58";
+//    private static String    QIANG_15_END_TIME =   "23:59";
+//    private static String    SERVICE_END_TIME ="23:59";
+
+//
     private static String    QIANG_14_BEGIN_TIME ="13:58";
     private static String    QIANG_14_END_TIME ="14:05";
     private static String    QIANG_15_BEGIN_TIME = "14:58";

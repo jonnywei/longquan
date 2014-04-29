@@ -20,8 +20,8 @@ public class Constants {
 	public static String KM_AUTO = "km0";
 	
 	public static int KM1_HiddenKM = 1;
-	public static int KM2_HiddenKM = 2;
-	public static int KM3_HiddenKM = 3;
+	public static int KM2_HiddenKM = 3;
+	public static int KM3_HiddenKM = 4;
 
 	public static String AM_STR = "am";
 	public static String PM_STR = "pm";
@@ -41,14 +41,18 @@ public class Constants {
 	public static String CAR_TYPE_OTHER = "other";
 	
 
-//    public static String   SERVER_URL ="http://localhost:8000/";
+    public static String   SERVER_URL ="http://localhost:8000/";
 	
-	public static String   SERVER_URL ="http://114.215.110.185/";
-	    
+//	public static String   SERVER_URL ="http://114.215.110.185:8000/";
+
+    public static String   SERVER_URL2 ="http://114.215.110.185/";
+
     public static String   CONFIG_URL = SERVER_URL + "a/config/";
     
-    public static String   YUECHE_URL = SERVER_URL + "a/yueche/";
-    
+    public static String   YUECHE_URL = SERVER_URL + "a/yueche/?jx=longquan&yc_date=%s";
+
+    public static String   XUEYUAN_DETAIL_URL = SERVER_URL + "a/xueyuan/%d/";
+
     public static String   YUECHE_DETAIL_URL = SERVER_URL + "a/yueche/%d/";
     
     public static String   YUECHE_SCAN_URL = SERVER_URL + "a/yueche/scan/";
@@ -59,7 +63,7 @@ public class Constants {
     
     public static String   PROXY_ADD_URL = SERVER_URL + "a/proxy/add/";
     
-    public static String   PROXY_URL = SERVER_URL + "a/proxy/all/";
+    public static String   PROXY_URL = SERVER_URL2 + "a/proxy/all/";
     
     public static String   YUECHE_UPDATE_URL = SERVER_URL + "a/yueche/%d/update/";
     

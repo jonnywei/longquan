@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.sohu.wap.proxy.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,10 @@ public class LongQuanNetMain
     {
 
         int status = YueCheHelper.STATUS_DISPATCH;
-        
+
+        //初始化confighttpproxy
+        ConfigHttpProxy.start();
+
         while(true){
 
              if (status == YueCheHelper.STATUS_DISPATCH) {   //启动进入的状态
@@ -81,57 +85,48 @@ public class LongQuanNetMain
 
     }
 
-    public  static void doYueChe(String time) throws InterruptedException {
-
-
-           //初始化confighttpproxy
-            ConfigHttpProxy.start();
+    public  static void doYueChe(String carType) throws InterruptedException {
 
             List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
             
             //约车日期
-            String date =  DateUtil.getFetureDay(7);
+            String date =  DateUtil.getFetureDay(11);
             String dateModel = NetSystemConfigurations.getSystemStringProperty("system.yueche.date.model", "auto");
             
             if(dateModel.equals("config")){
-            	 date = NetSystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(7));
+            	 date = NetSystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(11));
             }
             
             System.out.println("抢车日期为:"+ date);
-//           
-            if (YueCheHelper.isEnterCreakerModel()){
-              //  进入破解模式
-              //  速度肯定是最快的了
-              //  利用海驾的验证码漏洞，事先输入验证码，之后约车
-                System.out.println("Open Creak Model");
-                log.info("Open Creak Model");
-                CookieImgCodeHelper.getVerifyCodeSmart(VerifyCode.CODE_TYPE_LOGIN_IMG_CODE);
-            }
-          
+
             long startTime = System.currentTimeMillis();
             
-            YueCheInfo  ycInfo = new YueCheInfo();
+
+        YueCheInfo  ycInfo = new YueCheInfo(carType, date);
             
             //初始化线程池的数目
-            ExecutorService executeService = Executors.newFixedThreadPool(2 + ycInfo.getYueCheInfo().size() * YueCheHelper.getProxyNumPreUser());
+        int threadPerUserNum =
+                YueCheHelper.isUseProxy()? YueCheHelper.getProxyNumPreUser(): YueCheHelper.getThreadPerUser();
+
+        ExecutorService executeService = Executors.newFixedThreadPool(2 + ycInfo.getYueCheInfo().size() * threadPerUserNum );
             
             for (Integer accoutId: ycInfo.getYueCheInfo().keySet()){
                 XueYuanAccount  xy = ycInfo.getYueCheInfo().get(accoutId);
                 if ( xy!=null){
-                	int threadPerUserNum = 
-                		YueCheHelper.isUseProxy()? YueCheHelper.getProxyNumPreUser(): YueCheHelper.getThreadPerUser();
-                    
                 	for ( int num = 0 ; num < threadPerUserNum; num++){
-                            YueCheTask yueCheTask = new YueCheTask(xy,date);
-                            resultList.add(executeService.submit(yueCheTask) );     
-                       
+                        Host proxyHost = null;
+                         if (YueCheHelper.isUseProxy() ){
+                              proxyHost = ConfigHttpProxy.getInstance().getRandomHost();
+                         }
+                        YueCheTask yueCheTask = new YueCheTask(xy,date,proxyHost );
+                        resultList.add(executeService.submit(yueCheTask) );
+
                     } 
                  }
             }
             
-            executeService.shutdown(); 
-            
-            //等待两个小时
+            executeService.shutdown();
+            //等待30分钟
             executeService.awaitTermination(30*60,TimeUnit.SECONDS);
          
             System.out.println("shutdown Now!");
@@ -149,21 +144,45 @@ public class LongQuanNetMain
                      e.printStackTrace();
                 }  
             }  
-            log.info(date+" "+time+"task execute time ="+(System.currentTimeMillis()- startTime));
+            log.info(date+" "+carType+"task execute time ="+(System.currentTimeMillis()- startTime));
 
-            log.info(date+ time + "taskover!");
+            log.info(date + carType + "taskover!");
 
         }
     	
 
 
+    //14点桑塔纳
     private static  void doYueChe14(){
-
+        try {
+            doYueChe("stn");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        System.out.println("doYueChe14");
+//        try {
+//            ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
 
-
+     //15点奇瑞旗云
     private static void doYueChe15(){
+
+        System.out.println("doYueChe15");
+        try {
+            doYueChe("qy");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//
+//        try {
+//            ThreadUtil.sleep(YueCheHelper.WAITTING_SCAN_INTERVAL);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
    

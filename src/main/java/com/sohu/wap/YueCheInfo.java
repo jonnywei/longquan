@@ -8,6 +8,7 @@ package com.sohu.wap;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.sohu.wap.util.DateUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,12 +32,17 @@ public class YueCheInfo {
     
     
     private static Logger  log = LoggerFactory.getLogger(YueCheInfo.class);
-    
+
+    private String ycDate ;
+
+    private String carType;
   
     private    ConcurrentHashMap <Integer , XueYuanAccount>  yueCheInfoMap   = new ConcurrentHashMap<Integer, XueYuanAccount> ();
     
     
-    public  YueCheInfo (){
+    public  YueCheInfo (String carType, String ycDate){
+        this.carType = carType;
+        this.ycDate = ycDate;
         init();
     }
     
@@ -59,8 +65,11 @@ public class YueCheInfo {
     
     private void initYueCheInfos(){
     	try {
-    	 JSONArray ycArray = new JSONArray();;
-    	 String  ycInfo  = HttpUtil4Exposer.getInstance().getContent(Constants.YUECHE_URL);
+
+    	 JSONArray ycArray = new JSONArray();
+
+         String yueCheUrl = String.format(Constants.YUECHE_URL, DateUtil.getDashDate(ycDate));
+    	 String  ycInfo  = HttpUtil4Exposer.getInstance().getContent(yueCheUrl);
     	 if(ycInfo != null){
     		 	ycArray  = new JSONArray(ycInfo);
 			
@@ -73,8 +82,20 @@ public class YueCheInfo {
     		JSONObject yc =  ycArray.getJSONObject(index);
     		
     		XueYuanAccount xyAccount = XueYuanAccount.jsonToXueYuanAccount(yc);
-    		
-    		yueCheInfoMap.put(xyAccount.getId(), xyAccount);
+
+            String xueYuanDetailUrl =   String.format(Constants.XUEYUAN_DETAIL_URL, Integer.valueOf(xyAccount.getXueYuanId()) );
+
+            String  xueYuanDetailInfo  = HttpUtil4Exposer.getInstance().getContent(xueYuanDetailUrl);
+
+             if(xueYuanDetailInfo != null){
+                 JSONArray  xueYuanArray  = new JSONArray(xueYuanDetailInfo);
+                 XueYuanAccount.addXueYuanDetailInfo(xyAccount,xueYuanArray.getJSONObject(0));
+             }
+            if (carType ==null || carType.equals(xyAccount.getCarType())){
+                System.out.println(xyAccount);
+                yueCheInfoMap.put(xyAccount.getId(), xyAccount);
+            }
+
     		
     	 }
     	} catch (JSONException e) {
@@ -85,7 +106,7 @@ public class YueCheInfo {
     
     
     public static void main(String[] args){
-    	YueCheInfo ycInfo = new YueCheInfo();
+    	YueCheInfo ycInfo = new YueCheInfo("qr","2014-05-11");
     }
     
 

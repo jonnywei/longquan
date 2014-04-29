@@ -17,26 +17,23 @@ import com.sohu.wap.util.ThreadUtil;
 public class YueCheTask  extends YueChe implements Callable<Integer> {
 
 	protected static Logger log = LoggerFactory.getLogger(YueCheTask.class);
-	
+
 	XueYuanAccount xueYuan;
-	
+
 	String date;
 	YueCheTask(){
-	    
+
 	}
-	
-	
-	public YueCheTask(XueYuanAccount xueYuan, String date){
+
+
+	public YueCheTask(XueYuanAccount xueYuan, String date,Host proxyHost){
 
         httpUtil4 = HttpUtil4Exposer.createHttpClient();
-//	    if (YueCheHelper.isUseProxy()){
-//	             Host host = ConfigHttpProxy.getInstance().getRandomHost();
-//
-//	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient(host.getIp(),host.getPort());
-//	    }else{
-//	    		 httpUtil4 = HttpUtil4Exposer.createHttpClient();
-//	    }
-	
+	    if( proxyHost != null ){
+             httpUtil4 = HttpUtil4Exposer.createHttpClient(proxyHost.getIp(),proxyHost.getPort());
+	    }else{
+            httpUtil4 = HttpUtil4Exposer.createHttpClient();
+	    }
 		this.xueYuan = xueYuan;
 		this.date = date; 
 		log.info(this.xueYuan.getUserName()+" init thread");
@@ -196,7 +193,7 @@ public class YueCheTask  extends YueChe implements Callable<Integer> {
             }
 
             else if (result == YueChe.NO_CAR){  //无车的话，赶紧约下班车
-                if (YueCheHelper.isInQiang15ServiceTime()){
+                if (YueCheHelper.isInQiang15ServiceTime() || YueCheHelper.isInQiang14ServiceTime() ){
                     System.out.println(uinfo+"无车!continue qiang che");
                     log.info("nocar but in servicetime ,continue qiang");
                 } else{

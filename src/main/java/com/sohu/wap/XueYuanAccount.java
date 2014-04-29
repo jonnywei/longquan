@@ -63,31 +63,28 @@ public class XueYuanAccount {
     private String ycResultInfo;
     
     private String phoneNum; //海驾预留的手机或者电话号码
+
+    private String xueYuanId;
+
     private boolean isBookSuccess = false;
-    
-//  [
-//  {
-//      "pk": 1,
-//      "model": "yueche.yueche",
-//      "fields": {
-//          "car_type": "als",
-//          "yc_date": "2012-12-25",
-//          "black_car": "",
-//          "passwd": "23456789",
-//          "id_num": "234567890-",
-//          "xue_yuan": 1,
-//          "yc_info": "",
-//          "white_car": "",
-//          "yc_km": "km2",
-//          "yc_result": null,
-//          "phone_num": "",
-//          "create_date": "2012-12-18T15:09:51Z",
-//          "yc_time": "am",
-//          "update_date": "2012-12-18T15:17:29Z",
-//          "reserve": ""
-//      }
-//  }
-//]
+//
+//    {
+//        "pk": 1,
+//            "model": "yueche.yueche",
+//            "fields": {
+//        "update_date": "2014-04-28T16:00:52Z",
+//                "yc_date": "2014-05-06",
+//                "black_car": "",
+//                "xue_yuan": 1,
+//                "yc_info": "",
+//                "white_car": "",
+//                "yc_km": "km2",
+//                "yc_result": null,
+//                "create_date": "2014-04-28T13:39:26Z",
+//                "yc_time": "am",
+//                "reserve": "d er"
+//    }
+//    }
  
     public static  XueYuanAccount jsonToXueYuanAccount(JSONObject json){
     	
@@ -95,35 +92,68 @@ public class XueYuanAccount {
     	
     	yc.setId(json.optInt("pk"));
     	JSONObject field = json.optJSONObject("fields");
-    	yc.setUserName(field.optString("id_num").trim().toUpperCase());
-    	yc.setPassword(field.optString("passwd").trim());
-    	yc.setKm(field.optString("yc_km",Constants.KM2));
-    	yc.setYueCheDate(field.optString("yc_date").replace("-", ""));
-    	yc.setAmPm(field.optString("yc_time"));
-    	yc.setCarType(field.optString("car_type"));
-    	yc.setWhiteCar(field.optString("white_car"));  
-    	yc.setBlackCar(field.optString("black_car"));
-    	if(field.isNull("yc_result")){
-    		yc.setYcResult(BOOK_CAR_NOT_SET);
-    	}else{
-    		yc.setYcResult(field.optInt("yc_result"));
-    	}
-    	yc.setYcResultInfo(field.optString("yc_info"));
-    	yc.setPhoneNum(field.optString("phone_num", "").trim()); 
+        yc.setXueYuanId(String.valueOf(field.optInt("xue_yuan")) );
+        yc.setYueCheDate(field.optString("yc_date").replace("-", ""));
+        if(field.isNull("yc_result")){
+            yc.setYcResult(BOOK_CAR_NOT_SET);
+        }else{
+            yc.setYcResult(field.optInt("yc_result"));
+        }
+        yc.setYcResultInfo(field.optString("yc_info"));
+        yc.setKm(field.optString("yc_km", Constants.KM2));
+        yc.setAmPm(field.optString("yc_time"));
+        yc.setWhiteCar(field.optString("white_car"));
+        yc.setBlackCar(field.optString("black_car"));
+
+
+
     	return yc;
     }
-    
+
+//    {
+//        "pk": 1,
+//            "model": "yueche.xueyuan",
+//            "fields": {
+//        "car_type": "byd",
+//                "phone_num": "18811415862",
+//                "name": "徐红敏",
+//                "update_date": "2014-04-28T14:43:42Z",
+//                "passwd": "33333333333333",
+//                "id_num": "410923198702113103",
+//                "create_date": "2014-04-28T13:38:03Z",
+//                "ding_dan": 1,
+//                "jia_xiao": "haijia",
+//                "reserve": ""
+//    }
+//    }
+    public static void addXueYuanDetailInfo(XueYuanAccount yc, JSONObject json){
+        JSONObject field = json.optJSONObject("fields");
+        yc.setUserName(field.optString("id_num").trim().toUpperCase());
+        yc.setPassword(field.optString("passwd").trim());
+        yc.setCarType(field.optString("car_type"));
+        yc.setPhoneNum(field.optString("phone_num", "").trim());
+    }
+
     @Override
-	public String toString() {
-		return "XueYuanAccount [amPm=" + amPm + ", blackCar=" + blackCar
-				+ ", carType=" + carType + ", id=" + id + ", isBookSuccess="
-				+ isBookSuccess + ", km=" + km + ", password=" + password
-				+ ", phoneNum=" + phoneNum + ", userName=" + userName
-				+ ", whiteCar=" + whiteCar + ", ycResult=" + ycResult
-				+ ", ycResultInfo=" + ycResultInfo + ", yueCheDate="
-				+ yueCheDate + "]";
-	}
-    
+    public String toString() {
+        return "XueYuanAccount{" +
+                "id=" + id +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", carType='" + carType + '\'' +
+                ", yueCheDate='" + yueCheDate + '\'' +
+                ", amPm='" + amPm + '\'' +
+                ", whiteCar='" + whiteCar + '\'' +
+                ", blackCar='" + blackCar + '\'' +
+                ", km='" + km + '\'' +
+                ", ycResult=" + ycResult +
+                ", ycResultInfo='" + ycResultInfo + '\'' +
+                ", phoneNum='" + phoneNum + '\'' +
+                ", xueYuanId='" + xueYuanId + '\'' +
+                ", isBookSuccess=" + isBookSuccess +
+                '}';
+    }
+
     /**
      * @return the id
      */
@@ -239,4 +269,12 @@ public class XueYuanAccount {
 	public void setPhoneNum(String phoneNum) {
 		this.phoneNum = phoneNum;
 	}
+
+    public String getXueYuanId() {
+        return xueYuanId;
+    }
+
+    public void setXueYuanId(String xueYuanId) {
+        this.xueYuanId = xueYuanId;
+    }
 }

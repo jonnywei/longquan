@@ -153,9 +153,8 @@ public class DateUtil
         ca.getTime();
         return  getFormatTime(ca.getTime(),"yyyyMMdd");
     }
-    
-    
-    
+
+
     /**
      * 获取未来时间 7天的周六和周日
      * @return yyyyMMdd
@@ -187,6 +186,15 @@ public class DateUtil
             e.printStackTrace();
         }
         return   new Date();
+    }
+
+    /**
+     * 得到含有折线的日期
+     * @param dstr
+     * @return
+     */
+    public static String getDashDate(String dstr){
+        return  getFormatTime(getDate(dstr,"yyyyMMdd"),"yyyy-MM-dd");
     }
     
     
