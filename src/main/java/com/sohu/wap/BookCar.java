@@ -8,11 +8,9 @@ package com.sohu.wap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -58,15 +56,15 @@ public class BookCar {
 //            } 
 //            
 //            
-//            if (XueYuanAccount.BOOK_CAR_SUCCESS == result || BookCarUtil.TODAY_ALREADY_BOOKED_CAR  == result) {
-//				return  XueYuanAccount.BOOK_CAR_SUCCESS;
+//            if (YueCheItem.BOOK_CAR_SUCCESS == result || BookCarUtil.TODAY_ALREADY_BOOKED_CAR  == result) {
+//				return  YueCheItem.BOOK_CAR_SUCCESS;
 //			
 //			} else {
 //		 }
 //
 //        }  
         
-       return XueYuanAccount.BOOK_CAR_ERROR; 
+       return YueCheItem.BOOK_CAR_ERROR;
         
     }
     

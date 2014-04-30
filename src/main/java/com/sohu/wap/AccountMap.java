@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.PropConfigurations;
 
 
@@ -36,13 +35,13 @@ public class AccountMap {
     private static  AccountMap  _instance;
     
   
-    private    ConcurrentHashMap <String , XueYuanAccount>  xueYuanAccountMap   = new ConcurrentHashMap<String, XueYuanAccount> ();
+    private    ConcurrentHashMap <String , YueCheItem>  xueYuanAccountMap   = new ConcurrentHashMap<String, YueCheItem> ();
    
     
     private PropConfigurations xueYuan;
     
 
-    private    ConcurrentHashMap <String , XueYuanAccount>  scanXueYuanAccountMap   = new ConcurrentHashMap<String, XueYuanAccount> ();
+    private    ConcurrentHashMap <String , YueCheItem>  scanXueYuanAccountMap   = new ConcurrentHashMap<String, YueCheItem> ();
    
     
     private PropConfigurations scanXueYuan;
@@ -72,10 +71,10 @@ public class AccountMap {
  
     
     
-  public ConcurrentHashMap  <String , XueYuanAccount>   getXueYuanAccountMap(){
+  public ConcurrentHashMap  <String , YueCheItem>   getXueYuanAccountMap(){
             return xueYuanAccountMap;
     }
-  public ConcurrentHashMap  <String , XueYuanAccount>   getScanXueYuanAccountMap(){
+  public ConcurrentHashMap  <String , YueCheItem>   getScanXueYuanAccountMap(){
       return scanXueYuanAccountMap;
 }
   
@@ -117,7 +116,7 @@ public class AccountMap {
         while(itor.hasNext())
         {
             
-           XueYuanAccount sa= new XueYuanAccount();
+           YueCheItem sa= new YueCheItem();
            
            //身份证号码X必须大写
            String key = ((String)itor.next()).trim().toUpperCase() ;
@@ -174,7 +173,7 @@ public class AccountMap {
            String userName = temp[0];
            String password = temp[1];
 
-           XueYuanAccount sa= new XueYuanAccount();
+           YueCheItem sa= new YueCheItem();
            sa.setId(Integer.valueOf(key));
            sa.setUserName(userName);
            sa.setPassword(password);

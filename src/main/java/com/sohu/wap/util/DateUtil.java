@@ -154,6 +154,17 @@ public class DateUtil
         return  getFormatTime(ca.getTime(),"yyyyMMdd");
     }
 
+    /**
+     * 获取未来时间 截取至天
+     * @return yyyy-MM-dd
+     */
+    public static String getFetureDashDay(int after){
+        Calendar ca =   Calendar.getInstance(Locale.CHINA);
+        ca.add(Calendar.DAY_OF_MONTH, after);
+        ca.getTime();
+        return  getFormatTime(ca.getTime(),"yyyy-MM-dd");
+    }
+
 
     /**
      * 获取未来时间 7天的周六和周日

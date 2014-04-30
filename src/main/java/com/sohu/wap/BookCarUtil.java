@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sohu.wap.bo.Result;
-import com.sohu.wap.util.ThreadUtil;
 
 public class BookCarUtil {
 	
@@ -104,7 +103,7 @@ public class BookCarUtil {
 			jbResult = new JSONArray(bookResult.getString("d"));
 
 			if (jbResult.getJSONObject(0).getBoolean("Result")) {
-				resultN = XueYuanAccount.BOOK_CAR_SUCCESS;
+				resultN = YueCheItem.BOOK_CAR_SUCCESS;
 
 			} else {
 				String outMsg = jbResult.getJSONObject(0).getString("OutMSG");

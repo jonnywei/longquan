@@ -37,7 +37,7 @@ public class YueCheInfo {
 
     private String carType;
   
-    private    ConcurrentHashMap <Integer , XueYuanAccount>  yueCheInfoMap   = new ConcurrentHashMap<Integer, XueYuanAccount> ();
+    private    ConcurrentHashMap <Integer , YueCheItem>  yueCheInfoMap   = new ConcurrentHashMap<Integer, YueCheItem> ();
     
     
     public  YueCheInfo (String carType, String ycDate){
@@ -47,7 +47,7 @@ public class YueCheInfo {
     }
     
     
-  public ConcurrentHashMap  <Integer , XueYuanAccount>   getYueCheInfo(){
+  public ConcurrentHashMap  <Integer , YueCheItem>   getYueCheInfo(){
             return yueCheInfoMap;
     }
  
@@ -81,19 +81,20 @@ public class YueCheInfo {
     		
     		JSONObject yc =  ycArray.getJSONObject(index);
     		
-    		XueYuanAccount xyAccount = XueYuanAccount.jsonToXueYuanAccount(yc);
+    		YueCheItem yueCheItem = YueCheItem.jsonToYueCheItem(yc);
 
-            String xueYuanDetailUrl =   String.format(Constants.XUEYUAN_DETAIL_URL, Integer.valueOf(xyAccount.getXueYuanId()) );
+            String xueYuanDetailUrl =   String.format(Constants.XUEYUAN_DETAIL_URL, Integer.valueOf(yueCheItem.getXueYuanId()) );
 
             String  xueYuanDetailInfo  = HttpUtil4Exposer.getInstance().getContent(xueYuanDetailUrl);
 
              if(xueYuanDetailInfo != null){
                  JSONArray  xueYuanArray  = new JSONArray(xueYuanDetailInfo);
-                 XueYuanAccount.addXueYuanDetailInfo(xyAccount,xueYuanArray.getJSONObject(0));
+                 XueYuanAccount  xueYuanAccount = XueYuanAccount.jsonToXueYuanAccount(xueYuanArray.getJSONObject(0)) ;
+                 yueCheItem.addXueYuanDetailInfo( xueYuanAccount);
              }
-            if (carType ==null || carType.equals(xyAccount.getCarType())){
-                System.out.println(xyAccount);
-                yueCheInfoMap.put(xyAccount.getId(), xyAccount);
+            if (carType ==null || carType.equals(yueCheItem.getCarType())){
+                System.out.println(yueCheItem);
+                yueCheInfoMap.put(yueCheItem.getId(), yueCheItem);
             }
 
     		

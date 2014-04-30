@@ -39,11 +39,10 @@ public class Constants {
 	public static String CAR_TYPE_FK = "fk";
 	public static String CAR_TYPE_STN = "stn";
 	public static String CAR_TYPE_OTHER = "other";
-	
 
-    public static String   SERVER_URL ="http://localhost:8000/";
+//    public static String   SERVER_URL ="http://localhost:8000/";
 	
-//	public static String   SERVER_URL ="http://114.215.110.185:8000/";
+	public static String   SERVER_URL ="http://114.215.110.185:8000/";
 
     public static String   SERVER_URL2 ="http://114.215.110.185/";
 
@@ -55,7 +54,7 @@ public class Constants {
 
     public static String   YUECHE_DETAIL_URL = SERVER_URL + "a/yueche/%d/";
     
-    public static String   YUECHE_SCAN_URL = SERVER_URL + "a/yueche/scan/";
+    public static String   YUECHE_SCAN_URL = SERVER_URL + "a/yueche/scan/longquan/?yc_date=%s";
     
     public static String   COOKIE_URL = SERVER_URL + "a/cookie/all/";
     

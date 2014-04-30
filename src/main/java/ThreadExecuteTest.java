@@ -15,18 +15,10 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sohu.wap.XueYuanAccount;
 import com.sohu.wap.YueCheHelper;
-import com.sohu.wap.YueCheInfo;
-import com.sohu.wap.YueCheTask;
 
-import com.sohu.wap.proxy.ConfigHttpProxy;
-import com.sohu.wap.proxy.Host;
 import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.NetSystemConfigurations;
-import com.sohu.wap.util.ThreadPool;
-import com.sohu.wap.util.ThreadUtil;
-
 
 
 /**

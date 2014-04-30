@@ -612,6 +612,16 @@ public class YueChe {
                     resultN = CAR_TYPE_ERROR;
                     break;
                 }
+                if(bookResult.indexOf("成功")!= -1 ) {
+                    System.out.println("预约成功!...");
+						String info = ""+date + ":"
+								+ xnsd + "-"
+								+ selectedCar.getString("JLCBH");
+						result.setData(info);
+						System.out.println(info);
+						log.info(info);
+						resultN = BOOK_CAR_SUCCESS;
+                }
 
                 log.info(bookResult);
 
@@ -621,14 +631,7 @@ public class YueChe {
 //					// {"d":"[\r\n  {\r\n    \"Result\": true,\r\n    \"OutMSG\": \"\"\r\n  }\r\n]"}
 //
 //					if (jbResult.getJSONObject(0).getBoolean("Result")) {
-//						System.out.println("预约成功!...");
-//						String info = ""+selectedCar.getString("YYRQ") + ":"
-//								+ selectedCar.getString("XNSD") + "-"
-//								+ selectedCar.getString("CNBH");
-//						result.setData(info);
-//						System.out.println(info);
-//						log.info(info);
-//						resultN = BOOK_CAR_SUCCESS;
+//
 //
 //					} else {
 //

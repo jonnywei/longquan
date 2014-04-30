@@ -16,7 +16,6 @@ import com.sohu.wap.proxy.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sohu.wap.bo.VerifyCode;
 import com.sohu.wap.proxy.ConfigHttpProxy;
 import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.NetSystemConfigurations;
@@ -90,16 +89,16 @@ public class LongQuanNetMain
             List<Future<Integer>> resultList = new ArrayList<Future<Integer>>();  
             
             //约车日期
-            String date =  DateUtil.getFetureDay(11);
+            String date =  DateUtil.getFetureDay(13);
             String dateModel = NetSystemConfigurations.getSystemStringProperty("system.yueche.date.model", "auto");
             
             if(dateModel.equals("config")){
-            	 date = NetSystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(11));
+            	 date = NetSystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(13));
             }
             
             System.out.println("抢车日期为:"+ date);
 
-            long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
             
 
         YueCheInfo  ycInfo = new YueCheInfo(carType, date);
@@ -111,7 +110,7 @@ public class LongQuanNetMain
         ExecutorService executeService = Executors.newFixedThreadPool(2 + ycInfo.getYueCheInfo().size() * threadPerUserNum );
             
             for (Integer accoutId: ycInfo.getYueCheInfo().keySet()){
-                XueYuanAccount  xy = ycInfo.getYueCheInfo().get(accoutId);
+                YueCheItem xy = ycInfo.getYueCheInfo().get(accoutId);
                 if ( xy!=null){
                 	for ( int num = 0 ; num < threadPerUserNum; num++){
                         Host proxyHost = null;

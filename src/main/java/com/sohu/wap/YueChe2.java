@@ -346,7 +346,7 @@
 //						
 //						yucheTry++;
 //					
-//						if (XueYuanAccount.BOOK_CAR_SUCCESS == intResult) {
+//						if (YueCheItem.BOOK_CAR_SUCCESS == intResult) {
 //							System.out.println("预约成功!...");
 //							String info = "Info:"+selectedCar.getString("YYRQ") + ":"
 //									+ selectedCar.getString("XNSD") + "-"
@@ -354,7 +354,7 @@
 //							result.setData(info);
 //							System.out.println(info);
 //							log.info(info);
-//							resultN =XueYuanAccount.BOOK_CAR_SUCCESS;
+//							resultN =YueCheItem.BOOK_CAR_SUCCESS;
 //						
 //						} else {
 //							
@@ -373,7 +373,7 @@
 //					}
 //				}
 //					
-//			} while (resultN != XueYuanAccount.BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
+//			} while (resultN != YueCheItem.BOOK_CAR_SUCCESS && yucheTry < YUCHE_RETRY_TIME);
 //		} catch (JSONException e) {
 //			log.error("error,", e);
 //			e.printStackTrace();

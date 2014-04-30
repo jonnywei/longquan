@@ -12,11 +12,8 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sohu.wap.proxy.ConfigHttpProxy;
-import com.sohu.wap.proxy.Host;
 import com.sohu.wap.util.DateUtil;
 import com.sohu.wap.util.NetSystemConfigurations;
-import com.sohu.wap.util.SystemConfigurations;
 import com.sohu.wap.util.ThreadPool;
 
 
@@ -62,7 +59,7 @@ public class HaijiaMain
       
         
         for (String accoutId: AccountMap.getInstance().getXueYuanAccountMap().keySet()){
-            XueYuanAccount  xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);
+            YueCheItem xy =AccountMap.getInstance().getXueYuanAccountMap().get(accoutId);
             if ( xy!=null){
                  YueCheTask yueCheTask = new YueCheTask(xy,date,null);
                  resultList.add(executeService.submit(yueCheTask) );

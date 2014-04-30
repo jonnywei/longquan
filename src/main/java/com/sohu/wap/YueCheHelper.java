@@ -325,7 +325,8 @@ public class YueCheHelper
        		
        		JSONObject yc =  ycArray.getJSONObject(index);
        		
-       		XueYuanAccount xyAccount = XueYuanAccount.jsonToXueYuanAccount(yc);
+       		YueCheItem xyAccount = YueCheItem.jsonToYueCheItem(yc);
+
        		log.debug(xyAccount.toString());
        		result = xyAccount.getYcResult();
        		
