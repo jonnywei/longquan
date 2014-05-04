@@ -616,11 +616,15 @@ public class YueChe {
                     System.out.println("预约成功!...");
 						String info = ""+date + ":"
 								+ xnsd + "-"
-								+ selectedCar.getString("JLCBH");
+								+ selectedCar.getString("CNBH");
 						result.setData(info);
 						System.out.println(info);
 						log.info(info);
 						resultN = BOOK_CAR_SUCCESS;
+                }
+                if ("您该科目的训练小时将超出学时数!请核对!".equals(bookResult)){
+                    resultN = KEMU2_NO_TIME;
+	                 break;
                 }
 
                 log.info(bookResult);
