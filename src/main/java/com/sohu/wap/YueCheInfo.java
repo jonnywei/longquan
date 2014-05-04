@@ -107,7 +107,7 @@ public class YueCheInfo {
     
     
     public static void main(String[] args){
-    	YueCheInfo ycInfo = new YueCheInfo("qr","2014-05-11");
+    	YueCheInfo ycInfo = new YueCheInfo("qr","20140513");
     }
     
 

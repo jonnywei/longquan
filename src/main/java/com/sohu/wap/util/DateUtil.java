@@ -199,13 +199,38 @@ public class DateUtil
         return   new Date();
     }
 
+
+    public static Date getDate2(String dstr, String format){
+
+        SimpleDateFormat df =new SimpleDateFormat(format );
+        try {
+            Date time =   df.parse(dstr);
+
+            return time;
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return   new Date();
+    }
     /**
      * 得到含有折线的日期
      * @param dstr
      * @return
      */
     public static String getDashDate(String dstr){
-        return  getFormatTime(getDate(dstr,"yyyyMMdd"),"yyyy-MM-dd");
+
+        SimpleDateFormat df =new SimpleDateFormat("yyyyMMdd" );
+        SimpleDateFormat df2 =new SimpleDateFormat("yyyy-MM-dd" );
+        try {
+            Date time =   df.parse(dstr);
+
+         return    df2.format(time);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return  null;
     }
     
     

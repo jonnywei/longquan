@@ -40,7 +40,7 @@ public class LongQuanNetMain
         int status = YueCheHelper.STATUS_DISPATCH;
 
         //初始化confighttpproxy
-        ConfigHttpProxy.start();
+//        ConfigHttpProxy.start();
 
         while(true){
 
@@ -95,7 +95,7 @@ public class LongQuanNetMain
             if(dateModel.equals("config")){
             	 date = NetSystemConfigurations.getSystemStringProperty("system.yueche.date", DateUtil.getFetureDay(13));
             }
-            
+
             System.out.println("抢车日期为:"+ date);
 
         long startTime = System.currentTimeMillis();
@@ -114,9 +114,9 @@ public class LongQuanNetMain
                 if ( xy!=null){
                 	for ( int num = 0 ; num < threadPerUserNum; num++){
                         Host proxyHost = null;
-                         if (YueCheHelper.isUseProxy() ){
-                              proxyHost = ConfigHttpProxy.getInstance().getRandomHost();
-                         }
+//                         if (YueCheHelper.isUseProxy() ){
+//                              proxyHost = ConfigHttpProxy.getInstance().getRandomHost();
+//                         }
                         YueCheTask yueCheTask = new YueCheTask(xy,date,proxyHost );
                         resultList.add(executeService.submit(yueCheTask) );
 
@@ -172,7 +172,7 @@ public class LongQuanNetMain
 
         System.out.println("doYueChe15");
         try {
-            doYueChe("qy");
+            doYueChe("qr");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -42,17 +42,28 @@ public class ScanYueCheTask extends YueCheTask {
            int result =0;
 
 		 try {
-//
-             log.info(this.xueYuanAccount.getUserName()+"  yueche thread start!");
-             doLogin ();
-             System.out.println(xueYuanAccount.getUserName());
 
-             for (YueCheItem yueCheItem : xueYuanAccount.getYueCheItemList()){
-                 doYuche(yueCheItem);
-                 if (yueCheItem.isBookSuccess()){
-                     result =0;
+             log.info(this.xueYuanAccount.getUserName()+" yueche thread start!");
+
+             int loginResult = doLogin();
+
+             if ( loginResult == 0 ){
+                 System.out.println(xueYuanAccount.getUserName());
+
+                 for (YueCheItem yueCheItem : xueYuanAccount.getYueCheItemList()){
+                     doYuche(yueCheItem);
+                     if (yueCheItem.isBookSuccess()){
+                         result =0;
+                     }
+                 }
+             } else if ( loginResult == 3 ) {
+                 String info ="accountError:"+ xueYuanAccount.getUserName()+","+ xueYuanAccount.getPassword();
+                 log.error(info);
+                 for (YueCheItem yueCheItem : xueYuanAccount.getYueCheItemList()){
+                     YueCheHelper.updateYueCheBookInfo(yueCheItem.getId(), YueCheItem.BOOK_CAR_ACCOUNT_ERROR, info);
                  }
              }
+
         } catch (InterruptedException e) {
               log.error("cancel task! ");
                result =2;
@@ -154,9 +165,17 @@ public class ScanYueCheTask extends YueCheTask {
 		}
 		return NO_CAR;
 	}
-	
-	
-	private  void  doLogin () throws InterruptedException {
+
+
+    /**
+     *
+     *0 登录成功
+     *1 登录失败
+     *2 已经约车成功
+     *3 账号密码错误
+     *3 无法进行下一步了
+     * */
+	private  int  doLogin () throws InterruptedException {
 		
 		long currentTime = System.currentTimeMillis();
 		
@@ -172,10 +191,13 @@ public class ScanYueCheTask extends YueCheTask {
 	             }else{
 	                 first = false;
 	             }
-	          int result =  login(xueYuanAccount.getUserName() , xueYuanAccount.getPassword());
-	          if (result == YueChe.LONGIN_SUCCESS){
+	          int loginResult =  login(xueYuanAccount.getUserName() , xueYuanAccount.getPassword());
+	          if (loginResult == YueChe.LONGIN_SUCCESS){
 	              isLoginSuccess =  true;
-	          }
+	          } else if( loginResult == YueChe.LONGIN_ACCOUNT_ERROR ){
+
+                  return 3;
+              }
 	           
 	       }while (!isLoginSuccess);
 	        
@@ -186,6 +208,7 @@ public class ScanYueCheTask extends YueCheTask {
 	        log.info(xueYuanAccount.getUserName()+" retain login status!");
 
 		}
+        return 0;
         
     }
 	
@@ -224,7 +247,7 @@ public class ScanYueCheTask extends YueCheTask {
              
           if (result == YueChe.BOOK_CAR_SUCCESS){
               isSuccess = true;
-              String info = yueCheItem.getUserName() +":"+ret.getData()+":"+date+ YueCheHelper.AMPM.get(amPm)+"约车成功";
+              String info = yueCheItem.getUserName() +":"+ret.getData()+":"+date +"约车成功";
               System.out.println(info);
               log.info(info);
               YueCheHelper.updateYueCheBookInfo(yueCheItem.getUserName(),date, YueCheItem.BOOK_CAR_SUCCESS, info);

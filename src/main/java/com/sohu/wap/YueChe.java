@@ -423,7 +423,7 @@ public class YueChe {
             json.put("filters[orderby]","");
             json.put("filters[type]","km2Car");
             json.put("filters[xllxid]", hiddenKM);
-            json.put("filters[xnsd]", amOrpm);
+            json.put("filters[xnsd]", "-1");
             json.put("filters[yyrq]", date);
             json.put("orderBy","");
 			json.put("pagesize", 30);
@@ -612,7 +612,7 @@ public class YueChe {
                     resultN = CAR_TYPE_ERROR;
                     break;
                 }
-                if(bookResult.indexOf("成功")!= -1 ) {
+                if(bookResult.indexOf("操作成功")!= -1 ) {
                     System.out.println("预约成功!...");
 						String info = ""+date + ":"
 								+ xnsd + "-"
