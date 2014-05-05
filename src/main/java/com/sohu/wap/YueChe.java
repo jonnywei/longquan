@@ -532,10 +532,10 @@ public class YueChe {
                 do{
                     selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
 
-                    String[]  xnsds =  selectedCar.getString("XNSD").split("[,]");
+                    String[]  xnsds =  selectedCar.getString("XNSD").split(",");
                     for(int i =0; i< xnsds.length; i++){
                         String xnsd1 = xnsds[i];
-                        String[] info = xnsd1.split("[.]");
+                        String[] info = xnsd1.replace('.','#').split("#");
                         String sdname = info[0];
                         String sdid = info[1];
                         String sl = info[2];

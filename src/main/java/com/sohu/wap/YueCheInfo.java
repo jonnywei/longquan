@@ -107,7 +107,24 @@ public class YueCheInfo {
     
     
     public static void main(String[] args){
-    	YueCheInfo ycInfo = new YueCheInfo("qr","20140513");
+        long start = System.currentTimeMillis();
+        for (int n=0; n< 1000000; n++){
+          String b=  "08:00-12:00.812.0,13:00-17:00.15.4,17:00-20:00.58.0,".replace('.','#');
+              ;
+            String[]  xnsds =  b.split(",");
+            for(int i =0; i< xnsds.length; i++){
+                String xnsd1 = xnsds[i];
+                String[] info = xnsd1.split("#");
+                String sdname = info[0];
+                String sdid = info[1];
+                String sl = info[2];
+
+                System.out.println(sdname+sdid+sl);
+        }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println(end-start);
+//    	YueCheInfo ycInfo = new YueCheInfo("qr","20140513");
     }
     
 
