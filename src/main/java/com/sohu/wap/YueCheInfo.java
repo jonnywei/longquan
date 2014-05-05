@@ -6,6 +6,8 @@
  */
 package com.sohu.wap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sohu.wap.util.DateUtil;
@@ -108,27 +110,65 @@ public class YueCheInfo {
     
     public static void main(String[] args){
         long start = System.currentTimeMillis();
+
+        String b=  "08:00-12:00.812.0,13:00-17:00.15.4,17:00-20:00.58.0,";
+
         for (int n=0; n< 1000000; n++){
-          String b=  "08:00-12:00.812.0,13:00-17:00.15.4,17:00-20:00.58.0,".replace('.','#');
-              ;
-            String[]  xnsds =  b.split(",");
+            String[]  xnsds =  splitString(b,',');
             for(int i =0; i< xnsds.length; i++){
                 String xnsd1 = xnsds[i];
-                String[] info = xnsd1.split("#");
+                String[] info = splitString(xnsd1,'.');
                 String sdname = info[0];
                 String sdid = info[1];
                 String sl = info[2];
 
-                System.out.println(sdname+sdid+sl);
-        }
+//            System.out.println(sdname+" "+sdid+" "+sl);
+            }
         }
         long end = System.currentTimeMillis();
         System.out.println(end-start);
-//    	YueCheInfo ycInfo = new YueCheInfo("qr","20140513");
+
+
+//
+        for (int n=0; n< 1000000; n++){
+
+            String[]  xnsds =  b.split(",");
+            for(int i =0; i< xnsds.length; i++){
+                String xnsd1 = xnsds[i];
+                String[] info = xnsd1.split("[.]");
+                String sdname = info[0];
+                String sdid = info[1];
+                String sl = info[2];
+
+        }
+        }
+        long end2 = System.currentTimeMillis();
+        System.out.println(end2-end);
     }
     
 
-    
+        private static   String [] splitString (String str, char ch) {
+
+            List <String> list = new ArrayList<String>();
+            int length = str.length();
+            int lastIndex = 0;
+           for(int index =0;  index < length; index ++){
+               char c = str.charAt(index);
+               if(ch == c)  {
+                   list.add(str.substring(lastIndex, index));
+                   lastIndex = index +1;
+               }
+           }
+           if (lastIndex !=length )  {
+               list.add(str.substring(lastIndex));
+           }
+           String [] result = new String[list.size()];
+           for (int i =0; i< result.length; i++){
+               result[i] = list.get(i);
+           }
+
+            return   result ;
+        }
    
     
 }

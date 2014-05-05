@@ -12,9 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -532,10 +530,10 @@ public class YueChe {
                 do{
                     selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
 
-                    String[]  xnsds =  selectedCar.getString("XNSD").split(",");
+                    String[]  xnsds = splitString(selectedCar.getString("XNSD"),',');
                     for(int i =0; i< xnsds.length; i++){
                         String xnsd1 = xnsds[i];
-                        String[] info = xnsd1.replace('.','#').split("#");
+                        String[] info = splitString(xnsd1,'.');
                         String sdname = info[0];
                         String sdid = info[1];
                         String sl = info[2];
@@ -1238,5 +1236,31 @@ public class YueChe {
     public void setHttpUtil4(HttpUtil4 httpUtil4) {
         this.httpUtil4 = httpUtil4;
     }
-	
+
+
+
+    private static   String [] splitString (String str, char ch) {
+
+        List<String> list = new ArrayList<String>();
+        int length = str.length();
+        int lastIndex = 0;
+        for(int index =0;  index < length; index ++){
+            char c = str.charAt(index);
+            if(ch == c)  {
+                list.add(str.substring(lastIndex, index));
+                lastIndex = index +1;
+            }
+        }
+        if (lastIndex !=length )  {
+            list.add(str.substring(lastIndex));
+        }
+        String [] result = new String[list.size()];
+        for (int i =0; i< result.length; i++){
+            result[i] = list.get(i);
+        }
+
+        return   result ;
+    }
+
+
 }
