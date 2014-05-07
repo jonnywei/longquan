@@ -44,8 +44,6 @@ public class Constants {
 	
 	public static String   SERVER_URL ="http://114.215.110.185:8000/";
 
-    public static String   SERVER_URL2 ="http://114.215.110.185/";
-
     public static String   CONFIG_URL = SERVER_URL + "a/config/";
     
     public static String   YUECHE_URL = SERVER_URL + "a/yueche/?jx=longquan&yc_date=%s";
@@ -62,7 +60,7 @@ public class Constants {
     
     public static String   PROXY_ADD_URL = SERVER_URL + "a/proxy/add/";
     
-    public static String   PROXY_URL = SERVER_URL2 + "a/proxy/all/";
+    public static String   PROXY_URL = SERVER_URL + "a/proxy/all/";
     
     public static String   YUECHE_UPDATE_URL = SERVER_URL + "a/yueche/%d/update/";
     
