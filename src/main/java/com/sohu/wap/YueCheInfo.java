@@ -111,7 +111,7 @@ public class YueCheInfo {
     public static void main(String[] args){
         long start = System.currentTimeMillis();
 
-        String b=  "08:00-12:00.812.0,13:00-17:00.15.4,17:00-20:00.58.0,";
+        String b=  "08:00-12:00.812.0,13:00-17:00.15.0,17:00-20:00.58.3,";
 
         for (int n=0; n< 1000000; n++){
             String[]  xnsds =  splitString(b,',');

@@ -512,7 +512,7 @@ public class YueChe {
 			// 下一步，约车
 			int yucheTry = 0;
 
-            //     车辆信息
+            //     车辆信息        812,15,58
             //       {
 //                "JLCBH": "611290",
 //                    "CNBH": "15131",
@@ -527,6 +527,7 @@ public class YueChe {
                 JSONObject selectedCar = null;
                 boolean selectedCarSuccess = false;
                 String xnsd=null;
+                int selectCarRetryCount = 0;
                 do{
                     selectedCar = carsArray.getJSONObject(RandomUtil.getRandomInt(carsArray.length()));
 
@@ -543,7 +544,14 @@ public class YueChe {
                             break;
                         }
                     }
-                } while (!selectedCarSuccess);
+                    selectCarRetryCount ++;
+                } while (!selectedCarSuccess && selectCarRetryCount < 150);
+                if (!selectedCarSuccess){         //如果没有选车成功的话
+                    log.info("idle car not match");
+                    resultN = NO_CAR;
+                    result.setRet(resultN);
+                    return result;
+                }
 
                 log.info("选择的车是：" + selectedCar.toString());
                 System.out.println("选择的车是：" + selectedCar.toString());
@@ -1239,7 +1247,7 @@ public class YueChe {
 
 
 
-    private static   String [] splitString (String str, char ch) {
+    private   String [] splitString (String str, char ch) {
 
         List<String> list = new ArrayList<String>();
         int length = str.length();
