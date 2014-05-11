@@ -47,6 +47,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -586,12 +587,13 @@ public class HttpUtil4
 		 
 		} catch (ClientProtocolException e)
 		{
-			log.error("error! " +e.getMessage());
-			e.printStackTrace();
-		} catch (IOException e)
+			log.error("error! " +e.getMessage(),e);
+		}catch (HttpHostConnectException e){
+            log.error("error! " +e.getMessage(),e);
+        }
+        catch (IOException e)
 		{
-			log.error("error! " +e.getMessage());
-			e.printStackTrace();
+			log.error("error! " +e.getMessage(),e);
 		}finally{
 		    if(!httpGet.isAborted()){
 		        httpGet.abort();

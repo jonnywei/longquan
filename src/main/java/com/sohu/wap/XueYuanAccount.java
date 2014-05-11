@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * 
@@ -105,7 +106,7 @@ public class XueYuanAccount {
 
     private String phoneNum; //海驾预留的手机或者电话号码
 
-    List<YueCheItem>  yueCheItemList  = new ArrayList<YueCheItem>();
+    List<YueCheItem>  yueCheItemList  = new Vector<YueCheItem>();
 
 
 

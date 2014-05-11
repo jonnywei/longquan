@@ -62,12 +62,16 @@ public class ScanYueCheTask extends YueCheTask {
                  for (YueCheItem yueCheItem : xueYuanAccount.getYueCheItemList()){
                      YueCheHelper.updateYueCheBookInfo(yueCheItem.getId(), YueCheItem.BOOK_CAR_ACCOUNT_ERROR, info);
                  }
+             } else {
+                 log.error("login error,exit");
              }
 
         } catch (InterruptedException e) {
               log.error("cancel task! ");
                result =2;
-        }
+        } catch (Exception ex){
+             log.error("connetion exception",ex);
+         }
         return result;
 
 	}
@@ -173,7 +177,7 @@ public class ScanYueCheTask extends YueCheTask {
      *1 登录失败
      *2 已经约车成功
      *3 账号密码错误
-     *3 无法进行下一步了
+     *4 无法进行下一步了
      * */
 	private  int  doLogin () throws InterruptedException {
 		
@@ -184,23 +188,32 @@ public class ScanYueCheTask extends YueCheTask {
 		if ( ! isLogon || (currentTime - lastLoginTime > YueCheHelper.LOGIN_SESSION_TIMEOUT_MILLISECOND) ){
 			boolean  isLoginSuccess = false;
 	        boolean first = true;
+            int count =0;
 	        do {
-	             if (!first){
-	                 log.error("login error. retry!");
-	                 ThreadUtil.sleep(  RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
-	             }else{
-	                 first = false;
-	             }
+//	             if (!first){
+//	                 log.error("login error. retry!");
+//	                 ThreadUtil.sleep(  RandomUtil.getRandomInt(YueCheHelper.MAX_SLEEP_TIME));
+//	             }else{
+//	                 first = false;
+//	             }
 	          int loginResult =  login(xueYuanAccount.getUserName() , xueYuanAccount.getPassword());
 	          if (loginResult == YueChe.LONGIN_SUCCESS){
 	              isLoginSuccess =  true;
 	          } else if( loginResult == YueChe.LONGIN_ACCOUNT_ERROR ){
-
-                  return 3;
+                    return 3;
+              }else if(loginResult == YueChe.LONGIN_PROXY_ERROR || loginResult == YueChe.LONGIN_IP_FORBIDDEN ){
+                    log.error("proxy error or ip forbidden !");
+                    return 4;
+              } else if (loginResult == YueChe.LONGIN_ERROR){
+                  count ++;
+                  ThreadUtil.sleep(0.5f);
               }
 	           
-	       }while (!isLoginSuccess);
-	        
+	       }while (!isLoginSuccess && count < 50); //重试100次
+
+            if (!isLoginSuccess){
+                return 4;
+            }
 	        isLogon = true;
 	        lastLoginTime = System.currentTimeMillis();
 	        log.info(xueYuanAccount.getUserName()+" login success!");
@@ -261,7 +274,11 @@ public class ScanYueCheTask extends YueCheTask {
           }else if (result == YueChe.ALREADY_BOOKED_CAR){  //无车
               System.out.println(date+"该日已经预约车辆。不能在约车了！");
               break;
-          }else {  //无车
+          }else if (result == YueChe.YUE_CHE_TIME_EXPIRES){
+              log.error("时段过期了，不约了");
+              break;
+          }
+          else {  //无车
               System.out.println("未知错误！重试!RUSULT="+result);
           }
           

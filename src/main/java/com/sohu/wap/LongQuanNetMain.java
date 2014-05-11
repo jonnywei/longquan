@@ -40,7 +40,7 @@ public class LongQuanNetMain
         int status = YueCheHelper.STATUS_DISPATCH;
 
         //初始化confighttpproxy
-//        ConfigHttpProxy.start();
+        ConfigHttpProxy.start();
 
         while(true){
 
@@ -114,9 +114,9 @@ public class LongQuanNetMain
                 if ( xy!=null){
                 	for ( int num = 0 ; num < threadPerUserNum; num++){
                         Host proxyHost = null;
-//                         if (YueCheHelper.isUseProxy() ){
-//                              proxyHost = ConfigHttpProxy.getInstance().getRandomHost();
-//                         }
+                         if (YueCheHelper.isUseProxy() ){
+                              proxyHost = ConfigHttpProxy.getInstance().getRandomHost();
+                         }
                         YueCheTask yueCheTask = new YueCheTask(xy,date,proxyHost );
                         resultList.add(executeService.submit(yueCheTask) );
 

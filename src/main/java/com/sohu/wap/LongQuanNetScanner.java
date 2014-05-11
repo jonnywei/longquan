@@ -82,7 +82,7 @@ public class LongQuanNetScanner
                 for ( int num = 0 ; num < threadPerUserNum; num++){
                     Host proxyHost = null;
 //                    if (YueCheHelper.isUseProxy() ){
-//                        proxyHost = ConfigHttpProxy.getInstance().getRandomHost();
+                        proxyHost = ConfigHttpProxy.getInstance().getRandomHost();
 //                    }
                     ScanYueCheTask yueCheTask = new ScanYueCheTask(xy,proxyHost);
                     resultList.add(executeService.submit(yueCheTask) );

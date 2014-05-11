@@ -96,6 +96,7 @@ public class YueChe {
 	public static int NOT_BOOK_WEEKEND_CAR = 800005;
 	public static int KEMU2_NO_TIME=10003;
 	public static int IP_FORBIDDEN = 1000333;
+    public static int YUE_CHE_TIME_EXPIRES=10004; //
 	/**
 	 * 
 	 *
@@ -632,6 +633,10 @@ public class YueChe {
                     resultN = KEMU2_NO_TIME;
 	                 break;
                 }
+                if ("不可预约已过期的时段".equals(bookResult)){
+                    resultN = YUE_CHE_TIME_EXPIRES;
+                    break;
+                }
 
                 log.info(bookResult);
 
@@ -797,7 +802,7 @@ public class YueChe {
 		String imgDir = "d:/haijia/img";
 		String comand = "ping	" ; //都有的命令
 		if (OSUtil.getOSType() ==OSUtil.LINUX){
-			imgDir = SystemConfigurations.getSystemStringProperty("system.img.linux.dir", "/home/wjj/haijia/img");
+			imgDir = SystemConfigurations.getSystemStringProperty("system.img.linux.dir", "/tmp");
 			comand = "eog	" ;
 		}else{
 			imgDir = SystemConfigurations.getSystemStringProperty("system.img.dir", "d:/haijia/img");

@@ -31,7 +31,7 @@ public abstract class AbstractHttpProxy implements HttpProxy {
 
 	protected ConcurrentHashMap<String, Host> HOST_MAP = new ConcurrentHashMap<String, Host>();
 
-	protected static long initialDelay =  20*60 ;
+	protected static long initialDelay =  0*60 ;
 
 	protected static long delay = 60 * 60;
 	
